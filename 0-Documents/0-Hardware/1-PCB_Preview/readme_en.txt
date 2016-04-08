@@ -1,0 +1,1 @@
+PCB-Layout preview picture
