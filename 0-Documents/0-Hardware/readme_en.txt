@@ -1,1 +1,0 @@
-This folder include all pcb-layout project files and chip docments.
