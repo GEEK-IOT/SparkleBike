@@ -4,11 +4,40 @@ import android.app.Activity;
 import android.os.Bundle;
 
 /**
- * Created by 80119424 on 2016/4/6.
+ * MainActivity
+ * @Auther Cocoonshu
+ * @Date   2016-04-11 19:17:15
  */
-public class MainActivity extends Activity{
+public class MainActivity extends Activity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
 }
