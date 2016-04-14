@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">SparkleBike</string>
+    <string name="main_activity_drawer_layout_hide_desc">Hide Menu</string>
+    <string name="main_activity_drawer_layout_show_desc">Show Menu</string>
+
+    <string name="SharedElementName_FloatingActionButton">FloatingActionButton</string>
 </resources>
