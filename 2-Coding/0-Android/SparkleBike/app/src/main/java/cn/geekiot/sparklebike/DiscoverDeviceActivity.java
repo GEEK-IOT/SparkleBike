@@ -83,7 +83,7 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
             mFloatingActionButton.getGlobalVisibleRect(floatActionButtonRect);
             final Animator expandBackgroundAnimator = ViewAnimationUtils.createCircularReveal(
                     mBackgroundRippleView, floatActionButtonRect.centerX(), floatActionButtonRect.centerY(),
-                    0, (int)Math.hypot(mBackgroundRippleView.getWidth() * 0.5f, mBackgroundRippleView.getHeight() * 0.5f)
+                    0, (int)Math.hypot(mBackgroundRippleView.getWidth(), mBackgroundRippleView.getHeight())
             );
             expandBackgroundAnimator.addListener(new Animator.AnimatorListener() {
 
