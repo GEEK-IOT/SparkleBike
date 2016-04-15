@@ -4,11 +4,12 @@ import android.animation.Animator;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +17,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +33,8 @@ import com.cobox.utils.SDK;
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "MainActivity";
 
+    private Handler                 mAnimationHandler        = new Handler();
+    private View                    mBackgroundRippleView    = null;
     private CoordinatorLayout       mCoordinatorLayout       = null;
     private Toolbar                 mToolBar                 = null;
     private CollapsingToolbarLayout mCollapsingToolbarLayout = null;
@@ -111,26 +113,34 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupWindowStyle() {
         Window window = getWindow();
+        Transition enterTransition = TransitionInflater.from(MainActivity.this).inflateTransition(R.transition.discover_device_activity_enter_anim);
+        Transition exitTransition = TransitionInflater.from(MainActivity.this).inflateTransition(R.transition.discover_device_activity_exit_anim);
+        Transition sharedElementEnterTransition = TransitionInflater.from(MainActivity.this).inflateTransition(R.transition.discover_device_activity_shared_element_enter_anim);
+        Transition sharedElementExitTransition = TransitionInflater.from(MainActivity.this).inflateTransition(R.transition.discover_device_activity_shared_element_exit_anim);
+
         window.requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
-        window.setSharedElementEnterTransition(TransitionInflater.from(MainActivity.this).inflateTransition(R.transition.discover_device_activity_shared_element_enter_anim));
-        window.setSharedElementExitTransition(TransitionInflater.from(MainActivity.this).inflateTransition(R.transition.discover_device_activity_shared_element_exit_anim));
+        window.setEnterTransition(enterTransition);
+        window.setExitTransition(exitTransition);
+        window.setSharedElementEnterTransition(sharedElementEnterTransition);
+        window.setSharedElementExitTransition(sharedElementExitTransition);
         window.setAllowEnterTransitionOverlap(true);
         window.setAllowReturnTransitionOverlap(true);
     }
 
     private void findContentViews() {
-        mRecyclerView = (RecyclerView) findViewById(R.id.RecyclerView);
-        mRecyclerViewHelper = new RecyclerViewHelper(mRecyclerView);
+        mRecyclerView         = (RecyclerView) findViewById(R.id.RecyclerView);
+        mRecyclerViewHelper   = new RecyclerViewHelper(mRecyclerView);
         mRecyclerViewHelper.setupRecycleView();
         mRecyclerViewHelper.fillDataSet();
 
+        mBackgroundRippleView    = findViewById(R.id.View_BackgroundRipple);
         mCoordinatorLayout       = (CoordinatorLayout) findViewById(R.id.CoordinatorLayout);
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.CollapsingToolbarLayout);
         mDrawerLayout            = (DrawerLayout) findViewById(R.id.DrawerLayout);
         mFloatingActionButton    = (FloatingActionButton) findViewById(R.id.FloatingActionButton);
         mActionBarDrawerToggle   = new ActionBarDrawerToggle(MainActivity.this, mDrawerLayout,
-                R.string.main_activity_drawer_layout_show_desc,
-                R.string.main_activity_drawer_layout_hide_desc);
+                R.string.MainActivity_DrawerLayoutShowDesc,
+                R.string.MainActivity_DrawerLayoutHideDesc);
         mDrawerLayout.setDrawerListener(mActionBarDrawerToggle);
         mCollapsingToolbarLayout.setTitle("Cocoonshu");
     }
@@ -142,9 +152,40 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 final Intent intent = new Intent(MainActivity.this, DiscoverDeviceActivity.class);
                 if (SDK.isSupportedMaterialDesign()) {
-                    startActivity(intent,
-                            ActivityOptions.makeSceneTransitionAnimation(
-                                    MainActivity.this, mFloatingActionButton, getString(R.string.SharedElementName_FloatingActionButton)).toBundle());
+                    Rect floatActionButtonRect = new Rect();
+                    mFloatingActionButton.getGlobalVisibleRect(floatActionButtonRect);
+                    final Animator expandBackgroundAnimator = ViewAnimationUtils.createCircularReveal(
+                            mBackgroundRippleView, floatActionButtonRect.centerX(), floatActionButtonRect.centerY(),
+                            0, (int)Math.hypot(mBackgroundRippleView.getWidth(), mBackgroundRippleView.getHeight())
+                    );
+                    expandBackgroundAnimator.addListener(new Animator.AnimatorListener() {
+
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            mBackgroundRippleView.setVisibility(View.VISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            startActivity(intent,
+                                    ActivityOptions.makeSceneTransitionAnimation(
+                                            MainActivity.this, mFloatingActionButton, getString(R.string.SharedElementName_FloatingActionButton)).toBundle());
+                            mBackgroundRippleView.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+                            // Do Nothing
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+                            // Do Nothing
+                        }
+
+                    });
+                    expandBackgroundAnimator.start();
+
 
                 } else {
                     startActivity(intent);

@@ -5,11 +5,11 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/ApplicationName"
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
+            android:label="@string/ApplicationName"
             android:theme="@style/AppTheme.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -26,6 +26,16 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+        <service
+            android:name="com.cobox.cosmart.devicebridge.DeviceBridgeService"
+            android:enabled="true"
+            android:exported="true"
+            android:logo="@mipmap/ic_launcher"
+            android:label="@string/DeviceBridgeServiceName">
+            <intent-filter>
+                <action android:name="com.cobox.cosmart.devicebridge.StartService" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

@@ -90,10 +90,10 @@ public class RecyclerViewHelper {
         }
 
         private String[] mContentSet = new String[] {
-                "@刀锋偏冷 如果是纯色的判断点击位置的像素点应该可以实现、",
-                "@[QQ红包]请使用新版手机QQ查收红包。  可否知道视频点播 可有第三方框架、？",
-                "https://github.com/SinaVDDeveloper",
-                "好的 我看看"
+                "CoSmart",
+                "CoBox",
+                "CoAbstract",
+                "CoUI"
         };
 
         @Override

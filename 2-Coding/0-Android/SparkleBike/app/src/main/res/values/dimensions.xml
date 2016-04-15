@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="MainActivity_AppBarHeight">256dp</dimen>
-    <dimen name="MainActivity_ToolbarLayout_ExpandedTitleMarginStart">64dp</dimen>
+    <dimen name="MainActivity_AppBarHeight">200dp</dimen>
+    <dimen name="MainActivity_ToolbarLayout_ExpandedTitleMarginStart">50dp</dimen>
     <dimen name="MainActivity_FloatingActionButton_Margin">20dp</dimen>
     <dimen name="MainActivity_FloatingActionButton_BorderWidth">0dp</dimen>
     <dimen name="MainActivity_FloatingActionButton_ShadowSize_Sink">6dp</dimen>

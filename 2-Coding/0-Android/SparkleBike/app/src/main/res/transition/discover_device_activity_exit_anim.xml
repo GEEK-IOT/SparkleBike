@@ -2,7 +2,7 @@
 <transitionSet xml:android="http://schemas.android.com/apk/res/android"
                xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <explode/>
+    <fade/>
     <changeBounds/>
     <changeTransform/>
     <changeClipBounds/>

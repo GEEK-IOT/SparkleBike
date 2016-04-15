@@ -1,7 +1,9 @@
 package com.cobox.cosmart.devicebridge;
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Binder;
 import android.os.IBinder;
 
@@ -27,6 +29,41 @@ public class DeviceBridgeService extends Service {
             return DeviceBridgeService.this;
         }
 
+    }
+
+    public static synchronized boolean startDeviceBridgeService(Activity sponsor) {
+        if (sponsor == null) {
+            return false;
+        }
+        Intent intent = new Intent(sponsor, DeviceBridgeService.class);
+        sponsor.startService(intent);
+        return true;
+    }
+
+    public static synchronized boolean stopDeviceBridgeService(Activity sponsor) {
+        if (sponsor == null) {
+            return false;
+        }
+        Intent intent = new Intent(sponsor, DeviceBridgeService.class);
+        sponsor.stopService(intent);
+        return true;
+    }
+
+    public static synchronized boolean bindDeviceBridgeService(Activity sponsor, ServiceConnection connectionListener) {
+        if (sponsor == null || connectionListener == null) {
+            return false;
+        }
+        Intent intent = new Intent(sponsor, DeviceBridgeService.class);
+        sponsor.bindService(intent, connectionListener, Service.BIND_AUTO_CREATE);
+        return true;
+    }
+
+    public static synchronized boolean unbindDeviceBridgeService(Activity sponsor, ServiceConnection connectionListener) {
+        if (sponsor == null || connectionListener == null) {
+            return false;
+        }
+        sponsor.unbindService(connectionListener);
+        return true;
     }
 
     @Override

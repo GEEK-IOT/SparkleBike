@@ -75,6 +75,14 @@
             app:pressedTranslationZ="@dimen/MainActivity_FloatingActionButton_ShadowSize_Raise"
             app:fabSize="normal" />
 
+        <!-- 涟漪背景 -->
+        <View
+            android:id="@+id/View_BackgroundRipple"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/DiscoverDeviceActivity_FloatingActionButton_TintColor"
+            android:visibility="invisible" />
+
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
