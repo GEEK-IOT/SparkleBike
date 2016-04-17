@@ -20,12 +20,13 @@
             app:expandedTitleMarginStart="@dimen/MainActivity_ToolbarLayout_ExpandedTitleMarginStart"
             app:layout_scrollFlags="scroll|exitUntilCollapsed" >
 
-            <ImageView
+            <cn.geekiot.sparklebike.ui.DiscoverDeviceAnimView
                 android:id="@+id/ImageView_ToolBarBackground"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/bg_main_activity_toolbar_background"
+                app:master_device_drawable="@mipmap/ic_phone_android_black"
+                app:slaver_device_drawable="@mipmap/ic_developer_board_black"
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.75" />
 
@@ -50,11 +51,13 @@
             android:id="@+id/FloatingActionButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/MainActivity_FloatingActionButton_Margin"
+            android:layout_marginLeft="@dimen/MainActivity_FloatingActionButton_Margin"
+            android:layout_marginRight="@dimen/MainActivity_FloatingActionButton_Margin"
+            android:layout_marginTop="-30dp"
+            android:layout_below="@id/CollapsingToolbarLayout"
             android:src="@drawable/ic_plus"
             android:transitionName="@string/SharedElementName_FloatingActionButton"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
             app:borderWidth="@dimen/MainActivity_FloatingActionButton_BorderWidth"
             app:backgroundTint="@color/MainActivity_FloatingActionButton_TintColor"
             app:rippleColor="@color/MainActivity_FloatingActionButton_RippleColor"

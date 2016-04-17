@@ -64,6 +64,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         mActionBarDrawerToggle.syncState();
+        mAnimationHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mBackgroundRippleView.setVisibility(View.INVISIBLE);
+            }
+        }, 0);
     }
 
     @Override
@@ -152,41 +158,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 final Intent intent = new Intent(MainActivity.this, DiscoverDeviceActivity.class);
                 if (SDK.isSupportedMaterialDesign()) {
-                    Rect floatActionButtonRect = new Rect();
-                    mFloatingActionButton.getGlobalVisibleRect(floatActionButtonRect);
-                    final Animator expandBackgroundAnimator = ViewAnimationUtils.createCircularReveal(
-                            mBackgroundRippleView, floatActionButtonRect.centerX(), floatActionButtonRect.centerY(),
-                            0, (int)Math.hypot(mBackgroundRippleView.getWidth(), mBackgroundRippleView.getHeight())
-                    );
-                    expandBackgroundAnimator.addListener(new Animator.AnimatorListener() {
-
-                        @Override
-                        public void onAnimationStart(Animator animation) {
-                            mBackgroundRippleView.setVisibility(View.VISIBLE);
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            startActivity(intent,
-                                    ActivityOptions.makeSceneTransitionAnimation(
-                                            MainActivity.this, mFloatingActionButton, getString(R.string.SharedElementName_FloatingActionButton)).toBundle());
-                            mBackgroundRippleView.setVisibility(View.INVISIBLE);
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
-                            // Do Nothing
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {
-                            // Do Nothing
-                        }
-
-                    });
-                    expandBackgroundAnimator.start();
-
-
+                    startActivity(intent,
+                            ActivityOptions.makeSceneTransitionAnimation(
+                                    MainActivity.this, mFloatingActionButton, getString(R.string.SharedElementName_FloatingActionButton)).toBundle());
                 } else {
                     startActivity(intent);
                 }
