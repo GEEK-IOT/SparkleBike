@@ -25,16 +25,22 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.FrameLayout;
 
+import com.cobox.cosmart.devicebridge.Device;
 import com.cobox.cosmart.devicebridge.DeviceBridgeService;
+import com.cobox.cosmart.devicebridge.listeners.OnDeviceScanListener;
+
+import java.util.List;
+
+import cn.geekiot.sparklebike.ui.DiscoverDeviceAnimView;
 
 public class DiscoverDeviceActivity extends AppCompatActivity {
-
 
     private ViewGroup               mRootLayout                            = null;
     private Toolbar                 mToolBar                               = null;
     private CollapsingToolbarLayout mCollapsingToolbarLayout               = null;
     private RecyclerView            mFoundDeviceListView                   = null;
     private FloatingActionButton    mFloatingActionButton                  = null;
+    private DiscoverDeviceAnimView  mDiscoverDeviceAnimView                = null;
     private ServiceConnection       mDeviceBridgeServiceConnectionListener = null;
     private DeviceBridgeService     mDeviceBridgeService                   = null;
 
@@ -118,6 +124,7 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
         mFoundDeviceListView     = (RecyclerView) findViewById(R.id.RecyclerView_FoundDeviceList);
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.CollapsingToolbarLayout);
         mFloatingActionButton    = (FloatingActionButton) findViewById(R.id.FloatingActionButton);
+        mDiscoverDeviceAnimView  = (DiscoverDeviceAnimView) findViewById(R.id.DiscoverDeviceAnimView_ToolBarBackground);
         mCollapsingToolbarLayout.setTitle("Scanning...");
         mCollapsingToolbarLayout.setExpandedTitleColor(0xFFFFFFFF);
     }
@@ -128,6 +135,7 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
                 mDeviceBridgeService = ((DeviceBridgeService.DeviceBridgeServiceBinder) service).getService();
+                setupDiscoverService();
                 Snackbar.make(mRootLayout, "Connected to " + mDeviceBridgeService.getClass().getSimpleName(), Snackbar.LENGTH_SHORT).show();
             }
 
@@ -138,6 +146,27 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
             }
 
         };
+    }
+
+    private void setupDiscoverService() {
+        mDeviceBridgeService.setOnDeviceScanListener(new OnDeviceScanListener() {
+            @Override
+            public void onScanStart() {
+                mDiscoverDeviceAnimView.startDiscover();
+            }
+
+            @Override
+            public void onDeviceScaned(List<Device> deviceList) {
+                mDiscoverDeviceAnimView.toggleDeviceRespone();
+            }
+
+            @Override
+            public void onScanCompleted() {
+                mDiscoverDeviceAnimView.stopDiscover();
+            }
+        });
+        mDeviceBridgeService.discoveryDevice();
+        mDiscoverDeviceAnimView.startDiscover();
     }
 
     private void discoverDevice() {

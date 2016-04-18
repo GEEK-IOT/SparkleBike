@@ -10,5 +10,7 @@ import java.util.List;
  * @Date   2016-04-11 19:51
  */
 public interface OnDeviceScanListener {
-    public void onDeviceScaned(List<Device> deviceList);
+    void onScanStart();
+    void onDeviceScaned(List<Device> deviceList);
+    void onScanCompleted();
 }
