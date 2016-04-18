@@ -11,13 +11,14 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import cn.geekiot.sparklebike.R;
+import cn.geekiot.sparklebike.graphic.WaveDrawable;
 
 /**
  * Created by Cocoonshu on 2016/4/17.
  */
 public class DiscoverDeviceAnimView extends View {
 
-    private RippleDrawable mDblRippler          = null;
+    private WaveDrawable   mDblWave             = null;
     private Drawable       mDblMasterDevice     = null;
     private Drawable       mDblSlaverDevice     = null;
     private PointF         mMasterPosition      = new PointF();
@@ -55,7 +56,7 @@ public class DiscoverDeviceAnimView extends View {
             }
         }
         typedArray.recycle();
-        mDblRippler = new RippleDrawable(ColorStateList.valueOf(0x99000000), null, null);
+        mDblWave = new WaveDrawable();
     }
 
     @Override
@@ -110,9 +111,24 @@ public class DiscoverDeviceAnimView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        mDblRippler.setRadius(50);
-        canvas.translate(mMasterPosition.x, mMasterPosition.y);
-        mDblRippler.draw(canvas);
+        drawDiscoverWave(canvas);
+        drawDeviceResponeWave(canvas);
+        drawDevices(canvas);
+    }
+
+    private boolean drawDiscoverWave(Canvas canvas) {
+        mDblWave.setPivotPoint(getWidth() * 0.5f, getHeight() * 0.5f);
+        mDblWave.setRadius(50);
+        mDblWave.draw(canvas);
+        return true;
+    }
+
+    private boolean drawDeviceResponeWave(Canvas canvas) {
+        return true;
+    }
+
+    private boolean drawDevices(Canvas canvas) {
+        return true;
     }
 
     private float computeLongthSweepPath(float currentX, float currentY) {
@@ -149,6 +165,18 @@ public class DiscoverDeviceAnimView extends View {
         if (mDblSlaverDevice != null) {
             mDblSlaverDevice.setBounds(0, 0, (int)viewWidth, (int)viewHeight);
         }
-        mDblRippler.setBounds(0, 0, (int)viewWidth, (int)viewHeight);
+        mDblWave.setBounds(0, 0, (int)viewWidth, (int)viewHeight);
+    }
+    
+    public void startDiscover() {
+        // TODO: 2016-04-18  
+    }
+    
+    public void stopDiscover() {
+        // TODO: 2016-04-18  
+    }
+    
+    public void toggleDeviceRespone() {
+        // TODO: 2016-04-18
     }
 }

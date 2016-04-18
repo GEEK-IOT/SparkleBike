@@ -21,7 +21,7 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed" >
 
             <cn.geekiot.sparklebike.ui.DiscoverDeviceAnimView
-                android:id="@+id/ImageView_ToolBarBackground"
+                android:id="@+id/DiscoverDeviceAnimView_ToolBarBackground"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
