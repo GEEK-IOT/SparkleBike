@@ -74,6 +74,10 @@ public class WaveDrawable extends Drawable {
         mIsWaveShaderDirty = true;
     }
 
+    public float getThicknessPercent() {
+        return mWaveThickness;
+    }
+
     @Override
     public void setAlpha(int alpha) {
         mDrawableAlpha = alpha * FloatAlphaUnit;
