@@ -22,6 +22,7 @@ public class DiscoverDeviceAnimView extends View {
     private WaveDrawable   mDblWave               = null;
     private Drawable       mDblMasterDevice       = null;
     private Drawable       mDblSlaverDevice       = null;
+    private int            mWaveColor             = 0xFF000000;
     private PointF         mMasterPosition        = new PointF();
     private PointF         mSlaverPosition        = new PointF();
     private float          mMasterSweepDistance   = 0;
@@ -56,12 +57,16 @@ public class DiscoverDeviceAnimView extends View {
                 case R.styleable.DiscoverDeviceAnimView_slaver_device_drawable:
                     mDblSlaverDevice = typedArray.getDrawable(i);
                     break;
+                case R.styleable.DiscoverDeviceAnimView_wave_color:
+                    mWaveColor = typedArray.getColor(i, mWaveColor);
+                    break;
                 default:
                     break;
             }
         }
         typedArray.recycle();
         mDblWave = new WaveDrawable();
+        mDblWave.setWaveColor(mWaveColor);
     }
 
     @Override

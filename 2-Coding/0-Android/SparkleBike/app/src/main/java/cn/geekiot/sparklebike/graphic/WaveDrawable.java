@@ -78,6 +78,11 @@ public class WaveDrawable extends Drawable {
         return mWaveThickness;
     }
 
+    public void setWaveColor(int waveColor) {
+        mDarkColor = waveColor;
+        mLightColor = waveColor & (0x00 << 24);
+    }
+
     @Override
     public void setAlpha(int alpha) {
         mDrawableAlpha = alpha * FloatAlphaUnit;
@@ -109,4 +114,6 @@ public class WaveDrawable extends Drawable {
             mIsWaveShaderDirty = false;
         }
     }
+
+
 }

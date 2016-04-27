@@ -3,5 +3,6 @@
     <declare-styleable name="DiscoverDeviceAnimView">
         <attr name="master_device_drawable" format="reference"/>
         <attr name="slaver_device_drawable" format="reference"/>
+        <attr name="wave_color"             format="color" />
     </declare-styleable>
 </resources>

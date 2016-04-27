@@ -27,6 +27,7 @@
                 android:scaleType="centerCrop"
                 app:master_device_drawable="@mipmap/ic_phone_android_black"
                 app:slaver_device_drawable="@mipmap/ic_developer_board_black"
+                app:wave_color="#99111111"
                 app:layout_collapseMode="parallax"
                 app:layout_collapseParallaxMultiplier="0.75" />
 

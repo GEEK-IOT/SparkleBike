@@ -1,13 +1,5 @@
 package cn.geekiot.sparklebike;
 
-import android.animation.Animator;
-import android.app.Activity;
-import android.app.Service;
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.graphics.Rect;
-import android.os.IBinder;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,14 +11,13 @@ import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.FrameLayout;
 
 import com.cobox.cosmart.devicebridge.Device;
-import com.cobox.cosmart.devicebridge.DeviceBridgeService;
+import com.cobox.cosmart.devicebridge.DeviceBridge;
+import com.cobox.cosmart.devicebridge.listeners.OnBridgeConnectionListener;
 import com.cobox.cosmart.devicebridge.listeners.OnDeviceScanListener;
 
 import java.util.List;
@@ -35,14 +26,15 @@ import cn.geekiot.sparklebike.ui.DiscoverDeviceAnimView;
 
 public class DiscoverDeviceActivity extends AppCompatActivity {
 
-    private ViewGroup               mRootLayout                            = null;
-    private Toolbar                 mToolBar                               = null;
-    private CollapsingToolbarLayout mCollapsingToolbarLayout               = null;
-    private RecyclerView            mFoundDeviceListView                   = null;
-    private FloatingActionButton    mFloatingActionButton                  = null;
-    private DiscoverDeviceAnimView  mDiscoverDeviceAnimView                = null;
-    private ServiceConnection       mDeviceBridgeServiceConnectionListener = null;
-    private DeviceBridgeService     mDeviceBridgeService                   = null;
+    private ViewGroup                  mRootLayout                         = null;
+    private Toolbar                    mToolBar                            = null;
+    private CollapsingToolbarLayout    mCollapsingToolbarLayout            = null;
+    private RecyclerView               mFoundDeviceListView                = null;
+    private FloatingActionButton       mFloatingActionButton               = null;
+    private DiscoverDeviceAnimView     mDiscoverDeviceAnimView             = null;
+    private DeviceBridge               mDeviceBridge                       = new DeviceBridge();
+    private OnDeviceScanListener       mOnDeviceScanListener               = null;
+    private OnBridgeConnectionListener mOnBridgeConnectionListener         = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,19 +49,18 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        DeviceBridgeService.bindDeviceBridgeService(
-                DiscoverDeviceActivity.this,
-                mDeviceBridgeServiceConnectionListener
-        );
+        mDeviceBridge.connectService(DiscoverDeviceActivity.this);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        DeviceBridgeService.unbindDeviceBridgeService(
-                DiscoverDeviceActivity.this,
-                mDeviceBridgeServiceConnectionListener
-        );
+        mDeviceBridge.disconnectService(DiscoverDeviceActivity.this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
@@ -80,20 +71,15 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        // noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         } else if (id == android.R.id.home) {
             finish();
             return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void setupWindowStyle() {
@@ -130,26 +116,23 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        mDeviceBridgeServiceConnectionListener = new ServiceConnection() {
+        mOnBridgeConnectionListener = new OnBridgeConnectionListener() {
 
             @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                mDeviceBridgeService = ((DeviceBridgeService.DeviceBridgeServiceBinder) service).getService();
-                setupDiscoverService();
-                Snackbar.make(mRootLayout, "Connected to " + mDeviceBridgeService.getClass().getSimpleName(), Snackbar.LENGTH_SHORT).show();
+            public void onBridgeConnected() {
+                mDeviceBridge.setOnDeviceScanListener(mOnDeviceScanListener);
+                Snackbar.make(mRootLayout, "Connected to the CoSmart Bridge", Snackbar.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onServiceDisconnected(ComponentName name) {
-                Snackbar.make(mRootLayout, "Disconnected from " + mDeviceBridgeService.getClass().getSimpleName(), Snackbar.LENGTH_SHORT).show();
-                mDeviceBridgeService = null;
+            public void onBridgeDisconnected() {
+                Snackbar.make(mRootLayout, "Disconnected from the CoSmart Bridge", Snackbar.LENGTH_SHORT).show();
             }
 
         };
-    }
 
-    private void setupDiscoverService() {
-        mDeviceBridgeService.setOnDeviceScanListener(new OnDeviceScanListener() {
+        mOnDeviceScanListener = new OnDeviceScanListener() {
+
             @Override
             public void onScanStart() {
                 mDiscoverDeviceAnimView.startDiscover();
@@ -164,15 +147,10 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
             public void onScanCompleted() {
                 mDiscoverDeviceAnimView.stopDiscover();
             }
-        });
-        mDeviceBridgeService.discoveryDevice();
-        mDiscoverDeviceAnimView.startDiscover();
+        };
+
+        mDeviceBridge.setOnBridgeConnectionListener(mOnBridgeConnectionListener);
+        mDeviceBridge.setOnDeviceScanListener(mOnDeviceScanListener);
     }
 
-    private void discoverDevice() {
-        if (mDeviceBridgeService != null) {
-            mDeviceBridgeService.discoveryDevice();
-            // TODO: 2016-04-15
-        }
-    }
 }

@@ -1,5 +1,18 @@
 package com.cobox.cosmart.devicebridge;
 
+import android.app.Activity;
+import android.app.Service;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import com.cobox.cosmart.devicebridge.DeviceBridgeService.DeviceBridgeServiceBinder;
+
+import com.cobox.cosmart.devicebridge.listeners.OnBridgeConnectionListener;
+import com.cobox.cosmart.devicebridge.listeners.OnDeviceScanListener;
+
+import java.util.List;
+
 /**
  * DeviceBridge
  * @Auther Cocoonshu
@@ -7,12 +20,114 @@ package com.cobox.cosmart.devicebridge;
  */
 public class DeviceBridge {
 
-    public void startService() {}
+    private DeviceBridgeService        mService                    = null;
+    private ServiceConnection          mServiceConnectionListener  = null;
+    private OnDeviceScanListener       mOnDeviceScanListenerAgent  = null;
+    private OnDeviceScanListener       mOnDeviceScanListener       = null;
+    private OnBridgeConnectionListener mOnBridgeConnectionListener = null;
 
-    public void stopService() {}
+    public DeviceBridge() {
+        initializeListeners();
+    }
 
-    public void connectService() {}
+    private void initializeListeners() {
+        mServiceConnectionListener = new ServiceConnection() {
 
-    public void disconnectService() {}
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                mService = ((DeviceBridgeServiceBinder)service).getService();
+                mService.addOnDeviceScanListener(mOnDeviceScanListenerAgent);
+                if (mOnBridgeConnectionListener != null) {
+                    mOnBridgeConnectionListener.onBridgeConnected();
+                }
+                mService.discoverDevice();
+            }
 
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                if (mOnBridgeConnectionListener != null) {
+                    mOnBridgeConnectionListener.onBridgeDisconnected();
+                }
+            }
+
+        };
+
+        mOnDeviceScanListenerAgent = new OnDeviceScanListener() {
+
+            @Override
+            public void onScanStart() {
+                if (mOnDeviceScanListener != null) {
+                    mOnDeviceScanListener.onScanStart();
+                }
+            }
+
+            @Override
+            public void onDeviceScaned(List<Device> deviceList) {
+                if (mOnDeviceScanListener != null) {
+                    mOnDeviceScanListener.onDeviceScaned(deviceList);
+                }
+            }
+
+            @Override
+            public void onScanCompleted() {
+                if (mOnDeviceScanListener != null) {
+                    mOnDeviceScanListener.onScanCompleted();
+                }
+            }
+
+        };
+    }
+
+    private synchronized boolean bindDeviceBridgeService(Activity sponsor, ServiceConnection connectionListener) {
+        if (sponsor == null || connectionListener == null) {
+            return false;
+        }
+        Intent intent = new Intent(sponsor, DeviceBridgeService.class);
+        sponsor.bindService(intent, connectionListener, Service.BIND_AUTO_CREATE);
+        return true;
+    }
+
+    private synchronized boolean unbindDeviceBridgeService(Activity sponsor, ServiceConnection connectionListener) {
+        if (sponsor == null || connectionListener == null) {
+            return false;
+        }
+        sponsor.unbindService(connectionListener);
+        return true;
+    }
+
+    public static boolean startService(Activity sponsor) {
+        if (sponsor == null) {
+            return false;
+        }
+        Intent intent = new Intent(sponsor, DeviceBridgeService.class);
+        sponsor.startService(intent);
+        return true;
+    }
+
+    public static boolean stopService(Activity sponsor) {
+        if (sponsor == null) {
+            return false;
+        }
+        Intent intent = new Intent(sponsor, DeviceBridgeService.class);
+        sponsor.stopService(intent);
+        return true;
+    }
+
+    public boolean connectService(Activity sponsor) {
+        return bindDeviceBridgeService(sponsor, mServiceConnectionListener);
+    }
+
+    public boolean disconnectService(Activity sponsor) {
+        mService.cancelDiscoverDevice();
+        mService.removeOnDeviceScanListener(mOnDeviceScanListenerAgent);
+        return unbindDeviceBridgeService(sponsor, mServiceConnectionListener);
+    }
+
+    public void setOnDeviceScanListener(OnDeviceScanListener listener) {
+        mOnDeviceScanListener = listener;
+    }
+
+    public void setOnBridgeConnectionListener(OnBridgeConnectionListener listener) {
+        mOnBridgeConnectionListener = listener;
+    }
 }
