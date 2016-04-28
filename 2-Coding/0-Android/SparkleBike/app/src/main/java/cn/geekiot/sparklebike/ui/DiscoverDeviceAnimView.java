@@ -1,12 +1,10 @@
 package cn.geekiot.sparklebike.ui;
 
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.RippleDrawable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.AnimationUtils;
@@ -21,16 +19,17 @@ public class DiscoverDeviceAnimView extends View {
 
     private WaveDrawable   mDblWave               = null;
     private Drawable       mDblMasterDevice       = null;
-    private Drawable       mDblSlaverDevice       = null;
+    private Drawable       mDblSlaveDevice        = null;
     private int            mWaveColor             = 0xFF000000;
     private PointF         mMasterPosition        = new PointF();
-    private PointF         mSlaverPosition        = new PointF();
+    private PointF         mSlavePosition         = new PointF();
     private float          mMasterSweepDistance   = 0;
     private float          mSlaverSweepDistance   = 0;
 
     private long           mMasterAnimStartTime   = 0;
     private boolean        mIsDiscoverAnimationOn = false;
-    private float          mWaveSpeed             = 1;
+    private float          mWaveSpeed             = 1f;   // pixel/ms
+    private long           mMasterWaveInterval    = 1000; // ms
 
     public DiscoverDeviceAnimView(Context context) {
         this(context, null);
@@ -53,9 +52,15 @@ public class DiscoverDeviceAnimView extends View {
             switch (key) {
                 case R.styleable.DiscoverDeviceAnimView_master_device_drawable:
                     mDblMasterDevice = typedArray.getDrawable(i);
+                    if (mDblMasterDevice != null) {
+                        mDblMasterDevice.setBounds(0, 0, mDblMasterDevice.getIntrinsicWidth(), mDblMasterDevice.getIntrinsicHeight());
+                    }
                     break;
                 case R.styleable.DiscoverDeviceAnimView_slaver_device_drawable:
-                    mDblSlaverDevice = typedArray.getDrawable(i);
+                    mDblSlaveDevice = typedArray.getDrawable(i);
+                    if (mDblSlaveDevice != null) {
+                        mDblSlaveDevice.setBounds(0, 0, mDblSlaveDevice.getIntrinsicWidth(), mDblSlaveDevice.getIntrinsicHeight());
+                    }
                     break;
                 case R.styleable.DiscoverDeviceAnimView_wave_color:
                     mWaveColor = typedArray.getColor(i, mWaveColor);
@@ -114,8 +119,7 @@ public class DiscoverDeviceAnimView extends View {
 
         setMeasuredDimension(measuredWidth, measuredHeight);
         refreshMasterAndSlaverPosition();
-        mMasterSweepDistance = computeLongthSweepPath(mMasterPosition.x, mMasterPosition.y, mDblWave.getThicknessPercent());
-        mSlaverSweepDistance = computeLongthSweepPath(mSlaverPosition.x, mSlaverPosition.y, mDblWave.getThicknessPercent());
+        refreshMasterWaveTimeLine();
     }
 
     @Override
@@ -140,10 +144,21 @@ public class DiscoverDeviceAnimView extends View {
             long  currentAnimTime           = AnimationUtils.currentAnimationTimeMillis();
             long  deltaAnimTime             = currentAnimTime - mMasterAnimStartTime;
             float currentMasterWaveDistance = mWaveSpeed * deltaAnimTime;
+            float masterWaveIterator        = currentMasterWaveDistance;
+            float tempMaxDistance           = (float) Math.hypot(getWidth(), getHeight());
+            
+            tempMaxDistance += tempMaxDistance * mDblWave.getThicknessPercent();
+            while (masterWaveIterator > tempMaxDistance) {
+                masterWaveIterator -= mWaveSpeed * mMasterWaveInterval;
+            }
+            while (masterWaveIterator > 0) {
+                mDblWave.setPivotPoint(mMasterPosition.x, mMasterPosition.y);
+                mDblWave.setRadius(masterWaveIterator);
+                mDblWave.draw(canvas);
 
-            mDblWave.setPivotPoint(getWidth() * 0.5f, getHeight() * 0.5f);
-            mDblWave.setRadius(currentMasterWaveDistance);
-            mDblWave.draw(canvas);
+                masterWaveIterator -= mWaveSpeed * mMasterWaveInterval;
+            }
+
         }
 
         return true;
@@ -154,7 +169,23 @@ public class DiscoverDeviceAnimView extends View {
     }
 
     private boolean drawDevices(Canvas canvas) {
-        return true;
+        if (mDblMasterDevice != null) {
+            float drawableWidth  = mDblMasterDevice.getIntrinsicWidth();
+            float drawableHeight = mDblMasterDevice.getIntrinsicHeight();
+            canvas.save();
+            canvas.translate(mMasterPosition.x - drawableWidth * 0.5f, mMasterPosition.y - drawableHeight * 0.5f);
+            mDblMasterDevice.draw(canvas);
+            canvas.restore();
+        }
+        if (mDblSlaveDevice != null) {
+            float drawableWidth  = mDblSlaveDevice.getIntrinsicWidth();
+            float drawableHeight = mDblSlaveDevice.getIntrinsicHeight();
+            canvas.save();
+            canvas.translate(mSlavePosition.x - drawableWidth * 0.5f, mSlavePosition.y - drawableHeight * 0.5f);
+            mDblSlaveDevice.draw(canvas);
+            canvas.restore();
+        }
+        return false;
     }
 
     private float computeLongthSweepPath(float currentX, float currentY, float thicknessPercent) {
@@ -172,6 +203,17 @@ public class DiscoverDeviceAnimView extends View {
                 * (1.0f + thicknessPercent);
     }
 
+    private int computeMasterSweepCount() {
+        float wholeDistanceDurationMS = mMasterSweepDistance / mWaveSpeed;
+        float sweepCount              = wholeDistanceDurationMS / mMasterWaveInterval;
+        return (int) Math.ceil(sweepCount);
+    }
+
+    private void refreshMasterWaveTimeLine() {
+        mMasterSweepDistance = computeLongthSweepPath(mMasterPosition.x, mMasterPosition.y, mDblWave.getThicknessPercent());
+        mSlaverSweepDistance = computeLongthSweepPath(mSlavePosition.x, mSlavePosition.y, mDblWave.getThicknessPercent());
+    }
+
     private void refreshMasterAndSlaverPosition() {
         float viewWidth    = getWidth();
         float viewHeight   = getHeight();
@@ -181,17 +223,10 @@ public class DiscoverDeviceAnimView extends View {
         float maxYBorder   = viewHeight - getPaddingBottom();
         float centerY      = (maxYBorder - minYBorder) * 0.5f + minYBorder;
         float masterWidth  = mDblMasterDevice != null ? mDblMasterDevice.getIntrinsicWidth() : 0;
-        float slaverWidth  = mDblSlaverDevice != null ? mDblSlaverDevice.getIntrinsicWidth() : 0;
+        float slaverWidth  = mDblSlaveDevice != null ? mDblSlaveDevice.getIntrinsicWidth() : 0;
         mMasterPosition.x = minXBorder + masterWidth * 0.5f;
-        mSlaverPosition.x = maxXBorder - slaverWidth * 0.5f;
-        mMasterPosition.y = mSlaverPosition.y = centerY;
-
-        if (mDblMasterDevice != null) {
-            mDblMasterDevice.setBounds(0, 0, (int)viewWidth, (int)viewHeight);
-        }
-        if (mDblSlaverDevice != null) {
-            mDblSlaverDevice.setBounds(0, 0, (int)viewWidth, (int)viewHeight);
-        }
+        mSlavePosition.x  = maxXBorder - slaverWidth * 0.5f;
+        mMasterPosition.y = mSlavePosition.y = centerY;
         mDblWave.setBounds(0, 0, (int)viewWidth, (int)viewHeight);
     }
     
