@@ -2,13 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="cn.geekiot.sparklebike">
 
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/ApplicationName"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".MainActivity"
+            android:name=".page.MainActivity"
             android:label="@string/ApplicationName"
             android:theme="@style/AppTheme.MainActivity" >
             <intent-filter>
@@ -18,7 +21,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DiscoverDeviceActivity"
+            android:name=".page.DiscoverDeviceActivity"
             android:theme="@style/AppTheme.DiscoverDeviceActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

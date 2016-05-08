@@ -1,10 +1,8 @@
-package cn.geekiot.sparklebike;
+package cn.geekiot.sparklebike.page;
 
-import android.animation.Animator;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -20,10 +18,12 @@ import android.transition.TransitionInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.Window;
 
 import com.cobox.utils.SDK;
+
+import cn.geekiot.sparklebike.R;
+import cn.geekiot.sparklebike.RecyclerViewHelper;
 
 /**
  * MainActivity
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton    mFloatingActionButton    = null;
 
     private RecyclerView            mRecyclerView            = null;
-    private RecyclerViewHelper      mRecyclerViewHelper      = null;
+    private RecyclerViewHelper mRecyclerViewHelper      = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

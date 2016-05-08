@@ -1,8 +1,10 @@
-package cn.geekiot.sparklebike;
+package cn.geekiot.sparklebike.page;
 
+import android.content.DialogInterface;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -22,14 +24,17 @@ import com.cobox.cosmart.devicebridge.listeners.OnDeviceScanListener;
 
 import java.util.List;
 
+import cn.geekiot.sparklebike.R;
 import cn.geekiot.sparklebike.ui.DiscoverDeviceAnimView;
+import cn.geekiot.sparklebike.ui.WiFiEnableDialog;
+import cn.geekiot.sparklebike.view.DiscoverDeviceRecycleView;
 
 public class DiscoverDeviceActivity extends AppCompatActivity {
 
     private ViewGroup                  mRootLayout                         = null;
     private Toolbar                    mToolBar                            = null;
     private CollapsingToolbarLayout    mCollapsingToolbarLayout            = null;
-    private RecyclerView               mFoundDeviceListView                = null;
+    private DiscoverDeviceRecycleView  mFoundDeviceListView                = null;
     private FloatingActionButton       mFloatingActionButton               = null;
     private DiscoverDeviceAnimView     mDiscoverDeviceAnimView             = null;
     private DeviceBridge               mDeviceBridge                       = new DeviceBridge();
@@ -107,7 +112,7 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
 
     private void findContentViews() {
         mRootLayout              = (FrameLayout) findViewById(R.id.FrameLayout_RootLayout);
-        mFoundDeviceListView     = (RecyclerView) findViewById(R.id.RecyclerView_FoundDeviceList);
+        mFoundDeviceListView     = new DiscoverDeviceRecycleView((RecyclerView) findViewById(R.id.RecyclerView_FoundDeviceList));
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.CollapsingToolbarLayout);
         mFloatingActionButton    = (FloatingActionButton) findViewById(R.id.FloatingActionButton);
         mDiscoverDeviceAnimView  = (DiscoverDeviceAnimView) findViewById(R.id.DiscoverDeviceAnimView_ToolBarBackground);
@@ -121,6 +126,7 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
             @Override
             public void onBridgeConnected() {
                 mDeviceBridge.setOnDeviceScanListener(mOnDeviceScanListener);
+                startDiscover();
                 Snackbar.make(mRootLayout, "Connected to the CoSmart Bridge", Snackbar.LENGTH_SHORT).show();
             }
 
@@ -140,6 +146,7 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
 
             @Override
             public void onDeviceScaned(List<Device> deviceList) {
+                mFoundDeviceListView.notifyDataChanged(deviceList);
                 mDiscoverDeviceAnimView.toggleDeviceRespone();
             }
 
@@ -151,6 +158,29 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
 
         mDeviceBridge.setOnBridgeConnectionListener(mOnBridgeConnectionListener);
         mDeviceBridge.setOnDeviceScanListener(mOnDeviceScanListener);
+    }
+
+    private void startDiscover() {
+        if (mDeviceBridge != null) {
+            if (!mDeviceBridge.isWiFiEnabled()) {
+                AlertDialog dialog = WiFiEnableDialog.createDialog(DiscoverDeviceActivity.this, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case DialogInterface.BUTTON_POSITIVE:
+                                mDeviceBridge.setWiFiEnabled(true);
+                                mDeviceBridge.discoverDevice();
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                break;
+                        }
+                    }
+                });
+                dialog.show();
+            } else {
+                mDeviceBridge.discoverDevice();
+            }
+        }
     }
 
 }

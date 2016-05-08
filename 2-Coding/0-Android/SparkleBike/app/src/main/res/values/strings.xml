@@ -4,5 +4,12 @@
     <string name="MainActivity_DrawerLayoutHideDesc">Hide Menu</string>
     <string name="MainActivity_DrawerLayoutShowDesc">Show Menu</string>
 
+    <string name="WiFiEnabledDialog_Title">WiFi disabled</string>
+    <string name="WiFiEnabledDialog_Message">Please turn the WiFi on</string>
+    <string name="WiFiEnabledDialog_Confirm">Confirm</string>
+    <string name="WiFiEnabledDialog_Cancel">Cancel</string>
+
+    <string name="DiscoveryDeviceActivity_Item_Ignore"><u>Ignore</u></string>
+
     <string name="SharedElementName_FloatingActionButton">FloatingActionButton</string>
 </resources>

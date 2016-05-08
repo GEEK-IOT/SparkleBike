@@ -39,6 +39,30 @@ class DeviceBridgeService extends Service {
         mServiceBinder         = new DeviceBridgeServiceBinder();
         mOnDeviceScanListeners = new LinkedList<OnDeviceScanListener>();
         mESP8266Scaner         = new ESP8266Scaner(getApplicationContext());
+        mESP8266Scaner.setOnDeviceScanListener(new OnDeviceScanListener() {
+
+            @Override
+            public void onScanStart() {
+                for (OnDeviceScanListener listener : mOnDeviceScanListeners) {
+                    listener.onScanStart();
+                }
+            }
+
+            @Override
+            public void onDeviceScaned(List<Device> deviceList) {
+                for (OnDeviceScanListener listener : mOnDeviceScanListeners) {
+                    listener.onDeviceScaned(deviceList);
+                }
+            }
+
+            @Override
+            public void onScanCompleted() {
+                for (OnDeviceScanListener listener : mOnDeviceScanListeners) {
+                    listener.onScanCompleted();
+                }
+            }
+
+        });
     }
 
     @Override
@@ -86,5 +110,15 @@ class DeviceBridgeService extends Service {
 
     public void removeOnDeviceScanListener(OnDeviceScanListener listener) {
         mOnDeviceScanListeners.remove(listener);
+    }
+
+    public void setWiFiEnabld(boolean enabled) {
+        if (mESP8266Scaner != null) {
+            mESP8266Scaner.setWiFiEnabled(enabled);
+        }
+    }
+
+    public boolean isWiFiEnabled() {
+        return mESP8266Scaner == null ? null : mESP8266Scaner.isWiFiEnabled();
     }
 }

@@ -40,7 +40,6 @@ public class DeviceBridge {
                 if (mOnBridgeConnectionListener != null) {
                     mOnBridgeConnectionListener.onBridgeConnected();
                 }
-                mService.discoverDevice();
             }
 
             @Override
@@ -129,5 +128,21 @@ public class DeviceBridge {
 
     public void setOnBridgeConnectionListener(OnBridgeConnectionListener listener) {
         mOnBridgeConnectionListener = listener;
+    }
+
+    public void setWiFiEnabled(boolean enabled) {
+        if (mService != null) {
+            mService.setWiFiEnabld(enabled);
+        }
+    }
+
+    public boolean isWiFiEnabled() {
+        return mService == null ? null : mService.isWiFiEnabled();
+    }
+
+    public void discoverDevice() {
+        if (mService != null) {
+            mService.discoverDevice();
+        }
     }
 }
