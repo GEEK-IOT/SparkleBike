@@ -1,10 +1,12 @@
 package com.cobox.cosmart.devicebridge.devicelayer;
 
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 import com.cobox.cosmart.devicebridge.Config;
 import com.cobox.cosmart.devicebridge.Device;
@@ -18,6 +20,8 @@ import java.util.List;
  * Created by Cocoonshu on 2016/4/27.
  */
 public class ESP8266Scaner implements WifiStateBroadcastReceiver.OnNetworkStateChangedListener, WifiStateBroadcastReceiver.OnWifiRSSIChangedListener, WifiStateBroadcastReceiver.OnWifiScanedCompletedListener, WifiStateBroadcastReceiver.OnWifiStateChangedListener {
+
+    private static final String TAG = "ESP8266Scaner";
 
     private Context                    mContext                    = null;
     private WifiManager                mWiFiManager                = null;
@@ -77,11 +81,12 @@ public class ESP8266Scaner implements WifiStateBroadcastReceiver.OnNetworkStateC
     @Override
     public void onWifiScanedCompleted() {
         // Process devices
+        int i = 0;
         Iterator<ScanResult> scanResultItr = mWiFiManager.getScanResults().iterator();
         while (scanResultItr.hasNext()) {
             ScanResult result = scanResultItr.next();
-            if (result.SSID.startsWith(Config.COSMART_DEVICE_SSID_PREFIX)) {
-
+            Log.i(TAG, String.format("[onWifiScanedCompleted] #%d SSID: %s, BSSID: %s", i++, result.SSID, result.BSSID));
+           // if (result.SSID.startsWith(Config.COSMART_DEVICE_SSID_PREFIX)) {
                 synchronized (mDeviceList) {
                     boolean hasUpdatedResult = false;
                     for (Device device : mDeviceList) {
@@ -96,7 +101,7 @@ public class ESP8266Scaner implements WifiStateBroadcastReceiver.OnNetworkStateC
                         mDeviceList.add(device);
                     }
                 }
-            }
+           // }
         }
         fireScaningEvent();
 

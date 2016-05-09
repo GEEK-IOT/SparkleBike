@@ -46,11 +46,15 @@ public class Device {
         byte[] mac = new byte[6];
         String macString = null;
         if (SSID.startsWith(Config.COSMART_DEVICE_SSID_PREFIX)) {
-            macString = SSID.substring(Config.COSMART_DEVICE_SSID_PREFIX.length(), SSID.length());
-            macString = macString.toUpperCase();
-            for (int i = 0; i < mac.length; i++) {
-                mac[i] = (byte)((HEX.indexOf(macString.charAt(i * 2)) << 4)
-                        | (HEX.indexOf(macString.charAt(i * 2 + 1))));
+            if (Config.ESP8266_MAC_ALGORITHM == Config.GRAP_MAC_FROM_SSID) {
+                macString = SSID.substring(Config.COSMART_DEVICE_SSID_PREFIX.length(), SSID.length());
+                macString = macString.toUpperCase();
+                for (int i = 0; i < mac.length; i++) {
+                    mac[i] = (byte) ((HEX.indexOf(macString.charAt(i * 2)) << 4)
+                            | (HEX.indexOf(macString.charAt(i * 2 + 1))));
+                }
+            } else if (Config.ESP8266_MAC_ALGORITHM == Config.GRAP_MAC_FROM_BSSID) {
+                // TODO: 2016-05-09
             }
         }
         Log.e("Cocoonshu", String.format("[readMacFromSSID] mac = %02x%02x%02x%02x%02x%02x",

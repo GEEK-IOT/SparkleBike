@@ -2,7 +2,6 @@ package cn.geekiot.sparklebike.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,7 +13,6 @@ import com.cobox.cosmart.devicebridge.Device;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.Inflater;
 
 import cn.geekiot.sparklebike.R;
 
@@ -79,9 +77,13 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
     }
 
     public void updateFromDeviceList(List<Device> deviceList) {
-        synchronized (mDeviceList) {
-            mDeviceList.clear();
+        if (mDeviceList == null) {
             mDeviceList = new ArrayList<Device>(deviceList);
+        } else {
+            synchronized (mDeviceList) {
+                mDeviceList.clear();
+                mDeviceList = new ArrayList<Device>(deviceList);
+            }
         }
     }
 
