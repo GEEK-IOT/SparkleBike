@@ -16,7 +16,7 @@ import java.util.List;
  * @Auther Cocoonshu
  * @Date   2016-04-11 19:11:46
  */
-class DeviceBridgeService extends Service {
+public class DeviceBridgeService extends Service {
 
     private DeviceBridgeServiceBinder  mServiceBinder         = null;
     private List<OnDeviceScanListener> mOnDeviceScanListeners = null;

@@ -3,6 +3,7 @@ package cn.geekiot.sparklebike.adapter;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,8 @@ import cn.geekiot.sparklebike.R;
  */
 public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
 
+    private static final String TAG = "DiscoverDeviceAdapter";
+
     private List<Device> mDeviceList = null;
 
     public class DeviceViewHolder extends RecyclerView.ViewHolder {
@@ -36,8 +39,8 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
         private View.OnClickListener mOnClickListener = null;
         private Drawable             mDefaultIcon     = null;
 
-        public DeviceViewHolder(View parentView, int viewType) {
-            super(LayoutInflater.from(parentView.getContext()).inflate(R.layout.item_discovered_device, null));
+        public DeviceViewHolder(ViewGroup parentView, int viewType) {
+            super(LayoutInflater.from(parentView.getContext()).inflate(R.layout.item_discovered_device, parentView));
             initializeListeners();
             mContext     = parentView.getContext();
             mTxvTitle    = (TextView) itemView.findViewById(R.id.TextView_Title);
@@ -47,7 +50,6 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
             mBtnIgnore   = (TextView)itemView.findViewById(R.id.TextView_Ignore);
             mDefaultIcon = mContext.getDrawable(R.mipmap.ic_developer_board_black);
             mBtnIgnore.setOnClickListener(mOnClickListener);
-
         }
 
         private void initializeListeners() {
@@ -85,22 +87,29 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
                 mDeviceList = new ArrayList<Device>(deviceList);
             }
         }
+        Log.w(TAG, "[updateFromDeviceList] deviceList size = " + deviceList.size());
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Log.w(TAG, "[onCreateViewHolder]");
         return new DeviceViewHolder(parent, viewType);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        Log.w(TAG, "[notifyDataChanged] position = " + position);
         ((DeviceViewHolder)holder).updateContent(mDeviceList.get(position));
     }
 
     @Override
     public int getItemCount() {
-        synchronized (mDeviceList) {
-            return mDeviceList == null ? 0 : mDeviceList.size();
+        if (mDeviceList == null) {
+            return 0;
+        } else {
+            synchronized (mDeviceList) {
+                return mDeviceList == null ? 0 : mDeviceList.size();
+            }
         }
     }
 

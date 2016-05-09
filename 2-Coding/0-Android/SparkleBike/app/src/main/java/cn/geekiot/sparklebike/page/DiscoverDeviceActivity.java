@@ -27,7 +27,7 @@ import java.util.List;
 import cn.geekiot.sparklebike.R;
 import cn.geekiot.sparklebike.ui.DiscoverDeviceAnimView;
 import cn.geekiot.sparklebike.ui.WiFiEnableDialog;
-import cn.geekiot.sparklebike.view.DiscoverDeviceRecycleView;
+import cn.geekiot.sparklebike.ui.DiscoverDeviceRecycleView;
 
 public class DiscoverDeviceActivity extends AppCompatActivity {
 

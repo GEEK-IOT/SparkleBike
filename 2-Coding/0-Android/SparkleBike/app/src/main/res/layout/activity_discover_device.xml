@@ -47,7 +47,8 @@
             android:id="@+id/RecyclerView_FoundDeviceList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/CollapsingToolbarLayout"/>
+            android:layout_below="@+id/CollapsingToolbarLayout"
+            android:background="@color/colorAccent"/>
 
         <!-- 浮动按钮 -->
         <android.support.design.widget.FloatingActionButton

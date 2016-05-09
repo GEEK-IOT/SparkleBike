@@ -21,7 +21,7 @@ android {
         abi {
             enable true
             reset()
-            include 'armabi', 'x86', 'armeabi-v7a' //select ABIs to build APKs for
+            include 'armabi', 'x86', 'armeabi-v7a', 'mips' //select ABIs to build APKs for
             universalApk true //generate an additional APK that contains all the ABIs
         }
     }    // map for the version code
