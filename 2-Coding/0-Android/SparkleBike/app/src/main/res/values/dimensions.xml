@@ -6,5 +6,12 @@
     <dimen name="MainActivity_FloatingActionButton_BorderWidth">0dp</dimen>
     <dimen name="MainActivity_FloatingActionButton_ShadowSize_Sink">6dp</dimen>
     <dimen name="MainActivity_FloatingActionButton_ShadowSize_Raise">12dp</dimen>
+
+    <dimen name="DiscoverDeviceActivity_ItemIconWidth_Normal">@dimen/design_fab_size_normal</dimen>
+    <dimen name="DiscoverDeviceActivity_ItemIconHeight_Normal">@dimen/design_fab_size_normal</dimen>
+    <dimen name="DiscoverDeviceActivity_ItemIconWidth_Mini">@dimen/design_fab_size_mini</dimen>
+    <dimen name="DiscoverDeviceActivity_ItemIconHeight_Mini">@dimen/design_fab_size_mini</dimen>
+    <dimen name="DiscoverDeviceActivity_ItemIconPadding_Normal">16dp</dimen>
+    <dimen name="DiscoverDeviceActivity_ItemIconPadding_Mini">8dp</dimen>
 </resources>
 

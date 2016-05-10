@@ -40,7 +40,7 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
         private Drawable             mDefaultIcon     = null;
 
         public DeviceViewHolder(ViewGroup parentView, int viewType) {
-            super(LayoutInflater.from(parentView.getContext()).inflate(R.layout.item_discovered_device, parentView));
+            super(LayoutInflater.from(parentView.getContext()).inflate(R.layout.item_discovered_device, parentView, false));
             initializeListeners();
             mContext     = parentView.getContext();
             mTxvTitle    = (TextView) itemView.findViewById(R.id.TextView_Title);
@@ -87,18 +87,15 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
                 mDeviceList = new ArrayList<Device>(deviceList);
             }
         }
-        Log.w(TAG, "[updateFromDeviceList] deviceList size = " + deviceList.size());
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.w(TAG, "[onCreateViewHolder]");
         return new DeviceViewHolder(parent, viewType);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        Log.w(TAG, "[notifyDataChanged] position = " + position);
         ((DeviceViewHolder)holder).updateContent(mDeviceList.get(position));
     }
 

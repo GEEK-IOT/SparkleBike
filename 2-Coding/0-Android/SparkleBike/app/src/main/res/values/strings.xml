@@ -9,7 +9,7 @@
     <string name="WiFiEnabledDialog_Confirm">Confirm</string>
     <string name="WiFiEnabledDialog_Cancel">Cancel</string>
 
-    <string name="DiscoveryDeviceActivity_Item_Ignore"><u>Ignore</u></string>
+    <string name="DiscoveryDeviceActivity_Item_Ignore">Ignore</string>
 
     <string name="SharedElementName_FloatingActionButton">FloatingActionButton</string>
 </resources>

@@ -42,6 +42,7 @@ public class Device {
         Level        = result.level;
         Frequency    = result.frequency;
     }
+
     private byte[] readMacFromSSID() {
         byte[] mac = new byte[6];
         String macString = null;
@@ -54,7 +55,25 @@ public class Device {
                             | (HEX.indexOf(macString.charAt(i * 2 + 1))));
                 }
             } else if (Config.ESP8266_MAC_ALGORITHM == Config.GRAP_MAC_FROM_BSSID) {
-                // TODO: 2016-05-09
+                if (BSSID != null && BSSID.length() > 0) {
+                    String[] columns = BSSID.split(":");
+                    if (columns != null && columns.length == 6) {
+                        for (int i = 0; i < mac.length; i++) {
+                            mac[i] = (byte) ((HEX.indexOf(columns[i].charAt(0)) << 4)
+                                    | (HEX.indexOf(columns[i].charAt(1))));
+                        }
+                    }
+                }
+            }
+        } else {
+            if (BSSID != null && BSSID.length() > 0) {
+                String[] columns = BSSID.split(":");
+                if (columns != null && columns.length == 6) {
+                    for (int i = 0; i < mac.length; i++) {
+                        mac[i] = (byte) ((HEX.indexOf(columns[i].charAt(0)) << 4)
+                                | (HEX.indexOf(columns[i].charAt(1))));
+                    }
+                }
             }
         }
         Log.e("Cocoonshu", String.format("[readMacFromSSID] mac = %02x%02x%02x%02x%02x%02x",

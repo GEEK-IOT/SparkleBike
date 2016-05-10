@@ -4,12 +4,15 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.PointF;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 
 import cn.geekiot.sparklebike.R;
+import cn.geekiot.sparklebike.graphic.BlurDrawable;
 import cn.geekiot.sparklebike.graphic.WaveDrawable;
 
 /**
@@ -17,19 +20,24 @@ import cn.geekiot.sparklebike.graphic.WaveDrawable;
  */
 public class DiscoverDeviceAnimView extends View {
 
+    private static final String TAG          = "DiscoverDeviceAnimView";
+
     private WaveDrawable   mDblWave               = null;
     private Drawable       mDblMasterDevice       = null;
     private Drawable       mDblSlaveDevice        = null;
     private int            mWaveColor             = 0xFF000000;
+    private int            mBackgroundBlurRadius  = 5;
     private PointF         mMasterPosition        = new PointF();
     private PointF         mSlavePosition         = new PointF();
     private float          mMasterSweepDistance   = 0;
-    private float          mSlaverSweepDistance   = 0;
+    private float          mSlaveSweepDistance    = 0;
 
     private long           mMasterAnimStartTime   = 0;
+    private long           mSlaveAnimStartTime    = 0;
     private boolean        mIsDiscoverAnimationOn = false;
     private float          mWaveSpeed             = 1f;   // pixel/ms
     private long           mMasterWaveInterval    = 1000; // ms
+    private boolean        mIsSlaveResponeActived = false;
 
     public DiscoverDeviceAnimView(Context context) {
         this(context, null);
@@ -63,7 +71,10 @@ public class DiscoverDeviceAnimView extends View {
                     }
                     break;
                 case R.styleable.DiscoverDeviceAnimView_wave_color:
-                    mWaveColor = typedArray.getColor(i, mWaveColor);
+                    mWaveColor = typedArray.getColor(key, mWaveColor);
+                    break;
+                case R.styleable.DiscoverDeviceAnimView_background_blur_radius:
+                    mBackgroundBlurRadius = typedArray.getInt(key, mBackgroundBlurRadius);
                     break;
                 default:
                     break;
@@ -72,6 +83,18 @@ public class DiscoverDeviceAnimView extends View {
         typedArray.recycle();
         mDblWave = new WaveDrawable();
         mDblWave.setWaveColor(mWaveColor);
+        replaceBackgroundDrawable();
+    }
+
+    private void replaceBackgroundDrawable() {
+        BlurDrawable   blurDrawable       = null;
+        BitmapDrawable backgroundDrawable = null;
+
+        if (getBackground() != null && getBackground() instanceof BitmapDrawable) {
+            backgroundDrawable = (BitmapDrawable) getBackground();
+            blurDrawable       = new BlurDrawable(backgroundDrawable.getBitmap(), mBackgroundBlurRadius);
+            setBackground(blurDrawable);
+        }
     }
 
     @Override
@@ -128,7 +151,7 @@ public class DiscoverDeviceAnimView extends View {
 
         boolean hasMoreFrame = false;
         hasMoreFrame |= drawDiscoverWave(canvas);
-        hasMoreFrame |= drawDeviceResponeWave(canvas);
+        hasMoreFrame |= drawDeviceResponseWave(canvas);
         hasMoreFrame |= drawDevices(canvas);
         if (hasMoreFrame) {
             postInvalidateOnAnimation();
@@ -158,13 +181,29 @@ public class DiscoverDeviceAnimView extends View {
 
                 masterWaveIterator -= mWaveSpeed * mMasterWaveInterval;
             }
-
         }
 
         return true;
     }
 
-    private boolean drawDeviceResponeWave(Canvas canvas) {
+    private boolean drawDeviceResponseWave(Canvas canvas) {
+        if (mIsDiscoverAnimationOn && mIsSlaveResponeActived) {
+            long  currentAnimTime           = AnimationUtils.currentAnimationTimeMillis();
+            long  deltaAnimTime             = currentAnimTime - mSlaveAnimStartTime;
+            float currentSlaveWaveDistance  = mWaveSpeed * deltaAnimTime;
+            float tempMaxDistance           = (float) Math.hypot(getWidth(), getHeight());
+
+            tempMaxDistance += tempMaxDistance * mDblWave.getThicknessPercent();
+            if (currentSlaveWaveDistance > tempMaxDistance) {
+                mIsSlaveResponeActived = false;
+                return false;
+            } else {
+                mDblWave.setPivotPoint(mSlavePosition.x, mSlavePosition.y);
+                mDblWave.setRadius(currentSlaveWaveDistance);
+                mDblWave.draw(canvas);
+            }
+        }
+
         return true;
     }
 
@@ -211,7 +250,7 @@ public class DiscoverDeviceAnimView extends View {
 
     private void refreshMasterWaveTimeLine() {
         mMasterSweepDistance = computeLongthSweepPath(mMasterPosition.x, mMasterPosition.y, mDblWave.getThicknessPercent());
-        mSlaverSweepDistance = computeLongthSweepPath(mSlavePosition.x, mSlavePosition.y, mDblWave.getThicknessPercent());
+        mSlaveSweepDistance  = computeLongthSweepPath(mSlavePosition.x, mSlavePosition.y, mDblWave.getThicknessPercent());
     }
 
     private void refreshMasterAndSlaverPosition() {
@@ -231,17 +270,19 @@ public class DiscoverDeviceAnimView extends View {
     }
     
     public void startDiscover() {
-        // TODO: 2016-04-18
         mIsDiscoverAnimationOn = true;
         postInvalidateOnAnimation();
     }
     
     public void stopDiscover() {
-        // TODO: 2016-04-18
         mIsDiscoverAnimationOn = false;
     }
     
-    public void toggleDeviceRespone() {
-        // TODO: 2016-04-18
+    public void toggleDeviceResponse() {
+        if (!mIsSlaveResponeActived) {
+            mIsSlaveResponeActived = true;
+            mSlaveAnimStartTime = AnimationUtils.currentAnimationTimeMillis();
+            postInvalidateOnAnimation();
+        }
     }
 }

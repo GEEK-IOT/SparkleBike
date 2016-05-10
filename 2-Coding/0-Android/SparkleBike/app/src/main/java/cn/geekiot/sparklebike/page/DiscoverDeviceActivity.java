@@ -147,7 +147,7 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
             @Override
             public void onDeviceScaned(List<Device> deviceList) {
                 mFoundDeviceListView.notifyDataChanged(deviceList);
-                mDiscoverDeviceAnimView.toggleDeviceRespone();
+                mDiscoverDeviceAnimView.toggleDeviceResponse();
             }
 
             @Override

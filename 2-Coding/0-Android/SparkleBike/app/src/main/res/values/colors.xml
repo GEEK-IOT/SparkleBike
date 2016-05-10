@@ -10,5 +10,5 @@
     <color name="MainActivity_FloatingActionButton_TintColor">@color/TintColor</color>
     <color name="MainActivity_FloatingActionButton_RippleColor">@color/RippleColor</color>
     <color name="DiscoverDeviceActivity_FloatingActionButton_TintColor">@color/TintColor</color>
-    <color name="DiscoverDeviceActivity_BackgroundColor">@color/TintColor</color>
+    <color name="DiscoverDeviceActivity_BackgroundColor">@color/colorLight</color>
 </resources>
