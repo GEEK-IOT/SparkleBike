@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/MainActivity_AppBarHeight"
             app:contentScrim="?attr/colorPrimary"
-            app:expandedTitleMarginStart="@dimen/MainActivity_ToolbarLayout_ExpandedTitleMarginStart"
+            app:expandedTitleMarginStart="@dimen/DiscoverDeviceActivity_ToolbarLayout_ExpandedTitleMarginStart"
             app:layout_scrollFlags="scroll|exitUntilCollapsed" >
 
             <cn.geekiot.sparklebike.ui.DiscoverDeviceAnimView

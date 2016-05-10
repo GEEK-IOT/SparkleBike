@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="MainActivity_AppBarHeight">200dp</dimen>
+    <dimen name="MainActivity_AppBarHeight">150dp</dimen>
     <dimen name="MainActivity_ToolbarLayout_ExpandedTitleMarginStart">50dp</dimen>
     <dimen name="MainActivity_FloatingActionButton_Margin">20dp</dimen>
     <dimen name="MainActivity_FloatingActionButton_BorderWidth">0dp</dimen>
     <dimen name="MainActivity_FloatingActionButton_ShadowSize_Sink">6dp</dimen>
     <dimen name="MainActivity_FloatingActionButton_ShadowSize_Raise">12dp</dimen>
 
+    <dimen name="DiscoverDeviceActivity_ToolbarLayout_ExpandedTitleMarginStart">75dp</dimen>
     <dimen name="DiscoverDeviceActivity_ItemIconWidth_Normal">@dimen/design_fab_size_normal</dimen>
     <dimen name="DiscoverDeviceActivity_ItemIconHeight_Normal">@dimen/design_fab_size_normal</dimen>
     <dimen name="DiscoverDeviceActivity_ItemIconWidth_Mini">@dimen/design_fab_size_mini</dimen>

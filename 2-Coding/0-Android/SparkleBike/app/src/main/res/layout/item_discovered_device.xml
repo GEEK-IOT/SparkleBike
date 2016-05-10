@@ -5,9 +5,9 @@
     android:id="@+id/CardView_ItemRootLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_margin="10dp"
     android:foreground="?android:attr/selectableItemBackground"
-    card_view:cardCornerRadius="8dp"
+    card_view:cardCornerRadius="10dp"
     card_view:cardElevation="5dp">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -37,7 +37,7 @@
             android:layout_toRightOf="@+id/ImageView_Icon"
             android:layout_above="@+id/View_SplitLine"
             android:layout_marginLeft="20dp"
-            android:layout_marginBottom="15dp"
+            android:layout_marginBottom="13dp"
             android:text="Terminal"
             android:textColor="#FF999999"
             android:textSize="14sp"/>
@@ -49,7 +49,7 @@
             android:layout_toRightOf="@+id/TextView_Type"
             android:layout_above="@+id/View_SplitLine"
             android:layout_marginLeft="20dp"
-            android:layout_marginBottom="15dp"
+            android:layout_marginBottom="13dp"
             android:text="17-FE-AB-56-23-10"
             android:textColor="#FF999999"
             android:textSize="14sp"/>
