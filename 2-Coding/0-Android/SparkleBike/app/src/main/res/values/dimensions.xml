@@ -8,6 +8,9 @@
     <dimen name="MainActivity_FloatingActionButton_ShadowSize_Raise">12dp</dimen>
 
     <dimen name="DiscoverDeviceActivity_ToolbarLayout_ExpandedTitleMarginStart">75dp</dimen>
+    <dimen name="DiscoverDeviceActivity_ItemSpacing">10dp</dimen>
+    <dimen name="DiscoverDeviceActivity_ItemMarginTop">10dp</dimen>
+    <dimen name="DiscoverDeviceActivity_ItemMarginBottom">10dp</dimen>
     <dimen name="DiscoverDeviceActivity_ItemIconWidth_Normal">@dimen/design_fab_size_normal</dimen>
     <dimen name="DiscoverDeviceActivity_ItemIconHeight_Normal">@dimen/design_fab_size_normal</dimen>
     <dimen name="DiscoverDeviceActivity_ItemIconWidth_Mini">@dimen/design_fab_size_mini</dimen>

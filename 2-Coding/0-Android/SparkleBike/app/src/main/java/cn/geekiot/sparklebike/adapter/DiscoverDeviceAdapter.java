@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -31,11 +32,11 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
 
     public class DeviceViewHolder extends RecyclerView.ViewHolder {
         private Context              mContext         = null;
+        private ImageView            mImgIcon         = null;
         private TextView             mTxvTitle        = null;
         private TextView             mTxvType         = null;
         private TextView             mTxvMAC          = null;
-        private TextView             mBtnIgnore       = null;
-        private ImageView            mImgIcon         = null;
+        private ImageButton          mBtnMore         = null;
         private View.OnClickListener mOnClickListener = null;
         private Drawable             mDefaultIcon     = null;
 
@@ -47,9 +48,9 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
             mTxvType     = (TextView)itemView.findViewById(R.id.TextView_Type);
             mTxvMAC      = (TextView)itemView.findViewById(R.id.TextView_MAC);
             mImgIcon     = (ImageView)itemView.findViewById(R.id.ImageView_Icon);
-            mBtnIgnore   = (TextView)itemView.findViewById(R.id.TextView_Ignore);
+            mBtnMore     = (ImageButton)itemView.findViewById(R.id.ImageButton_More);
             mDefaultIcon = mContext.getDrawable(R.mipmap.ic_developer_board_black);
-            mBtnIgnore.setOnClickListener(mOnClickListener);
+            mBtnMore.setOnClickListener(mOnClickListener);
         }
 
         private void initializeListeners() {

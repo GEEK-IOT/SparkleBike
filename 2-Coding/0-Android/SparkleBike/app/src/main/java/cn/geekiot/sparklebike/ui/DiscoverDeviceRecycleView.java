@@ -1,5 +1,6 @@
 package cn.geekiot.sparklebike.ui;
 
+import android.graphics.Rect;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,11 +9,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
+import android.view.View;
 
 import com.cobox.cosmart.devicebridge.Device;
 
 import java.util.List;
 
+import cn.geekiot.sparklebike.R;
 import cn.geekiot.sparklebike.adapter.DiscoverDeviceAdapter;
 
 /**
@@ -22,6 +25,10 @@ public class DiscoverDeviceRecycleView {
 
     private static final String TAG = "RecycleView";
 
+    private final int fItemMarginTop;
+    private final int fItemMarginBottom;
+    private final int getfItemSpacing;
+
     private RecyclerView.LayoutManager  mLayoutManager  = null;
     private DiscoverDeviceAdapter       mAdapter        = null;
     private RecyclerView.ItemAnimator   mItemAnimator   = null;
@@ -29,13 +36,17 @@ public class DiscoverDeviceRecycleView {
     private RecyclerView                mHostView       = null;
 
     public DiscoverDeviceRecycleView(RecyclerView hostView) {
-        mHostView      = hostView;
-        mAdapter       = new DiscoverDeviceAdapter();
-        mItemAnimator  = new DefaultItemAnimator();
-        mItemDecoration = null;
-        mLayoutManager = new LinearLayoutManager(hostView.getContext());
+        mHostView          = hostView;
+        mAdapter           = new DiscoverDeviceAdapter();
+        mItemAnimator      = new DefaultItemAnimator();
+        mItemDecoration    = new MarginItemItemDecoration();
+        mLayoutManager     = new LinearLayoutManager(hostView.getContext());
+        fItemMarginTop     = hostView.getResources().getDimensionPixelOffset(R.dimen.DiscoverDeviceActivity_ItemMarginTop);
+        fItemMarginBottom  = hostView.getResources().getDimensionPixelOffset(R.dimen.DiscoverDeviceActivity_ItemMarginBottom);
+        getfItemSpacing    = hostView.getResources().getDimensionPixelOffset(R.dimen.DiscoverDeviceActivity_ItemSpacing);
         mLayoutManager.setAutoMeasureEnabled(true);
         mHostView.setItemAnimator(mItemAnimator);
+        mHostView.addItemDecoration(mItemDecoration);
         mHostView.setAdapter(mAdapter);
         mHostView.setLayoutManager(mLayoutManager);
     }
@@ -43,6 +54,22 @@ public class DiscoverDeviceRecycleView {
     public void notifyDataChanged(List<Device> deviceList) {
         mAdapter.updateFromDeviceList(deviceList);
         mAdapter.notifyDataSetChanged();
+    }
+
+    private class MarginItemItemDecoration extends RecyclerView.ItemDecoration {
+
+        @Override
+        public void getItemOffsets(Rect outRect, int itemPosition, RecyclerView parent) {
+            final int itemCount = mAdapter == null ? 0 : mAdapter.getItemCount();
+            if (itemPosition == 0) {
+                outRect.set(0, fItemMarginTop, 0, getfItemSpacing >> 1);
+            } else if (itemPosition == itemCount - 1) {
+                outRect.set(0, getfItemSpacing >> 1, 0, fItemMarginBottom);
+            } else {
+                outRect.set(0, getfItemSpacing >> 1, 0, getfItemSpacing >> 1);
+            }
+        }
+
     }
 
     private class FadeItemAnimator extends RecyclerView.ItemAnimator {

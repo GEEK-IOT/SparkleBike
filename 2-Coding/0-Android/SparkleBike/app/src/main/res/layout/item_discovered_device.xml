@@ -5,10 +5,11 @@
     android:id="@+id/CardView_ItemRootLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp"
+    android:layout_marginStart="10dp"
+    android:layout_marginEnd="10dp"
     android:foreground="?android:attr/selectableItemBackground"
-    card_view:cardCornerRadius="10dp"
-    card_view:cardElevation="5dp">
+    card_view:cardCornerRadius="0dp"
+    card_view:cardElevation="1dp">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -16,43 +17,7 @@
         android:paddingTop="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingBottom="5dp"
-        android:background="@drawable/discovered_device_item_background" >
-
-        <TextView
-            android:id="@+id/TextView_Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/ImageView_Icon"
-            android:layout_marginTop="5dp"
-            android:layout_marginLeft="20dp"
-            android:text="CoSmart Device"
-            android:textColor="#FFFFFFFF"
-            android:textSize="20sp"/>
-
-        <TextView
-            android:id="@+id/TextView_Type"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/ImageView_Icon"
-            android:layout_above="@+id/View_SplitLine"
-            android:layout_marginLeft="20dp"
-            android:layout_marginBottom="13dp"
-            android:text="Terminal"
-            android:textColor="#FF999999"
-            android:textSize="14sp"/>
-
-        <TextView
-            android:id="@+id/TextView_MAC"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/TextView_Type"
-            android:layout_above="@+id/View_SplitLine"
-            android:layout_marginLeft="20dp"
-            android:layout_marginBottom="13dp"
-            android:text="17-FE-AB-56-23-10"
-            android:textColor="#FF999999"
-            android:textSize="14sp"/>
+        android:paddingBottom="10dp" >
 
         <ImageView
             android:id="@+id/ImageView_Icon"
@@ -61,25 +26,78 @@
             android:layout_marginBottom="10dp"
             android:padding="@dimen/DiscoverDeviceActivity_ItemIconPadding_Normal"
             android:background="@drawable/circle_background"
-            android:src="@mipmap/ic_developer_board_black" />
-
-        <View
-            android:id="@+id/View_SplitLine"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@drawable/horizontal_dash_line"
-            android:layout_below="@+id/ImageView_Icon"
-            android:layerType="software"/>
+            android:src="@mipmap/ic_developer_board_black"
+            android:cropToPadding="false"
+            android:elevation="10dp"/>
 
         <TextView
-            android:id="@+id/TextView_Ignore"
+            android:id="@+id/TextView_Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/View_SplitLine"
+            android:layout_toEndOf="@+id/ImageView_Icon"
             android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:text="@string/DiscoveryDeviceActivity_Item_Ignore"
-            android:textColor="#FFFFFFFF" />
+            android:layout_marginStart="20dp"
+            android:text="CoSmart Device"
+            android:textColor="@color/DiscoverDeviceActivity_Item_TitleTextColor"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/TextView_MAC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/ImageView_Icon"
+            android:layout_below="@+id/TextView_Title"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp"
+            android:text="17-FE-AB-56-23-10"
+            android:textColor="@color/DiscoverDeviceActivity_Item_MACTextColor"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/TextView_Type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/TextView_MAC"
+            android:layout_toEndOf="@+id/ImageView_Icon"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp"
+            android:text="CoSmart Device: Terminal"
+            android:textColor="@color/DiscoverDeviceActivity_Item_TypeTextColor"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/TextView_Capabilities"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/TextView_Type"
+            android:layout_toEndOf="@+id/ImageView_Icon"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp"
+            android:text="WPA-PSK"
+            android:textColor="@color/DiscoverDeviceActivity_Item_CapabilitiesTextColor"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/TextView_LevelAndFrequency"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/TextView_Type"
+            android:layout_toEndOf="@+id/TextView_Capabilities"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="20dp"
+            android:text="-96 dBm / 5GHz"
+            android:textColor="@color/DiscoverDeviceActivity_Item_LevelAndFrequencyTextColor"
+            android:textSize="14sp"/>
+
+        <ImageButton
+            android:id="@+id/ImageButton_More"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:background="@mipmap/ic_more"/>
 
     </RelativeLayout>
 </android.support.v7.widget.CardView>
