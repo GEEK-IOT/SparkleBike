@@ -9,11 +9,12 @@
     android:layout_marginEnd="10dp"
     android:foreground="?android:attr/selectableItemBackground"
     card_view:cardCornerRadius="0dp"
-    card_view:cardElevation="1dp">
+    card_view:cardElevation="0dp">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:cropToPadding="false"
         android:paddingTop="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
@@ -23,19 +24,19 @@
             android:id="@+id/ImageView_Icon"
             android:layout_width="@dimen/DiscoverDeviceActivity_ItemIconWidth_Normal"
             android:layout_height="@dimen/DiscoverDeviceActivity_ItemIconHeight_Normal"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="5dp"
             android:padding="@dimen/DiscoverDeviceActivity_ItemIconPadding_Normal"
             android:background="@drawable/circle_background"
-            android:src="@mipmap/ic_developer_board_black"
+            android:src="@mipmap/ic_rounter"
             android:cropToPadding="false"
-            android:elevation="10dp"/>
+            android:elevation="0dp"/>
 
         <TextView
             android:id="@+id/TextView_Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/ImageView_Icon"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="0dp"
             android:layout_marginStart="20dp"
             android:text="CoSmart Device"
             android:textColor="@color/DiscoverDeviceActivity_Item_TitleTextColor"
@@ -47,11 +48,11 @@
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/ImageView_Icon"
             android:layout_below="@+id/TextView_Title"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:layout_marginStart="20dp"
             android:text="17-FE-AB-56-23-10"
             android:textColor="@color/DiscoverDeviceActivity_Item_MACTextColor"
-            android:textSize="14sp"/>
+            android:textSize="12sp"/>
 
         <TextView
             android:id="@+id/TextView_Type"
@@ -59,11 +60,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/TextView_MAC"
             android:layout_toEndOf="@+id/ImageView_Icon"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:layout_marginStart="20dp"
             android:text="CoSmart Device: Terminal"
             android:textColor="@color/DiscoverDeviceActivity_Item_TypeTextColor"
-            android:textSize="14sp"/>
+            android:textSize="12sp"/>
 
         <TextView
             android:id="@+id/TextView_Capabilities"
@@ -71,11 +72,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/TextView_Type"
             android:layout_toEndOf="@+id/ImageView_Icon"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:layout_marginStart="20dp"
             android:text="WPA-PSK"
             android:textColor="@color/DiscoverDeviceActivity_Item_CapabilitiesTextColor"
-            android:textSize="14sp"/>
+            android:textSize="12sp"/>
 
         <TextView
             android:id="@+id/TextView_LevelAndFrequency"
@@ -83,11 +84,11 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/TextView_Type"
             android:layout_toEndOf="@+id/TextView_Capabilities"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:layout_marginStart="20dp"
             android:text="-96 dBm / 5GHz"
             android:textColor="@color/DiscoverDeviceActivity_Item_LevelAndFrequencyTextColor"
-            android:textSize="14sp"/>
+            android:textSize="12sp"/>
 
         <ImageButton
             android:id="@+id/ImageButton_More"
