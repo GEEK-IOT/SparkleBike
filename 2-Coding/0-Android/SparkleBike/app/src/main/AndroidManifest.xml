@@ -2,18 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="cn.geekiot.sparklebike">
 
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/ApplicationName"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".page.MainActivity"
             android:label="@string/ApplicationName"
-            android:theme="@style/AppTheme.MainActivity" >
+            android:theme="@style/AppTheme.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -22,23 +22,30 @@
         </activity>
         <activity
             android:name=".page.DiscoverDeviceActivity"
-            android:theme="@style/AppTheme.DiscoverDeviceActivity" >
+            android:theme="@style/AppTheme.DiscoverDeviceActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
         <service
             android:name="com.cobox.cosmart.devicebridge.DeviceBridgeService"
             android:enabled="true"
             android:exported="true"
-            android:logo="@mipmap/ic_launcher"
-            android:label="@string/DeviceBridgeServiceName">
+            android:label="@string/DeviceBridgeServiceName"
+            android:logo="@mipmap/ic_launcher">
             <intent-filter>
-                <action android:name="com.cobox.cosmart.devicebridge.StartService" />
+                <action android:name="com.cobox.cosmart.devicebridge.StartService"/>
             </intent-filter>
         </service>
+
+        <activity
+            android:name=".page.DeviceDetailsActivity"
+            android:label="@string/title_activity_device_details"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

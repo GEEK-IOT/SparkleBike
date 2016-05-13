@@ -1,5 +1,6 @@
 package cn.geekiot.sparklebike.adapter;
 
+import android.app.AlarmManager;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
@@ -36,6 +37,8 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
         private TextView             mTxvTitle        = null;
         private TextView             mTxvType         = null;
         private TextView             mTxvMAC          = null;
+        private TextView             mTxvCapabilities = null;
+        private TextView             mTxvLevelAndFreq = null;
         private ImageButton          mBtnMore         = null;
         private View.OnClickListener mOnClickListener = null;
         private Drawable             mDefaultIcon     = null;
@@ -43,13 +46,15 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
         public DeviceViewHolder(ViewGroup parentView, int viewType) {
             super(LayoutInflater.from(parentView.getContext()).inflate(R.layout.item_discovered_device, parentView, false));
             initializeListeners();
-            mContext     = parentView.getContext();
-            mTxvTitle    = (TextView) itemView.findViewById(R.id.TextView_Title);
-            mTxvType     = (TextView)itemView.findViewById(R.id.TextView_Type);
-            mTxvMAC      = (TextView)itemView.findViewById(R.id.TextView_MAC);
-            mImgIcon     = (ImageView)itemView.findViewById(R.id.ImageView_Icon);
-            mBtnMore     = (ImageButton)itemView.findViewById(R.id.ImageButton_More);
-            mDefaultIcon = mContext.getDrawable(R.mipmap.ic_developer_board_black);
+            mContext         = parentView.getContext();
+            mTxvTitle        = (TextView) itemView.findViewById(R.id.TextView_Title);
+            mTxvType         = (TextView)itemView.findViewById(R.id.TextView_Type);
+            mTxvMAC          = (TextView)itemView.findViewById(R.id.TextView_MAC);
+            mTxvCapabilities = (TextView)itemView.findViewById(R.id.TextView_Capabilities);
+            mTxvLevelAndFreq = (TextView)itemView.findViewById(R.id.TextView_LevelAndFrequency);
+            mImgIcon         = (ImageView)itemView.findViewById(R.id.ImageView_Icon);
+            mBtnMore         = (ImageButton)itemView.findViewById(R.id.ImageButton_More);
+            mDefaultIcon     = mContext.getDrawable(R.mipmap.ic_rounter);
             mBtnMore.setOnClickListener(mOnClickListener);
         }
 
@@ -68,11 +73,15 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
             if (device == null) {
                 mTxvTitle.setText("-");
                 mTxvType.setText("-");
+                mTxvCapabilities.setText("-");
+                mTxvLevelAndFreq.setText("- / -");
                 mTxvMAC.setText("");
                 mImgIcon.setImageDrawable(mDefaultIcon);
             } else {
                 mTxvTitle.setText(device.getSSID());
                 mTxvType.setText("Terminal");
+                mTxvCapabilities.setText(device.getCapabilities());
+                mTxvLevelAndFreq.setText(device.getLevel() + " dBm / " + device.getFrequency() + " MHz");
                 mTxvMAC.setText(device.getMAC() == null ? "" : device.getMACString());
                 mImgIcon.setImageDrawable(mDefaultIcon);
             }

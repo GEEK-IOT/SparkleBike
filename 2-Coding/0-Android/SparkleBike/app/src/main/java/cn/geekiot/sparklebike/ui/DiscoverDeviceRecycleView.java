@@ -1,6 +1,8 @@
 package cn.geekiot.sparklebike.ui;
 
+import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -57,6 +59,11 @@ public class DiscoverDeviceRecycleView {
     }
 
     private class MarginItemItemDecoration extends RecyclerView.ItemDecoration {
+
+        @Override
+        public void onDrawOver(Canvas c, RecyclerView parent) {
+            super.onDrawOver(c, parent);
+        }
 
         @Override
         public void getItemOffsets(Rect outRect, int itemPosition, RecyclerView parent) {

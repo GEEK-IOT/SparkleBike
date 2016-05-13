@@ -12,4 +12,5 @@
     <string name="DiscoveryDeviceActivity_Item_Ignore">Ignore</string>
 
     <string name="SharedElementName_FloatingActionButton">FloatingActionButton</string>
+    <string name="title_activity_device_details">DeviceDetailsActivity</string>
 </resources>
