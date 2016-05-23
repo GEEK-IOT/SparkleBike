@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_marginStart="10dp"
     android:layout_marginEnd="10dp"
+    android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
     card_view:cardCornerRadius="0dp"
     card_view:cardElevation="0dp">
@@ -14,11 +15,12 @@
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/discover_device_item_bg"
         android:cropToPadding="false"
         android:paddingTop="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingBottom="10dp" >
+        android:paddingBottom="10dp">
 
         <ImageView
             android:id="@+id/ImageView_Icon"
@@ -29,7 +31,9 @@
             android:background="@drawable/circle_background"
             android:src="@mipmap/ic_rounter"
             android:cropToPadding="false"
-            android:elevation="0dp"/>
+            android:elevation="0dp"
+            android:clickable="false"
+            android:focusableInTouchMode="false"/>
 
         <TextView
             android:id="@+id/TextView_Title"
@@ -40,7 +44,9 @@
             android:layout_marginStart="20dp"
             android:text="CoSmart Device"
             android:textColor="@color/DiscoverDeviceActivity_Item_TitleTextColor"
-            android:textSize="20sp"/>
+            android:textSize="@dimen/DiscoverDeviceActivity_ItemTitleSize"
+            android:clickable="false"
+            android:focusableInTouchMode="false"/>
 
         <TextView
             android:id="@+id/TextView_MAC"
@@ -52,7 +58,9 @@
             android:layout_marginStart="20dp"
             android:text="17-FE-AB-56-23-10"
             android:textColor="@color/DiscoverDeviceActivity_Item_MACTextColor"
-            android:textSize="12sp"/>
+            android:textSize="@dimen/DiscoverDeviceActivity_ItemMACSize"
+            android:clickable="false"
+            android:focusableInTouchMode="false"/>
 
         <TextView
             android:id="@+id/TextView_Type"
@@ -64,7 +72,9 @@
             android:layout_marginStart="20dp"
             android:text="CoSmart Device: Terminal"
             android:textColor="@color/DiscoverDeviceActivity_Item_TypeTextColor"
-            android:textSize="12sp"/>
+            android:textSize="@dimen/DiscoverDeviceActivity_ItemTypeSize"
+            android:clickable="false"
+            android:focusableInTouchMode="false"/>
 
         <TextView
             android:id="@+id/TextView_Capabilities"
@@ -76,7 +86,9 @@
             android:layout_marginStart="20dp"
             android:text="WPA-PSK"
             android:textColor="@color/DiscoverDeviceActivity_Item_CapabilitiesTextColor"
-            android:textSize="12sp"/>
+            android:textSize="@dimen/DiscoverDeviceActivity_ItemCapabilitiesSize"
+            android:clickable="false"
+            android:focusableInTouchMode="false"/>
 
         <TextView
             android:id="@+id/TextView_LevelAndFrequency"
@@ -88,7 +100,9 @@
             android:layout_marginStart="20dp"
             android:text="-96 dBm / 5GHz"
             android:textColor="@color/DiscoverDeviceActivity_Item_LevelAndFrequencyTextColor"
-            android:textSize="12sp"/>
+            android:textSize="@dimen/DiscoverDeviceActivity_ItemLevelAndFrequencySize"
+            android:clickable="false"
+            android:focusableInTouchMode="false"/>
 
         <ImageButton
             android:id="@+id/ImageButton_More"

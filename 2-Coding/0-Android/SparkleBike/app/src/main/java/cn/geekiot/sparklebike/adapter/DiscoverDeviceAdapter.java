@@ -3,9 +3,11 @@ package cn.geekiot.sparklebike.adapter;
 import android.app.AlarmManager;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -32,34 +34,44 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
     private List<Device> mDeviceList = null;
 
     public class DeviceViewHolder extends RecyclerView.ViewHolder {
-        private Context              mContext         = null;
-        private ImageView            mImgIcon         = null;
-        private TextView             mTxvTitle        = null;
-        private TextView             mTxvType         = null;
-        private TextView             mTxvMAC          = null;
-        private TextView             mTxvCapabilities = null;
-        private TextView             mTxvLevelAndFreq = null;
-        private ImageButton          mBtnMore         = null;
-        private View.OnClickListener mOnClickListener = null;
-        private Drawable             mDefaultIcon     = null;
+        private Context              mContext                = null;
+        private CardView             mRootCardView           = null;
+        private ImageView            mImgIcon                = null;
+        private TextView             mTxvTitle               = null;
+        private TextView             mTxvType                = null;
+        private TextView             mTxvMAC                 = null;
+        private ImageButton          mBtnMore                = null;
+        private View.OnTouchListener mOnItemTouchListener    = null;
+        private View.OnClickListener mOnMoreBtnClickListener = null;
+        private Drawable             mDefaultIcon            = null;
 
         public DeviceViewHolder(ViewGroup parentView, int viewType) {
             super(LayoutInflater.from(parentView.getContext()).inflate(R.layout.item_discovered_device, parentView, false));
             initializeListeners();
-            mContext         = parentView.getContext();
-            mTxvTitle        = (TextView) itemView.findViewById(R.id.TextView_Title);
-            mTxvType         = (TextView)itemView.findViewById(R.id.TextView_Type);
-            mTxvMAC          = (TextView)itemView.findViewById(R.id.TextView_MAC);
-            mTxvCapabilities = (TextView)itemView.findViewById(R.id.TextView_Capabilities);
-            mTxvLevelAndFreq = (TextView)itemView.findViewById(R.id.TextView_LevelAndFrequency);
-            mImgIcon         = (ImageView)itemView.findViewById(R.id.ImageView_Icon);
-            mBtnMore         = (ImageButton)itemView.findViewById(R.id.ImageButton_More);
-            mDefaultIcon     = mContext.getDrawable(R.mipmap.ic_rounter);
-            mBtnMore.setOnClickListener(mOnClickListener);
+            mContext      = parentView.getContext();
+            mRootCardView = (CardView) itemView.findViewById(R.id.CardView_ItemRootLayout);
+            mTxvTitle     = (TextView) itemView.findViewById(R.id.TextView_Title);
+            mTxvType      = (TextView)itemView.findViewById(R.id.TextView_Type);
+            mTxvMAC       = (TextView)itemView.findViewById(R.id.TextView_MAC);
+            mImgIcon      = (ImageView)itemView.findViewById(R.id.ImageView_Icon);
+            mBtnMore      = (ImageButton)itemView.findViewById(R.id.ImageButton_More);
+            mDefaultIcon  = mContext.getDrawable(R.mipmap.ic_rounter);
+            mBtnMore.setOnClickListener(mOnMoreBtnClickListener);
+            parentView.setOnTouchListener(mOnItemTouchListener);
         }
 
         private void initializeListeners() {
-            mOnClickListener = new View.OnClickListener() {
+            mOnItemTouchListener = new View.OnTouchListener() {
+
+                @Override
+                public boolean onTouch(View view, MotionEvent event) {
+                    mRootCardView.dispatchTouchEvent(event);
+                    return false;
+                }
+
+            };
+
+            mOnMoreBtnClickListener = new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {

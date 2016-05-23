@@ -17,5 +17,10 @@
     <dimen name="DiscoverDeviceActivity_ItemIconHeight_Mini">@dimen/design_fab_size_mini</dimen>
     <dimen name="DiscoverDeviceActivity_ItemIconPadding_Normal">16dp</dimen>
     <dimen name="DiscoverDeviceActivity_ItemIconPadding_Mini">8dp</dimen>
+    <dimen name="DiscoverDeviceActivity_ItemTitleSize">18sp</dimen>
+    <dimen name="DiscoverDeviceActivity_ItemMACSize">10sp</dimen>
+    <dimen name="DiscoverDeviceActivity_ItemTypeSize">10sp</dimen>
+    <dimen name="DiscoverDeviceActivity_ItemCapabilitiesSize">10sp</dimen>
+    <dimen name="DiscoverDeviceActivity_ItemLevelAndFrequencySize">10sp</dimen>
 </resources>
 

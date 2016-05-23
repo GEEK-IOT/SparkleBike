@@ -6,6 +6,6 @@
         android:left="10dp"
         android:right="10dp"
         android:bottom="10dp"/>
-    <solid android:color="@color/colorAccent" />
+    <solid android:color="@color/DiscoverDeviceActivity_Item_IconColor" />
     <size android:width="100dp" android:height="100dp" />
 </shape>

@@ -3,6 +3,7 @@
     <color name="colorPrimary">#FFE91E63</color>
     <color name="colorPrimaryDark">#FF880E4F</color>
     <color name="colorAccent">#FFFFEB3B</color>
+    <color name="colorDecent">#8ba1b9</color>
     <color name="colorLight">#FFFFFFFF</color>
     <color name="TintColor">#FF1565C0</color>
     <color name="RippleColor">#FF222222</color>
@@ -13,6 +14,7 @@
     <color name="MainActivity_FloatingActionButton_RippleColor">@color/RippleColor</color>
     <color name="DiscoverDeviceActivity_FloatingActionButton_TintColor">@color/TintColor</color>
     <color name="DiscoverDeviceActivity_BackgroundColor">@color/colorLight</color>
+    <color name="DiscoverDeviceActivity_Item_IconColor">@color/colorDecent</color>
     <color name="DiscoverDeviceActivity_Item_TitleTextColor">@color/PrimaryTextColor</color>
     <color name="DiscoverDeviceActivity_Item_MACTextColor">@color/SecondaryTextColor</color>
     <color name="DiscoverDeviceActivity_Item_TypeTextColor">@color/SecondaryTextColor</color>
