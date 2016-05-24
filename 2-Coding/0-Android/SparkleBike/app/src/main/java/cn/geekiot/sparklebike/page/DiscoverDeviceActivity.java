@@ -15,6 +15,7 @@ import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.FrameLayout;
@@ -164,12 +165,13 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
         mOnItemClickListener = new OnItemClickListener() {
 
             @Override
-            public void onItemClick(Device device, int position, long id) {
+            public void onItemClick(View itemView, Device device, int position, long id) {
                 final Intent intent = new Intent(DiscoverDeviceActivity.this, DeviceDetailsActivity.class);
                 if (SDK.isSupportedMaterialDesign()) {
+                    View itemIcon = itemView.findViewById(R.id.ImageView_Icon);
                     startActivity(intent,
                         ActivityOptions.makeSceneTransitionAnimation(
-                            DiscoverDeviceActivity.this, mFloatingActionButton, getString(R.string.SharedElementName_FloatingActionButton)).toBundle());
+                            DiscoverDeviceActivity.this, itemIcon, getString(R.string.SharedElementName_FloatingActionButton)).toBundle());
                 } else {
                     startActivity(intent);
                 }

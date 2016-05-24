@@ -26,6 +26,7 @@
             android:id="@+id/ImageView_Icon"
             android:layout_width="@dimen/DiscoverDeviceActivity_ItemIconWidth_Normal"
             android:layout_height="@dimen/DiscoverDeviceActivity_ItemIconHeight_Normal"
+            android:transitionName="@string/SharedElementName_FloatingActionButton"
             android:layout_marginTop="5dp"
             android:padding="@dimen/DiscoverDeviceActivity_ItemIconPadding_Normal"
             android:background="@drawable/circle_background"

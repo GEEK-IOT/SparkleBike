@@ -39,7 +39,7 @@ public class DiscoverDeviceRecycleView {
     private OnItemClickListener         mOnItemClickListener = null;
 
     public interface OnItemClickListener {
-        void onItemClick(Device device, int position, long id);
+        void onItemClick(View itemView, Device device, int position, long id);
     }
 
     public DiscoverDeviceRecycleView(RecyclerView hostView) {
@@ -66,7 +66,7 @@ public class DiscoverDeviceRecycleView {
             public void onItemClick(View view, int position, long id) {
                 if (mOnItemClickListener != null) {
                     final Device device = mAdapter.getItemContent(position);
-                    mOnItemClickListener.onItemClick(device, position, id);
+                    mOnItemClickListener.onItemClick(view, device, position, id);
                 }
             }
 
