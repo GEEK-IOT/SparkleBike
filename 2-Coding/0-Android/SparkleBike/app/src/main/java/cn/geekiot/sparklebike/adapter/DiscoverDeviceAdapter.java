@@ -1,5 +1,6 @@
 package cn.geekiot.sparklebike.adapter;
 
+import android.app.AlarmManager;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.CardView;
