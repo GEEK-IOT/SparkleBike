@@ -156,14 +156,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                final Intent intent = new Intent(MainActivity.this, DiscoverDeviceActivity.class);
-                if (SDK.isSupportedMaterialDesign()) {
-                    startActivity(intent,
-                            ActivityOptions.makeSceneTransitionAnimation(
-                                    MainActivity.this, mFloatingActionButton, getString(R.string.SharedElementName_FloatingActionButton)).toBundle());
-                } else {
-                    startActivity(intent);
-                }
+            final Intent intent = new Intent(MainActivity.this, DiscoverDeviceActivity.class);
+            if (SDK.isSupportedMaterialDesign()) {
+                startActivity(intent,
+                        ActivityOptions.makeSceneTransitionAnimation(
+                                MainActivity.this, mFloatingActionButton, getString(R.string.SharedElementName_FloatingActionButton)).toBundle());
+            } else {
+                startActivity(intent);
+            }
             }
 
         });

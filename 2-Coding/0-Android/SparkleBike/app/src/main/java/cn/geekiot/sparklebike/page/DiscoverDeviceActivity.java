@@ -1,6 +1,8 @@
 package cn.geekiot.sparklebike.page;
 
+import android.app.ActivityOptions;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,6 +23,7 @@ import com.cobox.cosmart.devicebridge.Device;
 import com.cobox.cosmart.devicebridge.DeviceBridge;
 import com.cobox.cosmart.devicebridge.listeners.OnBridgeConnectionListener;
 import com.cobox.cosmart.devicebridge.listeners.OnDeviceScanListener;
+import com.cobox.utils.SDK;
 
 import java.util.List;
 
@@ -28,18 +31,20 @@ import cn.geekiot.sparklebike.R;
 import cn.geekiot.sparklebike.ui.DiscoverDeviceAnimView;
 import cn.geekiot.sparklebike.ui.WiFiEnableDialog;
 import cn.geekiot.sparklebike.ui.DiscoverDeviceRecycleView;
+import cn.geekiot.sparklebike.ui.DiscoverDeviceRecycleView.OnItemClickListener;
 
 public class DiscoverDeviceActivity extends AppCompatActivity {
 
-    private ViewGroup                  mRootLayout                         = null;
-    private Toolbar                    mToolBar                            = null;
-    private CollapsingToolbarLayout    mCollapsingToolbarLayout            = null;
-    private DiscoverDeviceRecycleView  mFoundDeviceListView                = null;
-    private FloatingActionButton       mFloatingActionButton               = null;
-    private DiscoverDeviceAnimView     mDiscoverDeviceAnimView             = null;
-    private DeviceBridge               mDeviceBridge                       = new DeviceBridge();
-    private OnDeviceScanListener       mOnDeviceScanListener               = null;
-    private OnBridgeConnectionListener mOnBridgeConnectionListener         = null;
+    private ViewGroup                  mRootLayout                 = null;
+    private Toolbar                    mToolBar                    = null;
+    private CollapsingToolbarLayout    mCollapsingToolbarLayout    = null;
+    private DiscoverDeviceRecycleView  mFoundDeviceListView        = null;
+    private FloatingActionButton       mFloatingActionButton       = null;
+    private DiscoverDeviceAnimView     mDiscoverDeviceAnimView     = null;
+    private DeviceBridge               mDeviceBridge               = new DeviceBridge();
+    private OnDeviceScanListener       mOnDeviceScanListener       = null;
+    private OnBridgeConnectionListener mOnBridgeConnectionListener = null;
+    private OnItemClickListener        mOnItemClickListener        = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +161,23 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
             }
         };
 
+        mOnItemClickListener = new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(Device device, int position, long id) {
+                final Intent intent = new Intent(DiscoverDeviceActivity.this, DeviceDetailsActivity.class);
+                if (SDK.isSupportedMaterialDesign()) {
+                    startActivity(intent,
+                        ActivityOptions.makeSceneTransitionAnimation(
+                            DiscoverDeviceActivity.this, mFloatingActionButton, getString(R.string.SharedElementName_FloatingActionButton)).toBundle());
+                } else {
+                    startActivity(intent);
+                }
+            }
+
+        };
+
+        mFoundDeviceListView.setOnItemClickListener(mOnItemClickListener);
         mDeviceBridge.setOnBridgeConnectionListener(mOnBridgeConnectionListener);
         mDeviceBridge.setOnDeviceScanListener(mOnDeviceScanListener);
     }
@@ -166,14 +188,14 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
                 AlertDialog dialog = WiFiEnableDialog.createDialog(DiscoverDeviceActivity.this, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case DialogInterface.BUTTON_POSITIVE:
-                                mDeviceBridge.setWiFiEnabled(true);
-                                mDeviceBridge.discoverDevice();
-                                break;
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                break;
-                        }
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            mDeviceBridge.setWiFiEnabled(true);
+                            mDeviceBridge.discoverDevice();
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            break;
+                    }
                     }
                 });
                 dialog.show();

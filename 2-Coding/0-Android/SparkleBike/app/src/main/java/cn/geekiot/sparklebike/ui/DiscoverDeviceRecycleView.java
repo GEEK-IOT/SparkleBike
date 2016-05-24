@@ -31,15 +31,20 @@ public class DiscoverDeviceRecycleView {
     private final int fItemMarginBottom;
     private final int getfItemSpacing;
 
-    private RecyclerView.LayoutManager  mLayoutManager  = null;
-    private DiscoverDeviceAdapter       mAdapter        = null;
-    private RecyclerView.ItemAnimator   mItemAnimator   = null;
-    private RecyclerView.ItemDecoration mItemDecoration = null;
-    private RecyclerView                mHostView       = null;
+    private RecyclerView.LayoutManager  mLayoutManager       = null;
+    private DiscoverDeviceAdapter       mAdapter             = null;
+    private RecyclerView.ItemAnimator   mItemAnimator        = null;
+    private RecyclerView.ItemDecoration mItemDecoration      = null;
+    private RecyclerView                mHostView            = null;
+    private OnItemClickListener         mOnItemClickListener = null;
+
+    public interface OnItemClickListener {
+        void onItemClick(Device device, int position, long id);
+    }
 
     public DiscoverDeviceRecycleView(RecyclerView hostView) {
         mHostView          = hostView;
-        mAdapter           = new DiscoverDeviceAdapter();
+        mAdapter           = new DiscoverDeviceAdapter(hostView);
         mItemAnimator      = new DefaultItemAnimator();
         mItemDecoration    = new MarginItemItemDecoration();
         mLayoutManager     = new LinearLayoutManager(hostView.getContext());
@@ -51,6 +56,25 @@ public class DiscoverDeviceRecycleView {
         mHostView.addItemDecoration(mItemDecoration);
         mHostView.setAdapter(mAdapter);
         mHostView.setLayoutManager(mLayoutManager);
+        initializeListeners();
+    }
+
+    private void initializeListeners() {
+        mAdapter.setOnItemClickListener(new DiscoverDeviceAdapter.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(View view, int position, long id) {
+                if (mOnItemClickListener != null) {
+                    final Device device = mAdapter.getItemContent(position);
+                    mOnItemClickListener.onItemClick(device, position, id);
+                }
+            }
+
+        });
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mOnItemClickListener = listener;
     }
 
     public void notifyDataChanged(List<Device> deviceList) {
