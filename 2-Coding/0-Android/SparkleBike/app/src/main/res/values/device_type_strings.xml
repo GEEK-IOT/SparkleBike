@@ -1,0 +1,6 @@
+<resources>
+    <string name="DeviceTypeName_WiFiDevice">WiFi Device</string>
+    <string name="DeviceTypeName_CoSmartDevice">CoSmart Device</string>
+    <string name="DeviceTypeName_CoSmartCommander">CoSmart Commander</string>
+    <string name="DeviceTypeName_CoSmartMonitor">CoSmart Monitor</string>
+</resources>

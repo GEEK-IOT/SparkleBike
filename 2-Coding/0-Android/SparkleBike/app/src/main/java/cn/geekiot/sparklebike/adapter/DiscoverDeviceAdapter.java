@@ -2,6 +2,8 @@ package cn.geekiot.sparklebike.adapter;
 
 import android.app.AlarmManager;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -15,12 +17,14 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.cobox.cosmart.devicebridge.Config;
 import com.cobox.cosmart.devicebridge.Device;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.geekiot.sparklebike.R;
+import cn.geekiot.sparklebike.page.DeviceDetailsActivity;
 
 /**
  * DiscoverDeviceAdapter
@@ -30,7 +34,12 @@ import cn.geekiot.sparklebike.R;
  */
 public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
 
-    private static final String TAG = "DiscoverDeviceAdapter";
+    private static final String TAG                 = "DiscoverDeviceAdapter";
+
+    private static String[]       sDeviceTypeNameList         = {/* Load during construction */};
+    private static int[]          sDeviceIconHintColorList    = {/* Load during construction */};
+    private static String         sDefaultDeviceType          = null;
+    private static ColorStateList sDefaultDeviceIconTintColor = null;
 
     private List<Device>        mDeviceList          = null;
     private RecyclerView        mHostView            = null;
@@ -83,12 +92,12 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
                 @Override
                 public void onClick(View v) {
                 Log.e("Cocoonshu", "[onClick] Item");
-                if (mOnItemClickListener != null) {
-                    mOnItemClickListener.onItemClick(
-                            DeviceViewHolder.this.itemView,
-                            DeviceViewHolder.this.getAdapterPosition(),
-                            DeviceViewHolder.this.getItemId());
-                }
+                    if (mOnItemClickListener != null) {
+                        mOnItemClickListener.onItemClick(
+                                DeviceViewHolder.this.itemView,
+                                DeviceViewHolder.this.getAdapterPosition(),
+                                DeviceViewHolder.this.getItemId());
+                    }
                 }
 
             });
@@ -100,21 +109,45 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
                 mTxvType.setText("-");
                 mTxvCapabilities.setText("-");
                 mTxvLevelAndFreq.setText("- / -");
-                mTxvMAC.setText("");
+                mTxvMAC.setText(sDefaultDeviceType);
                 mImgIcon.setImageDrawable(mDefaultIcon);
+                mImgIcon.setBackgroundTintList(sDefaultDeviceIconTintColor);
+                mImgIcon.setTag(sDefaultDeviceIconTintColor);
+                mImgIcon.setTag(sDeviceIconHintColorList[0]);
             } else {
                 mTxvTitle.setText(device.getSSID());
-                mTxvType.setText("Terminal");
                 mTxvCapabilities.setText(device.getCapabilities());
                 mTxvLevelAndFreq.setText(device.getLevel() + " dBm / " + device.getFrequency() + " MHz");
                 mTxvMAC.setText(device.getMAC() == null ? "" : device.getMACString());
-                mImgIcon.setImageDrawable(mDefaultIcon);
+
+                if (device.getSSID().startsWith(Config.COSMART_DEVICE_SSID_PREFIX)) {
+                    mTxvType.setText(sDeviceTypeNameList[1]);
+                    mImgIcon.setImageDrawable(mDefaultIcon);
+                    mImgIcon.setBackgroundTintList(ColorStateList.valueOf(sDeviceIconHintColorList[1]));
+                    mImgIcon.setTag(sDeviceIconHintColorList[1]);
+                } else {
+                    mTxvType.setText(sDefaultDeviceType);
+                    mImgIcon.setImageDrawable(mDefaultIcon);
+                    mImgIcon.setBackgroundTintList(sDefaultDeviceIconTintColor);
+                    mImgIcon.setTag(sDeviceIconHintColorList[0]);
+                }
             }
         }
     }
 
     public DiscoverDeviceAdapter(RecyclerView hostView) {
         mHostView = hostView;
+        loadDeviceResourceList(hostView.getContext());
+    }
+
+    private void loadDeviceResourceList(Context context) {
+        Resources resources = context.getResources();
+        if (resources != null) {
+            sDeviceTypeNameList         = resources.getStringArray(R.array.DeviceTypeName);
+            sDeviceIconHintColorList    = resources.getIntArray(R.array.IconTintColor);
+            sDefaultDeviceType          = sDeviceTypeNameList.length > 0 ? sDeviceTypeNameList[0] : null;
+            sDefaultDeviceIconTintColor = sDeviceIconHintColorList.length > 0 ? ColorStateList.valueOf(sDeviceIconHintColorList[0]) : null;
+        }
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {

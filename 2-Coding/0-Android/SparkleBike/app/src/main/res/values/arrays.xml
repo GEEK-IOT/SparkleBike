@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="DeviceTypeName">
+        <item>@string/DeviceTypeName_WiFiDevice</item>
+        <item>@string/DeviceTypeName_CoSmartDevice</item>
+        <item>@string/DeviceTypeName_CoSmartCommander</item>
+        <item>@string/DeviceTypeName_CoSmartMonitor</item>
+    </string-array>
+    <array name="IconTintColor">
+        <item>@color/IconTintColor_WiFiDevice</item>
+        <item>@color/IconTintColor_CoSmartDevice</item>
+        <item>@color/IconTintColor_CoSmartCommander</item>
+        <item>@color/IconTintColor_CoSmartMonitor</item>
+    </array>
+</resources>

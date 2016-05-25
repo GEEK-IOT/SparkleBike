@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="IconTintColor_WiFiDevice">#FF8BA1B9</color>
+    <color name="IconTintColor_CoSmartDevice">#FFBC00d9</color>
+    <color name="IconTintColor_CoSmartCommander">#FFDC5400</color>
+    <color name="IconTintColor_CoSmartMonitor">#FF00A9DC</color>
+</resources>

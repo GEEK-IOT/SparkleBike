@@ -55,24 +55,42 @@
             android:layout_height="match_parent"
             android:layout_below="@+id/CollapsingToolbarLayout" />
 
-        <!-- 浮动按钮 -->
+        <!-- 浮动按钮组 -->
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/FloatingActionButton"
+            android:id="@+id/FloatingActionButton_FakeShadowView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
             android:layout_marginLeft="@dimen/MainActivity_FloatingActionButton_Margin"
             android:layout_marginRight="@dimen/MainActivity_FloatingActionButton_Margin"
             android:layout_marginTop="-30dp"
             android:layout_below="@id/CollapsingToolbarLayout"
             android:src="@mipmap/ic_developer_board_black"
-            android:transitionName="@string/SharedElementName_FloatingActionButton"
-            android:layout_alignParentLeft="true"
             app:borderWidth="@dimen/MainActivity_FloatingActionButton_BorderWidth"
             app:backgroundTint="@color/MainActivity_FloatingActionButton_TintColor"
             app:rippleColor="@color/MainActivity_FloatingActionButton_RippleColor"
             app:elevation="@dimen/MainActivity_FloatingActionButton_ShadowSize_Sink"
             app:pressedTranslationZ="@dimen/MainActivity_FloatingActionButton_ShadowSize_Raise"
             app:fabSize="normal" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/FloatingActionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="@dimen/MainActivity_FloatingActionButton_Margin"
+            android:layout_marginRight="@dimen/MainActivity_FloatingActionButton_Margin"
+            android:layout_marginTop="-30dp"
+            android:layout_below="@id/CollapsingToolbarLayout"
+            android:src="@mipmap/ic_developer_board_black"
+            android:transitionName="@string/SharedElementName_FloatingActionButton"
+            app:borderWidth="@dimen/MainActivity_FloatingActionButton_BorderWidth"
+            app:backgroundTint="@color/MainActivity_FloatingActionButton_TintColor"
+            app:rippleColor="@color/MainActivity_FloatingActionButton_RippleColor"
+            app:elevation="@dimen/MainActivity_FloatingActionButton_ShadowSize_Sink"
+            app:pressedTranslationZ="@dimen/MainActivity_FloatingActionButton_ShadowSize_Raise"
+            app:fabSize="normal" />
+
 
     </RelativeLayout>
 </FrameLayout>

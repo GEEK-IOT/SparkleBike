@@ -29,6 +29,7 @@ import com.cobox.utils.SDK;
 import java.util.List;
 
 import cn.geekiot.sparklebike.R;
+import cn.geekiot.sparklebike.adapter.DiscoverDeviceAdapter;
 import cn.geekiot.sparklebike.ui.DiscoverDeviceAnimView;
 import cn.geekiot.sparklebike.ui.WiFiEnableDialog;
 import cn.geekiot.sparklebike.ui.DiscoverDeviceRecycleView;
@@ -166,9 +167,14 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(View itemView, Device device, int position, long id) {
-                final Intent intent = new Intent(DiscoverDeviceActivity.this, DeviceDetailsActivity.class);
+                Intent intent        = new Intent(DiscoverDeviceActivity.this, DeviceDetailsActivity.class);
+                View   itemIcon      = itemView.findViewById(R.id.ImageView_Icon);
+                int    itemIconColor = (Integer) itemIcon.getTag();
+                intent.putExtra(DeviceDetailsActivity.KEY_DEVICE_ICON_COLOR, itemIconColor);
+                intent.putExtra(DeviceDetailsActivity.KEY_DEVICE_SSID, device.getSSID());
+                intent.putExtra(DeviceDetailsActivity.KEY_DEVICE_BSSID, device.getBSSID());
+
                 if (SDK.isSupportedMaterialDesign()) {
-                    View itemIcon = itemView.findViewById(R.id.ImageView_Icon);
                     startActivity(intent,
                         ActivityOptions.makeSceneTransitionAnimation(
                             DiscoverDeviceActivity.this, itemIcon, getString(R.string.SharedElementName_FloatingActionButton)).toBundle());
