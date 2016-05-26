@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/DrawerLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/CoordinatorLayout"
@@ -33,14 +34,14 @@
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
                     android:src="@drawable/bg_main_activity_toolbar_background"
-                    app:layout_collapseMode="parallax"
+                    app:layout_collapseMode="pin"
                     app:layout_collapseParallaxMultiplier="0.75" />
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/ToolBar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    app:layout_collapseMode="pin"
+                    app:layout_collapseMode="parallax"
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
@@ -90,7 +91,6 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:layout_marginTop="?android:attr/actionBarSize"
         app:headerLayout="@layout/main_activity_navigation_menu_header_layout"
         app:menu="@menu/main_activity_navigation_menu" />
 

@@ -6,6 +6,7 @@
         <item name="colorPrimary">#2196F3</item>
         <item name="colorPrimaryDark">#1565C0</item>
         <item name="colorAccent">#E91E63</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="AppTheme.WithoutActionBar">
@@ -19,6 +20,11 @@
     </style>
 
     <style name="AppTheme.DiscoverDeviceActivity">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.DeviceDetailsActivity">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>

@@ -10,6 +10,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/ApplicationName"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".page.MainActivity"
             android:label="@string/ApplicationName"
@@ -20,9 +21,21 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name=".page.DiscoverDeviceActivity"
-            android:theme="@style/AppTheme.DiscoverDeviceActivity">
+            android:theme="@style/AppTheme.DeviceDetailsActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".page.DeviceDetailsActivity"
+            android:label="@string/title_activity_device_details"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -41,11 +54,6 @@
             </intent-filter>
         </service>
 
-        <activity
-            android:name=".page.DeviceDetailsActivity"
-            android:label="@string/title_activity_device_details"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
     </application>
 
 </manifest>
