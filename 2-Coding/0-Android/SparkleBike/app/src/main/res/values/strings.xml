@@ -1,16 +1,17 @@
 <resources>
     <string name="ApplicationName">SparkleBike</string>
     <string name="DeviceBridgeServiceName">CoSmartDeviceBridgeService</string>
+
     <string name="MainActivity_DrawerLayoutHideDesc">Hide Menu</string>
     <string name="MainActivity_DrawerLayoutShowDesc">Show Menu</string>
+    <string name="MainActivity_DefaultFragment_NoRecord">No record</string>
+
+    <string name="DiscoveryDeviceActivity_Item_Ignore">Ignore</string>
 
     <string name="WiFiEnabledDialog_Title">WiFi disabled</string>
     <string name="WiFiEnabledDialog_Message">Please turn the WiFi on</string>
     <string name="WiFiEnabledDialog_Confirm">Confirm</string>
     <string name="WiFiEnabledDialog_Cancel">Cancel</string>
-
-    <string name="DiscoveryDeviceActivity_Item_Ignore">Ignore</string>
-
     <string name="SharedElementName_FloatingActionButton">FloatingActionButton</string>
     <string name="SharedElementName_TitleText">TitleText</string>
     <string name="title_activity_device_details">DeviceDetailsActivity</string>

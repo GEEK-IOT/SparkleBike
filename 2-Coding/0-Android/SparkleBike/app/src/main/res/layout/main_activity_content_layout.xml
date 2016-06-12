@@ -1,11 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/RecyclerView"
+    <android.support.design.widget.TabLayout
+        android:id="@+id/TabLayout_tabStrip"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="80dp"
+        android:background="@color/MainActivity_TabStrip_BackgroundColor"
+        android:translationZ="6dp"
+        app:tabIndicatorHeight="5dp"
+        app:tabIndicatorColor="@color/MainActivity_TabStrip_IndicatorColor"
+        app:tabSelectedTextColor="@color/MainActivity_TabStrip_SelectedTextColor"
+        app:tabTextColor="@color/MainActivity_TabStrip_TextColor" >
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/TabItem_Device"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout="@layout/tabitem_main_activity_content_layout_device_item" />
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/TabItem_Group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout="@layout/tabitem_main_activity_content_layout_group_item" />
+
+        <android.support.design.widget.TabItem
+            android:id="@+id/TabItem_Area"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout="@layout/tabitem_main_activity_content_layout_area_item" />
+
+    </android.support.design.widget.TabLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/ViewPager_FragmentPager"
+        android:layout_width="match_parent"
+        android:layout_height="640dp">
+        
+        <FrameLayout
+            android:id="@+id/FrameLayout_Device"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <FrameLayout
+            android:id="@+id/FrameLayout_Group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <FrameLayout
+            android:id="@+id/FrameLayout_Area"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+        
+    </android.support.v4.view.ViewPager>
 
 </RelativeLayout>

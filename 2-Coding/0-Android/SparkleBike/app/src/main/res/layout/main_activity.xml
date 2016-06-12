@@ -10,7 +10,7 @@
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/CoordinatorLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent">
 
         <!-- 向上隐藏 -->
         <android.support.design.widget.AppBarLayout
@@ -24,8 +24,10 @@
                 android:id="@+id/CollapsingToolbarLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                app:toolbarId="@+id/ToolBar"
                 app:contentScrim="?attr/colorPrimary"
                 app:expandedTitleMarginStart="@dimen/MainActivity_ToolbarLayout_ExpandedTitleMarginStart"
+                app:collapsedTitleTextAppearance="@style/NormalTabTextStyle"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed" >
 
                 <ImageView
@@ -41,7 +43,7 @@
                     android:id="@+id/ToolBar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    app:layout_collapseMode="parallax"
+                    app:layout_collapseMode="pin"
                     app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 

@@ -8,10 +8,14 @@ import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
@@ -22,15 +26,17 @@ import android.view.Window;
 
 import com.cobox.utils.SDK;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cn.geekiot.sparklebike.R;
-import cn.geekiot.sparklebike.RecyclerViewHelper;
 
 /**
  * MainActivity
  * @Auther Cocoonshu
  * @Date 2016-04-11 19:17:15
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FragmentControlLinker {
     public static final String TAG = "MainActivity";
 
     private Handler                 mAnimationHandler        = new Handler();
@@ -42,8 +48,11 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle   mActionBarDrawerToggle   = null;
     private FloatingActionButton    mFloatingActionButton    = null;
 
-    private RecyclerView            mRecyclerView            = null;
-    private RecyclerViewHelper mRecyclerViewHelper      = null;
+    private InnerPagerAdapter           mPagerAdapter    = null;
+    private ViewPager                   mFragmentPager   = null;
+    private MainActivityDevicesFragment mDevicesFragment = null;
+    private MainActivityGroupsFragment  mGroupsFragment  = null;
+    private MainActivityAreasFragment   mAreasFragment   = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         setupActionBarAsToolBar();
         findContentViews();
         setupViewListeners();
+        setupFragment();
     }
 
     @Override
@@ -104,12 +114,7 @@ public class MainActivity extends AppCompatActivity {
         if (mActionBarDrawerToggle.onOptionsItemSelected(item))
             return true;
 
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        // noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -134,16 +139,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void findContentViews() {
-        mRecyclerView         = (RecyclerView) findViewById(R.id.RecyclerView);
-        mRecyclerViewHelper   = new RecyclerViewHelper(mRecyclerView);
-        mRecyclerViewHelper.setupRecycleView();
-        mRecyclerViewHelper.fillDataSet();
-
         mBackgroundRippleView    = findViewById(R.id.View_BackgroundRipple);
         mCoordinatorLayout       = (CoordinatorLayout) findViewById(R.id.CoordinatorLayout);
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.CollapsingToolbarLayout);
         mDrawerLayout            = (DrawerLayout) findViewById(R.id.DrawerLayout);
         mFloatingActionButton    = (FloatingActionButton) findViewById(R.id.FloatingActionButton);
+        mFragmentPager           = (ViewPager) findViewById(R.id.ViewPager_FragmentPager);
         mActionBarDrawerToggle   = new ActionBarDrawerToggle(MainActivity.this, mDrawerLayout,
                 R.string.MainActivity_DrawerLayoutShowDesc,
                 R.string.MainActivity_DrawerLayoutHideDesc);
@@ -174,5 +175,55 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(mToolBar);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void setupFragment() {
+        List<Fragment> fragmentList = new ArrayList<Fragment>();
+
+        mDevicesFragment = new MainActivityDevicesFragment();
+        Bundle deviceBundle = new Bundle();
+        mDevicesFragment.setArguments(deviceBundle);
+        mDevicesFragment.setControlLinker(this);
+        fragmentList.add(mDevicesFragment);
+
+        mGroupsFragment = new MainActivityGroupsFragment();
+        Bundle groupBundle = new Bundle();
+        mGroupsFragment.setArguments(groupBundle);
+        mGroupsFragment.setControlLinker(this);
+        fragmentList.add(mGroupsFragment);
+
+        mAreasFragment = new MainActivityAreasFragment();
+        Bundle areaBundle = new Bundle();
+        mGroupsFragment.setArguments(areaBundle);
+        mGroupsFragment.setControlLinker(this);
+        fragmentList.add(mAreasFragment);
+
+        mPagerAdapter = new InnerPagerAdapter(getSupportFragmentManager(), fragmentList);
+        mFragmentPager.setAdapter(mPagerAdapter);
+    }
+
+    /**
+     * Inner Pager Adapter
+     * @Auther Cocoonshu
+     * @Date 2016-06-12 18:03:21
+     */
+    private class InnerPagerAdapter extends FragmentPagerAdapter {
+
+        private List<Fragment> mFragmentList = null;
+
+        public InnerPagerAdapter(FragmentManager fragmentManager, List<Fragment> fragmentList) {
+            super(fragmentManager);
+            mFragmentList = fragmentList;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList == null ? null : mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList == null ? 0 : mFragmentList.size();
+        }
     }
 }

@@ -1,9 +1,15 @@
 <resources>
 
+    <style name="CustomTabTextStyle" parent="@android:style/TextAppearance.Holo">
+        <item name="android:textStyle">normal</item>
+    </style>
+
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:actionBarTabTextStyle">@style/CustomTabTextStyle</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
+
 </resources>
