@@ -8,6 +8,7 @@ import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements FragmentControlLi
 
     private InnerPagerAdapter           mPagerAdapter    = null;
     private ViewPager                   mFragmentPager   = null;
+    private TabLayout                   mTabLayout       = null;
     private MainActivityDevicesFragment mDevicesFragment = null;
     private MainActivityGroupsFragment  mGroupsFragment  = null;
     private MainActivityAreasFragment   mAreasFragment   = null;
@@ -145,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements FragmentControlLi
         mDrawerLayout            = (DrawerLayout) findViewById(R.id.DrawerLayout);
         mFloatingActionButton    = (FloatingActionButton) findViewById(R.id.FloatingActionButton);
         mFragmentPager           = (ViewPager) findViewById(R.id.ViewPager_FragmentPager);
+        mTabLayout               = (TabLayout) findViewById(R.id.TabLayout_tabStrip);
         mActionBarDrawerToggle   = new ActionBarDrawerToggle(MainActivity.this, mDrawerLayout,
                 R.string.MainActivity_DrawerLayoutShowDesc,
                 R.string.MainActivity_DrawerLayoutHideDesc);
@@ -185,21 +188,25 @@ public class MainActivity extends AppCompatActivity implements FragmentControlLi
         mDevicesFragment.setArguments(deviceBundle);
         mDevicesFragment.setControlLinker(this);
         fragmentList.add(mDevicesFragment);
+        mTabLayout.addTab(mTabLayout.newTab().setCustomView(R.layout.tabitem_main_activity_content_layout_device_item));
 
         mGroupsFragment = new MainActivityGroupsFragment();
         Bundle groupBundle = new Bundle();
         mGroupsFragment.setArguments(groupBundle);
         mGroupsFragment.setControlLinker(this);
         fragmentList.add(mGroupsFragment);
+        mTabLayout.addTab(mTabLayout.newTab().setCustomView(R.layout.tabitem_main_activity_content_layout_group_item));
 
         mAreasFragment = new MainActivityAreasFragment();
         Bundle areaBundle = new Bundle();
         mGroupsFragment.setArguments(areaBundle);
         mGroupsFragment.setControlLinker(this);
         fragmentList.add(mAreasFragment);
+        mTabLayout.addTab(mTabLayout.newTab().setCustomView(R.layout.tabitem_main_activity_content_layout_area_item));
 
         mPagerAdapter = new InnerPagerAdapter(getSupportFragmentManager(), fragmentList);
         mFragmentPager.setAdapter(mPagerAdapter);
+        mTabLayout.setupWithViewPager(mFragmentPager);
     }
 
     /**
