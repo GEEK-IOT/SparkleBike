@@ -10,6 +10,7 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -21,10 +22,11 @@ android {
         abi {
             enable true
             reset()
-            include 'armabi', 'x86', 'armeabi-v7a', 'mips' //select ABIs to build APKs for
-            universalApk true //generate an additional APK that contains all the ABIs
+            include 'armabi', 'x86', 'armeabi-v7a', 'mips' // select ABIs to build APKs for
+            universalApk true // generate an additional APK that contains all the ABIs
         }
-    }    // map for the version code
+    }
+    // map for the version code
     project.ext.versionCodes = ['armeabi': 1, 'armeabi-v7a': 2, 'arm64-v8a': 3, 'mips': 5, 'mips64': 6, 'x86': 8, 'x86_64': 9]
 
     android.applicationVariants.all { variant ->        // assign different version code for each output

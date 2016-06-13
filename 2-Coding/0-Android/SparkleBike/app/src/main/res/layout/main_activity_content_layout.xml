@@ -16,27 +16,7 @@
         app:tabIndicatorHeight="5dp"
         app:tabIndicatorColor="@color/MainActivity_TabStrip_IndicatorColor"
         app:tabSelectedTextColor="@color/MainActivity_TabStrip_SelectedTextColor"
-        app:tabTextColor="@color/MainActivity_TabStrip_TextColor" >
-
-        <android.support.design.widget.TabItem
-            android:id="@+id/TabItem_Device"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout="@layout/tabitem_main_activity_content_layout_device_item" />
-
-        <android.support.design.widget.TabItem
-            android:id="@+id/TabItem_Group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout="@layout/tabitem_main_activity_content_layout_group_item" />
-
-        <android.support.design.widget.TabItem
-            android:id="@+id/TabItem_Area"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout="@layout/tabitem_main_activity_content_layout_area_item" />
-
-    </android.support.design.widget.TabLayout>
+        app:tabTextColor="@color/MainActivity_TabStrip_TextColor" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/ViewPager_FragmentPager"

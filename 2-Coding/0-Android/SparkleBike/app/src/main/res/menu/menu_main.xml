@@ -1,7 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <item android:id="@+id/action_home_router"
+          android:title="路由"
+          android:orderInCategory="90"
+          android:icon="@drawable/ani_home_router"
+          app:showAsAction="ifRoom" />
     <item android:id="@+id/action_settings"
           android:title="设置"
           android:orderInCategory="100"
           app:showAsAction="never" />
+
 </menu>

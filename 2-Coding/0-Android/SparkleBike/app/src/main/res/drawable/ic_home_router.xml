@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="50dp"
+    android:height="50dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+
+    <group
+        android:name="centerPoint"
+        android:pivotX="50"
+        android:pivotY="50"
+        android:scaleX="1.0"
+        android:scaleY="1.0">
+        <path
+            android:fillColor="@color/icons"
+            android:pathData="M40,50
+                              a10,10 0 1,1 0,1 z"/>
+    </group>
+
+    <group
+        android:name="waveHidden"
+        android:pivotX="50"
+        android:pivotY="50"
+        android:scaleX="0.5"
+        android:scaleY="0.5">
+        <path
+            android:name="waveHiddenPath"
+            android:strokeColor="@color/icons"
+            android:strokeWidth="5"
+            android:strokeAlpha="0.0"
+            android:pathData="M38,70.7846
+                              a24,24 0 1,1 24,0"/>
+    </group>
+
+    <group
+        android:name="waveInner"
+        android:pivotX="50"
+        android:pivotY="50"
+        android:scaleX="0.9"
+        android:scaleY="0.9">
+        <path
+            android:name="waveInnerPath"
+            android:strokeColor="@color/icons"
+            android:strokeWidth="5"
+            android:pathData="M38,70.7846
+                              a24,24 0 1,1 24,0"/>
+    </group>
+
+    <group
+        android:name="waveOuter"
+        android:pivotX="50"
+        android:pivotY="50"
+        android:scaleX="1.5"
+        android:scaleY="1.5">
+        <path
+            android:name="waveOuterPath"
+            android:strokeColor="@color/icons"
+            android:strokeWidth="5"
+            android:pathData="M38,70.7846
+                              a24,24 0 1,1 24,0"/>
+        <!--android:pathData="M31.75,81.61-->
+        <!--a36.5,36.5 0 1,1 36.5,0"-->
+    </group>
+
+</vector>

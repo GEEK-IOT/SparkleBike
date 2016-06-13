@@ -5,6 +5,21 @@
     <string name="MainActivity_DrawerLayoutHideDesc">Hide Menu</string>
     <string name="MainActivity_DrawerLayoutShowDesc">Show Menu</string>
     <string name="MainActivity_DefaultFragment_NoRecord">No record</string>
+    <plurals name="MainActivity_TabLayout_Unit_Device">
+        <item quantity="zero">device</item>
+        <item quantity="one">device</item>
+        <item quantity="other">devices</item>
+    </plurals>
+    <plurals name="MainActivity_TabLayout_Unit_Group">
+        <item quantity="zero">group</item>
+        <item quantity="one">group</item>
+        <item quantity="other">groups</item>
+    </plurals>
+    <plurals name="MainActivity_TabLayout_Unit_Area">
+        <item quantity="zero">area</item>
+        <item quantity="one">area</item>
+        <item quantity="other">areas</item>
+    </plurals>
 
     <string name="DiscoveryDeviceActivity_Item_Ignore">Ignore</string>
 

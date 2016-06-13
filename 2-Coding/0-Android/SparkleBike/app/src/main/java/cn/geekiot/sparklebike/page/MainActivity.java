@@ -1,36 +1,42 @@
 package cn.geekiot.sparklebike.page;
 
 import android.app.ActivityOptions;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.TextView;
 
 import com.cobox.utils.SDK;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import cn.geekiot.sparklebike.R;
+import cn.geekiot.sparklebike.ui.WiFiEnableDialog;
 
 /**
  * MainActivity
@@ -119,6 +125,19 @@ public class MainActivity extends AppCompatActivity implements FragmentControlLi
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_home_router) {
+            Drawable icon = item.getIcon();
+            if (icon instanceof AnimatedVectorDrawableCompat) {
+                AnimatedVectorDrawableCompat vectorIcon = (AnimatedVectorDrawableCompat) icon;
+                vectorIcon.start();
+//                WiFiEnableDialog.createDialog(MainActivity.this, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.dismiss();
+//                    }
+//                }).show();
+            }
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -181,32 +200,14 @@ public class MainActivity extends AppCompatActivity implements FragmentControlLi
     }
 
     private void setupFragment() {
-        List<Fragment> fragmentList = new ArrayList<Fragment>();
-
-        mDevicesFragment = new MainActivityDevicesFragment();
-        Bundle deviceBundle = new Bundle();
-        mDevicesFragment.setArguments(deviceBundle);
-        mDevicesFragment.setControlLinker(this);
-        fragmentList.add(mDevicesFragment);
         mTabLayout.addTab(mTabLayout.newTab().setCustomView(R.layout.tabitem_main_activity_content_layout_device_item));
-
-        mGroupsFragment = new MainActivityGroupsFragment();
-        Bundle groupBundle = new Bundle();
-        mGroupsFragment.setArguments(groupBundle);
-        mGroupsFragment.setControlLinker(this);
-        fragmentList.add(mGroupsFragment);
         mTabLayout.addTab(mTabLayout.newTab().setCustomView(R.layout.tabitem_main_activity_content_layout_group_item));
-
-        mAreasFragment = new MainActivityAreasFragment();
-        Bundle areaBundle = new Bundle();
-        mGroupsFragment.setArguments(areaBundle);
-        mGroupsFragment.setControlLinker(this);
-        fragmentList.add(mAreasFragment);
         mTabLayout.addTab(mTabLayout.newTab().setCustomView(R.layout.tabitem_main_activity_content_layout_area_item));
 
-        mPagerAdapter = new InnerPagerAdapter(getSupportFragmentManager(), fragmentList);
+        mPagerAdapter = new InnerPagerAdapter(getSupportFragmentManager(), MainActivity.this);
         mFragmentPager.setAdapter(mPagerAdapter);
         mTabLayout.setupWithViewPager(mFragmentPager);
+        mPagerAdapter.setTabLayout(mTabLayout);
     }
 
     /**
@@ -216,21 +217,86 @@ public class MainActivity extends AppCompatActivity implements FragmentControlLi
      */
     private class InnerPagerAdapter extends FragmentPagerAdapter {
 
-        private List<Fragment> mFragmentList = null;
+        public static final int   POSITION_DEVICE_PAGE = 0;
+        public static final int   POSITION_GROUP_PAGE  = 1;
+        public static final int   POSITION_AREA_PAGE   = 2;
+        public static final int   PAGE_SIZE            = 3;
+        public        final int   TAB_LAYOUT_TEMPLATE  = R.layout.main_activity_content_layout_tabitem;
+        public        final int[] TAB_ITEM_UNIT_RESIDS = {
+                R.plurals.MainActivity_TabLayout_Unit_Device,
+                R.plurals.MainActivity_TabLayout_Unit_Group,
+                R.plurals.MainActivity_TabLayout_Unit_Area
+        };
 
-        public InnerPagerAdapter(FragmentManager fragmentManager, List<Fragment> fragmentList) {
+        private TabLayout             mTabLayout     = null;
+        private FragmentControlLinker mControlLinker = null;
+
+        public InnerPagerAdapter(FragmentManager fragmentManager, FragmentControlLinker controlLinker) {
             super(fragmentManager);
-            mFragmentList = fragmentList;
+            mControlLinker = controlLinker;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case POSITION_DEVICE_PAGE: return "device";
+                case POSITION_GROUP_PAGE: return "group";
+                case POSITION_AREA_PAGE: return "area";
+                default:return "xx";
+            }
         }
 
         @Override
         public Fragment getItem(int position) {
-            return mFragmentList == null ? null : mFragmentList.get(position);
+            Fragment targetFragment = null;
+            switch (position) {
+                case POSITION_DEVICE_PAGE:
+                    Bundle deviceBundle = new Bundle();
+                    mDevicesFragment = new MainActivityDevicesFragment();
+                    mDevicesFragment.setArguments(deviceBundle);
+                    mDevicesFragment.setControlLinker(mControlLinker);
+                    targetFragment = mDevicesFragment;
+                    break;
+
+                case POSITION_GROUP_PAGE:
+                    Bundle groupBundle = new Bundle();
+                    mGroupsFragment = new MainActivityGroupsFragment();
+                    mGroupsFragment.setArguments(groupBundle);
+                    mGroupsFragment.setControlLinker(mControlLinker);
+                    targetFragment = mGroupsFragment;
+                    break;
+
+                case POSITION_AREA_PAGE:
+                    Bundle areaBundle = new Bundle();
+                    mAreasFragment = new MainActivityAreasFragment();
+                    mAreasFragment.setArguments(areaBundle);
+                    mAreasFragment.setControlLinker(mControlLinker);
+                    targetFragment = mAreasFragment;
+                    break;
+            }
+            return targetFragment;
         }
 
         @Override
         public int getCount() {
-            return mFragmentList == null ? 0 : mFragmentList.size();
+            return PAGE_SIZE;
+        }
+
+        public void setTabLayout(TabLayout tabLayout) {
+            mTabLayout = tabLayout;
+
+            int            tabCount = mTabLayout.getTabCount();
+            Context        context  = mTabLayout.getContext();
+            LayoutInflater inflater = LayoutInflater.from(context);
+            for (int i = 0; i < tabCount; i++) {
+                TabLayout.Tab tab = mTabLayout.getTabAt(i);
+                if (tab != null) {
+                    View     customView = inflater.inflate(TAB_LAYOUT_TEMPLATE, null, false);
+                    TextView unitView   = (TextView) customView.findViewById(R.id.TextView_Unit);
+                    unitView.setText(context.getResources().getQuantityText(TAB_ITEM_UNIT_RESIDS[i], 0));
+                    tab.setCustomView(customView);
+                }
+            }
         }
     }
 }
