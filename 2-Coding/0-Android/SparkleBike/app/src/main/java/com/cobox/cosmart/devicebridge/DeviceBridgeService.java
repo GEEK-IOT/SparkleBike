@@ -6,6 +6,7 @@ import android.os.Binder;
 import android.os.IBinder;
 
 import com.cobox.cosmart.devicebridge.devicelayer.ESP8266Scaner;
+import com.cobox.cosmart.devicebridge.listeners.OnDeviceConnectionListener;
 import com.cobox.cosmart.devicebridge.listeners.OnDeviceScanListener;
 
 import java.util.LinkedList;
@@ -120,5 +121,13 @@ public class DeviceBridgeService extends Service {
 
     public boolean isWiFiEnabled() {
         return mESP8266Scaner == null ? null : mESP8266Scaner.isWiFiEnabled();
+    }
+
+    public void connectDevice(Device device, OnDeviceConnectionListener listener) {
+        // TODO
+    }
+
+    public void disconnectDevice(Device device) {
+        // TODO
     }
 }

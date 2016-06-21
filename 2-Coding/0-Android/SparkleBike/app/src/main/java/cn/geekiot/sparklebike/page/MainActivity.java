@@ -130,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements FragmentControlLi
             if (icon instanceof AnimatedVectorDrawableCompat) {
                 AnimatedVectorDrawableCompat vectorIcon = (AnimatedVectorDrawableCompat) icon;
                 vectorIcon.start();
+                // TODO Show a router chooser window
 //                WiFiEnableDialog.createDialog(MainActivity.this, new DialogInterface.OnClickListener() {
 //                    @Override
 //                    public void onClick(DialogInterface dialog, int which) {

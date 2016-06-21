@@ -9,6 +9,7 @@ import android.os.IBinder;
 import com.cobox.cosmart.devicebridge.DeviceBridgeService.DeviceBridgeServiceBinder;
 
 import com.cobox.cosmart.devicebridge.listeners.OnBridgeConnectionListener;
+import com.cobox.cosmart.devicebridge.listeners.OnDeviceConnectionListener;
 import com.cobox.cosmart.devicebridge.listeners.OnDeviceScanListener;
 
 import java.util.List;
@@ -143,6 +144,18 @@ public class DeviceBridge {
     public void discoverDevice() {
         if (mService != null) {
             mService.discoverDevice();
+        }
+    }
+
+    public void connectDevice(Device device, OnDeviceConnectionListener listener) {
+        if (mService != null) {
+            mService.connectDevice(device, listener);
+        }
+    }
+
+    public void disconnectDevice(Device device) {
+        if (mService != null) {
+            mService.disconnectDevice(device);
         }
     }
 }

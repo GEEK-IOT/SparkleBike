@@ -1,7 +1,9 @@
 package com.cobox.cosmart.devicebridge.listeners;
 
 /**
- * Created by Cocoonshu on 2016/4/27.
+ * OnBridgeConnectionListener
+ * @Auther Cocoonshu
+ * @Date   2016-06-21 15:49:22
  */
 public interface OnBridgeConnectionListener {
     void onBridgeConnected();
