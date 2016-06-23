@@ -4,6 +4,11 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
 
+    sourceSets {
+
+        main {}
+
+    }
     defaultConfig {
         applicationId "cn.geekiot.sparklebike"
         minSdkVersion 21
