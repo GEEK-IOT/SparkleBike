@@ -20,6 +20,24 @@ void ICACHE_FLASH_ATTR Text_copyText(char *dest, const char *src, size_t copyLen
 	}
 }
 
+bool ICACHE_FLASH_ATTR Text_compareText(const char* ref, const char *src, unsigned short start, unsigned short length) {
+	if (length == 0 && (ref == NULL || os_strlen(ref) == 0)) {
+		return true;
+	}
+
+	size_t refLength = os_strlen(ref);
+	if (refLength != length) {
+		return false;
+	}
+	size_t i = 0;
+	for (i = 0; start < length; start++, i++) {
+		if (*(ref + i) != *(src + start)) {
+			return false;
+		}
+	}
+	return true;
+}
+
 const char* ICACHE_FLASH_ATTR Text_toAuthModeString(AUTH_MODE authMode) {
 	switch(authMode) {
 	case AUTH_OPEN:
@@ -57,12 +75,12 @@ uint32 ICACHE_FLASH_ATTR Text_parseIPAddressString(const char* strSource, unsign
 		return 0;
 
 	uint32 result = 0;
-	char numberStr[4];
-	os_bzero(numberStr, 4);
+	char   numberStr[4];
+	os_memset(numberStr, '\0', 4);
 
-	size_t numItr = 0;
+	size_t numItr   = 0;
 	size_t ipBitItr = 0;
-	size_t end = start + length + 1;
+	size_t end      = start + length + 1;
 	for (; start < end; start++) {
 		const char* current = strSource + start;
 		if (*current == '.' || start == (end - 1)) {
@@ -80,22 +98,72 @@ uint32 ICACHE_FLASH_ATTR Text_parseIPAddressString(const char* strSource, unsign
 	return result;
 }
 
+uint32 ICACHE_FLASH_ATTR Text_parsePortString(const char* strSource, unsigned short start, unsigned short length) {
+	if (length == 0)
+		return 0;
+
+	char numberStr[length + 1];
+	os_memset(numberStr, '\0', length + 1);
+
+	size_t numItr = 0;
+	size_t end    = start + length + 1;
+	for (; start < end; start++, numItr++) {
+		numberStr[numItr] = *(strSource + start);
+	}
+
+	return atoi(numberStr);
+}
+
+enum TerminalType ICACHE_FLASH_ATTR Text_parseTerminalTypeString(const char* strSource, unsigned short start, unsigned short length) {
+	if (length == 0) {
+		return UnknownType;
+	}
+
+	if (Text_compareText(IDC_FLATFORM_ANDROID, strSource, start, length)) {
+		return Android;
+	} else if (Text_compareText(IDC_FLATFORM_IOS, strSource, start, length)) {
+		return IOS;
+	} else if (Text_compareText(IDC_FLATFORM_PC, strSource, start, length)) {
+		return PC;
+	} else if (Text_compareText(IDC_FLATFORM_WEB, strSource, start, length)) {
+		return Web;
+	} else {
+		return UnknownType;
+	}
+}
+
+enum TerminalPlatform ICACHE_FLASH_ATTR Text_parseTerminalPlatformString(const char* strSource, unsigned short start, unsigned short length) {
+	if (length == 0) {
+		return UnknownPlatform;
+	}
+
+	if (Text_compareText(IDC_TERMINAL_MONITOR, strSource, start, length)) {
+		return Monitor;
+	} else if (Text_compareText(IDC_TERMINAL_COMMANDER, strSource, start, length)) {
+		return Commander;
+	} else if (Text_compareText(IDC_TERMINAL_DEVICE, strSource, start, length)) {
+		return Device;
+	} else {
+		return UnknownPlatform;
+	}
+}
+
 const char* ICACHE_FLASH_ATTR Text_terminalPlatformEnumToString(enum TerminalPlatform platform) {
 	switch (platform) {
-		case Android: return ANDROID_FLATFORM_IDENTIFY;
-		case IOS:     return IOS_FLATFORM_IDENTIFY;
-		case PC:      return PC_FLATFORM_IDENTIFY;
-		case Web:     return WEB_FLATFORM_IDENTIFY;
-		default:      return UNKNOWN_FLATFORM_IDENTIFY;
+		case Android: return IDC_FLATFORM_ANDROID;
+		case IOS:     return IDC_FLATFORM_IOS;
+		case PC:      return IDC_FLATFORM_PC;
+		case Web:     return IDC_FLATFORM_WEB;
+		default:      return IDC_FLATFORM_UNKNOWN;
 	}
 }
 
 const char* ICACHE_FLASH_ATTR Text_terminalTypeEnumToString(enum TerminalType type) {
 	switch (type) {
-		case Monitor:   return MONITOR_TERMINAL_IDENTIFY;
-		case Commander: return COMMANDER_TERMINAL_IDENTIFY;
-		case Device:    return DEVICE_TERMINAL_IDENTIFY;
-		default:        return UNKNOWN_TERMINAL_IDENTIFY;
+		case Monitor:   return IDC_TERMINAL_MONITOR;
+		case Commander: return IDC_TERMINAL_COMMANDER;
+		case Device:    return IDC_TERMINAL_DEVICE;
+		default:        return IDC_TERMINAL_UNKNOWN;
 	}
 }
 

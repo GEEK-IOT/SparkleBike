@@ -48,6 +48,18 @@ static const char AUTHMODE_WPA_PSK                        [] ICACHE_DATA_ATTR = 
 static const char AUTHMODE_WPA2_PSK                       [] ICACHE_DATA_ATTR = {"Null"};
 static const char AUTHMODE_WPA_WPA2_PSK                   [] ICACHE_DATA_ATTR = {"Null"};
 
+// IDENTIFY
+static const char IDC_COSMART                             [] ICACHE_DATA_ATTR = {"cosmart"};
+static const char IDC_FLATFORM_ANDROID                    [] ICACHE_DATA_ATTR = {"android"};
+static const char IDC_FLATFORM_IOS                        [] ICACHE_DATA_ATTR = {"ios"};
+static const char IDC_FLATFORM_PC                         [] ICACHE_DATA_ATTR = {"pc"};
+static const char IDC_FLATFORM_WEB                        [] ICACHE_DATA_ATTR = {"web"};
+static const char IDC_FLATFORM_UNKNOWN                    [] ICACHE_DATA_ATTR = {"unknown"};
+static const char IDC_TERMINAL_MONITOR                    [] ICACHE_DATA_ATTR = {"monitor"};
+static const char IDC_TERMINAL_COMMANDER                  [] ICACHE_DATA_ATTR = {"commander"};
+static const char IDC_TERMINAL_DEVICE                     [] ICACHE_DATA_ATTR = {"device"};
+static const char IDC_TERMINAL_UNKNOWN                    [] ICACHE_DATA_ATTR = {"unknown"};
+
 // APPLICATION LOGS
 static const char LOG_EMPTY                               []                    = {""};
 static const char LOG_ONE_LINE                            []                    = {"\r\n"};
@@ -90,20 +102,20 @@ static const char LOG_WIFI_STATION_CONNECTED              [] ICACHE_DATA_ATTR = 
 static const char LOG_WIFI_STATION_DISCONNECTED           [] ICACHE_DATA_ATTR = {"[WiFi] Station: %02x:%02x:%02x:%02x:%02x:%02x(%d) disconnected!"};
 
 // JSON KEYWORDS
-static const char KEY_REQUEST_ID        [] ICACHE_DATA_ATTR = {"requestID"};
-static const char KEY_RESPONSE_ID       [] ICACHE_DATA_ATTR = {"responseID"};
-static const char KEY_RETURN            [] ICACHE_DATA_ATTR = {"return"};
-static const char KEY_RESPONSE_STATE    [] ICACHE_DATA_ATTR = {"responseState"};
-static const char KEY_METHOD            [] ICACHE_DATA_ATTR = {"method"};
-static const char KEY_PARAMETERS        [] ICACHE_DATA_ATTR = {"parameters"};
-static const char KEY_BROADCAST_IP      [] ICACHE_DATA_ATTR = {"broadcastIP"};
-static const char KEY_BROADCAST_PORT    [] ICACHE_DATA_ATTR = {"broadcastPort"};
-static const char KEY_PLATFORM          [] ICACHE_DATA_ATTR = {"platform"};
-static const char KEY_COMMAND_PORT      [] ICACHE_DATA_ATTR = {"commandPort"};
-static const char KEY_SECURITY_CODE     [] ICACHE_DATA_ATTR = {"securityCode"};
-static const char KEY_STATE_CODE        [] ICACHE_DATA_ATTR = {"stateCode"};
-static const char KEY_STATE_MESSAGE     [] ICACHE_DATA_ATTR = {"stateMessage"};
-static const char KEY_STATE_DESCRIPTION [] ICACHE_DATA_ATTR = {"stateDescription"};
+//static const char KEY_REQUEST_ID        [] ICACHE_DATA_ATTR = {"requestID"};
+//static const char KEY_RESPONSE_ID       [] ICACHE_DATA_ATTR = {"responseID"};
+//static const char KEY_RETURN            [] ICACHE_DATA_ATTR = {"return"};
+//static const char KEY_RESPONSE_STATE    [] ICACHE_DATA_ATTR = {"responseState"};
+//static const char KEY_METHOD            [] ICACHE_DATA_ATTR = {"method"};
+//static const char KEY_PARAMETERS        [] ICACHE_DATA_ATTR = {"parameters"};
+//static const char KEY_BROADCAST_IP      [] ICACHE_DATA_ATTR = {"broadcastIP"};
+//static const char KEY_BROADCAST_PORT    [] ICACHE_DATA_ATTR = {"broadcastPort"};
+//static const char KEY_PLATFORM          [] ICACHE_DATA_ATTR = {"platform"};
+//static const char KEY_COMMAND_PORT      [] ICACHE_DATA_ATTR = {"commandPort"};
+//static const char KEY_SECURITY_CODE     [] ICACHE_DATA_ATTR = {"securityCode"};
+//static const char KEY_STATE_CODE        [] ICACHE_DATA_ATTR = {"stateCode"};
+//static const char KEY_STATE_MESSAGE     [] ICACHE_DATA_ATTR = {"stateMessage"};
+//static const char KEY_STATE_DESCRIPTION [] ICACHE_DATA_ATTR = {"stateDescription"};
 
 void Cosmart_initialize();
 

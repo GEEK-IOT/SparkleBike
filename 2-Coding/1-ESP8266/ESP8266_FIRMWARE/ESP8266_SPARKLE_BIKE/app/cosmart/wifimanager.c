@@ -15,12 +15,12 @@
 #include "user_interface.h"
 
 // 内部函数声明
-bool isNeedRebootAfterSetOpMode();
-char* generateAPSSID();
-void  deleteAPSSID(char** pAPSSID);
-char* generateAPPassword();
-void  deleteAPPassword(char** pAPPassword);
-void  onWifiEventReceived(System_Event_t* event);
+LOCAL bool  isNeedRebootAfterSetOpMode();
+LOCAL char* generateAPSSID();
+LOCAL void  deleteAPSSID(char** pAPSSID);
+LOCAL char* generateAPPassword();
+LOCAL void  deleteAPPassword(char** pAPPassword);
+LOCAL void  onWifiEventReceived(System_Event_t* event);
 
 ///////////////
 //  外部函数   //
@@ -63,6 +63,7 @@ void ICACHE_FLASH_ATTR WiFi_setupAPAndSTA() {
 		Log_printfln(LOG_WIFI_REBOOT_FOR_AP_CONFIG_CHANGED);
 		system_restart();
 	}
+	wifi_set_broadcast_if(STATIONAP_MODE);
 
 	Log_printfln(LOG_WIFI_UPDATING_CONFIG);
 	Log_printfln(LOG_WIFI_UPDATING_CONFIG_OP_MODE,        Text_toOPModeString(opmode));
@@ -88,7 +89,7 @@ void ICACHE_FLASH_ATTR WiFi_setupProtocolBridge() {
 ///////////////
 //  内部函数   //
 ///////////////
-bool ICACHE_FLASH_ATTR isNeedRebootAfterSetOpMode() {
+LOCAL bool ICACHE_FLASH_ATTR isNeedRebootAfterSetOpMode() {
 	const char* refVersion = REF_VERSION;
 	const char* sdkVersion = system_get_sdk_version();
 	if (sdkVersion != 0x00) {
@@ -111,7 +112,7 @@ bool ICACHE_FLASH_ATTR isNeedRebootAfterSetOpMode() {
 	return true;
 }
 
-char* ICACHE_FLASH_ATTR generateAPSSID() {
+LOCAL char* ICACHE_FLASH_ATTR generateAPSSID() {
 	uint8  apMacAddr[6]  = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	size_t SSIDBytesSize = sizeof(char) * (os_strlen(SSID_PREFIX) + 12 + 1);
 	char*  APSSID        = (char*)os_malloc(SSIDBytesSize);
@@ -123,14 +124,14 @@ char* ICACHE_FLASH_ATTR generateAPSSID() {
 	return APSSID;
 }
 
-void ICACHE_FLASH_ATTR deleteAPSSID(char** pAPSSID) {
+LOCAL void ICACHE_FLASH_ATTR deleteAPSSID(char** pAPSSID) {
 	if (pAPSSID != 0x00) {
 		os_free(*pAPSSID);
 		*pAPSSID = 0x00;
 	}
 }
 
-char* ICACHE_FLASH_ATTR generateAPPassword() {
+LOCAL char* ICACHE_FLASH_ATTR generateAPPassword() {
 	uint8  apMacAddr[6]        = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	uint8  encodedMacAddr[6]   = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	size_t APPasswordBytesSize = 12 + 1;
@@ -151,14 +152,14 @@ char* ICACHE_FLASH_ATTR generateAPPassword() {
 	return APPassword;
 }
 
-void ICACHE_FLASH_ATTR deleteAPPassword(char** pAPPassword) {
+LOCAL void ICACHE_FLASH_ATTR deleteAPPassword(char** pAPPassword) {
 	if (pAPPassword != 0x00) {
 		os_free(*pAPPassword);
 		*pAPPassword = 0x00;
 	}
 }
 
-void ICACHE_FLASH_ATTR onWifiEventReceived(System_Event_t* event) {
+LOCAL void ICACHE_FLASH_ATTR onWifiEventReceived(System_Event_t* event) {
 	if (event != NULL) {
 		switch (event->event) {
 			case EVENT_SOFTAPMODE_STACONNECTED:{
