@@ -85,7 +85,7 @@ public class ESP8266Scaner implements WifiStateBroadcastReceiver.OnNetworkStateC
         Iterator<ScanResult> scanResultItr = mWiFiManager.getScanResults().iterator();
         while (scanResultItr.hasNext()) {
             ScanResult result = scanResultItr.next();
-            Log.i(TAG, String.format("[onWifiScanedCompleted] #%d SSID: %s, BSSID: %s", i++, result.SSID, result.BSSID));
+            //Log.i(TAG, String.format("[onWifiScanedCompleted] #%d SSID: %s, BSSID: %s", i++, result.SSID, result.BSSID));
            // if (result.SSID.startsWith(Config.COSMART_DEVICE_SSID_PREFIX)) {
                 synchronized (mDeviceList) {
                     boolean hasUpdatedResult = false;

@@ -29,5 +29,6 @@
     <string name="WiFiEnabledDialog_Cancel">Cancel</string>
     <string name="SharedElementName_FloatingActionButton">FloatingActionButton</string>
     <string name="SharedElementName_TitleText">TitleText</string>
+    <string name="SharedElementName_DeviceItem">DeviceItem</string>
     <string name="title_activity_device_details">DeviceDetailsActivity</string>
 </resources>

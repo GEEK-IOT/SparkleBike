@@ -19,6 +19,7 @@
             android:layout_height="@dimen/MainActivity_AppBarHeight"
             android:elevation="5dp"
             android:cropToPadding="false"
+            android:transitionName="@string/SharedElementName_DeviceItem"
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginStart="@dimen/DiscoverDeviceActivity_ToolbarLayout_ExpandedTitleMarginStart"
             app:layout_scrollFlags="scroll|exitUntilCollapsed" >

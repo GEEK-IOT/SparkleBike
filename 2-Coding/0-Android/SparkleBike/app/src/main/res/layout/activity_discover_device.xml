@@ -5,7 +5,8 @@
     android:id="@+id/FrameLayout_RootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/DiscoverDeviceActivity_BackgroundColor">
+    android:background="@color/DiscoverDeviceActivity_BackgroundColor"
+    android:fitsSystemWindows="true">
 
     <RelativeLayout
         android:id="@+id/RelativeLayout_RootLayout"
