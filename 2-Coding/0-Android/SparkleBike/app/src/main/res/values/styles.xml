@@ -5,7 +5,7 @@
     </style>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
@@ -20,6 +20,13 @@
         <item name="colorAccent">@color/accent</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.HomeActivity" parent="AppTheme">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
     </style>
 
     <style name="AppTheme.MainActivity">
@@ -47,7 +54,6 @@
     </style>
 
     <style name="AppTheme.NoActionBar">
-
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -55,5 +61,15 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="AppTheme.ToolBarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+        <item name="actionMenuTextColor">#FFFFFF</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="AppTheme.ToolBarPopupTheme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="actionMenuTextColor">#FFFFFF</item>
+        <item name="android:textSize">18sp</item>
+    </style>
 
 </resources>

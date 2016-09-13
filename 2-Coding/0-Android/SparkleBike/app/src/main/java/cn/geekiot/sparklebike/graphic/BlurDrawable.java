@@ -10,9 +10,9 @@ import java.io.InputStream;
 
 /**
  * BlurDrawable
- * @Auther 80074591
+ * @Auther Cocoonshu
  * @Date 2016-05-10 17:36
- * Copyright (c) 2016 80074591
+ * Copyright (c) 2016 Cocoonshu
  */
 public class BlurDrawable extends BitmapDrawable {
 

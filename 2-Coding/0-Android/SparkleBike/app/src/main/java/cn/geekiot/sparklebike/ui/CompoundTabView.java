@@ -7,9 +7,9 @@ import android.widget.FrameLayout;
 
 /**
  * CompoundTabView
- * @Auther 80074591
+ * @Auther Cocoonshu
  * @Date 2016-06-13 11:06
- * Copyright (c) 2016 80074591
+ * Copyright (c) 2016 Cocoonshu
  */
 public class CompoundTabView extends FrameLayout {
 

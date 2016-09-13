@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="cn.geekiot.sparklebike.page.HomeActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/ToolBar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/AppTheme.ToolBarPopupTheme"
+            app:theme="@style/AppTheme.ToolBarTheme"
+            app:title="@string/ApplicationName"/>
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/TabLayout_tabStrip"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:background="@color/MainActivity_TabStrip_BackgroundColor"
+            android:translationZ="6dp"
+            app:tabIndicatorHeight="5dp"
+            app:tabIndicatorColor="@color/MainActivity_TabStrip_IndicatorColor"
+            app:tabSelectedTextColor="@color/MainActivity_TabStrip_SelectedTextColor"
+            app:tabTextColor="@color/MainActivity_TabStrip_TextColor"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/ViewPager_FragmentPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#6cb4ae"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <FrameLayout
+            android:id="@+id/FrameLayout_Device"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <FrameLayout
+            android:id="@+id/FrameLayout_Group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <FrameLayout
+            android:id="@+id/FrameLayout_Area"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </android.support.v4.view.ViewPager>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/FloatingActionBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@android:drawable/ic_dialog_email"
+        app:pressedTranslationZ="12dp"
+        app:elevation="6dp"
+        app:fabSize="normal"/>
+
+</android.support.design.widget.CoordinatorLayout>

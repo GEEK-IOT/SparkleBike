@@ -10,6 +10,16 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/ApplicationName"
         android:theme="@style/AppTheme">
+        <activity
+            android:name=".page.HomeActivity"
+            android:label="@string/title_activity_home"
+            android:theme="@style/AppTheme.HomeActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".page.MainActivity"
@@ -21,7 +31,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <activity
             android:name=".page.DiscoverDeviceActivity"
             android:theme="@style/AppTheme.DeviceDetailsActivity">
@@ -31,7 +40,6 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-
         <activity
             android:name=".page.DeviceDetailsActivity"
             android:label="@string/title_activity_device_details"
@@ -53,7 +61,6 @@
                 <action android:name="com.cobox.cosmart.devicebridge.StartService"/>
             </intent-filter>
         </service>
-
     </application>
 
 </manifest>

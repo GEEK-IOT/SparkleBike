@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                                    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/CardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="5dp"
+    app:cardMaxElevation="10dp"
+    app:cardPreventCornerOverlap="true"
+    app:cardUseCompatPadding="true">
+
+    <ImageView
+        android:id="@+id/ImageView_Image"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:scaleType="centerCrop"
+        android:background="#868686"/>
+
+    <TextView
+        android:id="@+id/TextView_Title"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="#55ff0000"
+        android:layout_gravity="bottom"
+        android:gravity="center_vertical"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:ellipsize="middle"
+        android:textColor="#F5F5F5"
+        android:text="OPPO-SZ"/>
+
+</android.support.v7.widget.CardView>

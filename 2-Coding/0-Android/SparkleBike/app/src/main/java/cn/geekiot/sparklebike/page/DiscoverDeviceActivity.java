@@ -115,6 +115,8 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
         setSupportActionBar(mToolBar);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        getWindow().setStatusBarColor(getResources().getColor(R.color.primary));
     }
 
     private void findContentViews() {
