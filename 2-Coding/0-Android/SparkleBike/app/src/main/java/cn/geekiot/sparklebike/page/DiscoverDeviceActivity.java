@@ -13,11 +13,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.cobox.cosmart.devicebridge.Device;
@@ -29,7 +31,6 @@ import com.cobox.utils.SDK;
 import java.util.List;
 
 import cn.geekiot.sparklebike.R;
-import cn.geekiot.sparklebike.adapter.DiscoverDeviceAdapter;
 import cn.geekiot.sparklebike.ui.DiscoverDeviceAnimView;
 import cn.geekiot.sparklebike.ui.WiFiEnableDialog;
 import cn.geekiot.sparklebike.ui.DiscoverDeviceRecycleView;
@@ -108,6 +109,10 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
         window.setSharedElementExitTransition(sharedElementExitTransition);
         window.setAllowEnterTransitionOverlap(true);
         window.setAllowReturnTransitionOverlap(true);
+
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.setStatusBarColor(getResources().getColor(R.color.primary_dark));
     }
 
     private void setupActionBarAsToolBar() {
@@ -177,9 +182,14 @@ public class DiscoverDeviceActivity extends AppCompatActivity {
                 intent.putExtra(DeviceDetailsActivity.KEY_DEVICE_BSSID, device.getBSSID());
 
                 if (SDK.isSupportedMaterialDesign()) {
+                    Pair<View, String> sharedViewIcon = new Pair<View, String>(
+                            itemIcon, getString(R.string.SharedElementName_FloatingActionButton));
+                    Pair<View, String> sharedViewTitle = new Pair<View, String>(
+                            itemView, getString(R.string.SharedElementName_DeviceItem));
+
                     startActivity(intent,
                         ActivityOptions.makeSceneTransitionAnimation(
-                            DiscoverDeviceActivity.this, itemIcon, getString(R.string.SharedElementName_FloatingActionButton)).toBundle());
+                            DiscoverDeviceActivity.this, sharedViewIcon).toBundle());
                 } else {
                     startActivity(intent);
                 }

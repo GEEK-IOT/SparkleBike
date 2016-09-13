@@ -9,7 +9,7 @@
     android:layout_marginEnd="10dp"
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
-	android:descendantFocusability="blocksDescendants"
+    android:transitionName="@string/SharedElementName_DeviceItem"
     card_view:cardCornerRadius="0dp"
     card_view:cardElevation="0dp">
 
@@ -39,14 +39,14 @@
             android:id="@+id/TextView_Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:transitionName="@string/SharedElementName_TitleText"
             android:layout_toStartOf="@+id/ImageButton_More"
             android:layout_toEndOf="@+id/ImageView_Icon"
             android:layout_marginTop="0dp"
             android:layout_marginStart="20dp"
             android:text="CoSmart Device"
             android:textColor="@color/DiscoverDeviceActivity_Item_TitleTextColor"
-            android:textSize="@dimen/DiscoverDeviceActivity_ItemTitleSize"/>
+            android:textSize="@dimen/DiscoverDeviceActivity_ItemTitleSize"
+            android:background="#3300FF00"/>
 
         <TextView
             android:id="@+id/TextView_MAC"
@@ -59,7 +59,8 @@
             android:layout_marginStart="20dp"
             android:text="17-FE-AB-56-23-10"
             android:textColor="@color/DiscoverDeviceActivity_Item_MACTextColor"
-            android:textSize="@dimen/DiscoverDeviceActivity_ItemMACSize"/>
+            android:textSize="@dimen/DiscoverDeviceActivity_ItemMACSize"
+            android:background="#3300FF00"/>
 
         <TextView
             android:id="@+id/TextView_Type"
@@ -72,7 +73,8 @@
             android:layout_marginStart="20dp"
             android:text="CoSmart Device: Terminal"
             android:textColor="@color/DiscoverDeviceActivity_Item_TypeTextColor"
-            android:textSize="@dimen/DiscoverDeviceActivity_ItemTypeSize"/>
+            android:textSize="@dimen/DiscoverDeviceActivity_ItemTypeSize"
+            android:background="#3300FF00"/>
 
         <TextView
             android:id="@+id/TextView_Capabilities"
@@ -85,7 +87,8 @@
             android:layout_marginStart="20dp"
             android:text="WPA-PSK"
             android:textColor="@color/DiscoverDeviceActivity_Item_CapabilitiesTextColor"
-            android:textSize="@dimen/DiscoverDeviceActivity_ItemCapabilitiesSize"/>
+            android:textSize="@dimen/DiscoverDeviceActivity_ItemCapabilitiesSize"
+            android:background="#3300FF00"/>
 
         <TextView
             android:id="@+id/TextView_LevelAndFrequency"
@@ -98,7 +101,8 @@
             android:layout_marginStart="20dp"
             android:text="-96 dBm / 5GHz"
             android:textColor="@color/DiscoverDeviceActivity_Item_LevelAndFrequencyTextColor"
-            android:textSize="@dimen/DiscoverDeviceActivity_ItemLevelAndFrequencySize"/>
+            android:textSize="@dimen/DiscoverDeviceActivity_ItemLevelAndFrequencySize"
+            android:background="#3300FF00"/>
 
         <ImageButton
             android:id="@+id/ImageButton_More"

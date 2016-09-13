@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SparkleBike.iml" filepath="$PROJECT_DIR$/SparkleBike.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/prism/prism.iml" filepath="$PROJECT_DIR$/prism/prism.iml" />
+      <module fileurl="file://$PROJECT_DIR$/prism-palette/prism-palette.iml" filepath="$PROJECT_DIR$/prism-palette/prism-palette.iml" />
     </modules>
   </component>
 </project>

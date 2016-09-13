@@ -34,7 +34,7 @@ import cn.geekiot.sparklebike.page.DeviceDetailsActivity;
  */
 public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
 
-    private static final String TAG                 = "DiscoverDeviceAdapter";
+    private static final String TAG = "DiscoverDeviceAdapter";
 
     private static String[]       sDeviceTypeNameList         = {/* Load during construction */};
     private static int[]          sDeviceIconHintColorList    = {/* Load during construction */};
@@ -75,6 +75,13 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
             mBtnMore         = (ImageButton) itemView.findViewById(R.id.ImageButton_More);
             mDefaultIcon     = mContext.getResources().getDrawable(R.mipmap.ic_rounter);
             initializeListeners();
+
+            this.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.e("Cocoonshu", "[onClick] ItemView clicked");
+                }
+            });
         }
 
         private void initializeListeners() {
@@ -82,7 +89,7 @@ public class DiscoverDeviceAdapter extends RecyclerView.Adapter {
 
                 @Override
                 public void onClick(View v) {
-                Log.e("Cocoonshu", "[onClick] ButtonMore");
+                    Log.e("Cocoonshu", "[onClick] ButtonMore");
                 }
 
             });

@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import cn.geekiot.sparklebike.R;
+import cn.geekiot.sparklebike.ui.TestRecycleViewHelper;
 
 /**
  * AbsFragment
@@ -57,6 +58,7 @@ public class AbsFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mRecyclerAdapter);
         setupListeners();
+        mRecycleViewHelper = new TestRecycleViewHelper((RecyclerView) mRootView.findViewById(R.id.RecyclerView_ContentList));
         return mRootView;
     }
 
