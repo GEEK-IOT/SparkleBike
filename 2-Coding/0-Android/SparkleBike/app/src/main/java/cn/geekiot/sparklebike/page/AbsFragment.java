@@ -58,7 +58,6 @@ public class AbsFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mRecyclerAdapter);
         setupListeners();
-        mRecycleViewHelper = new TestRecycleViewHelper((RecyclerView) mRootView.findViewById(R.id.RecyclerView_ContentList));
         return mRootView;
     }
 

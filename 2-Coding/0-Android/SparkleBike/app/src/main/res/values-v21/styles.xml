@@ -1,7 +1,31 @@
 <resources>
 
-    <style name="CustomTabTextStyle" parent="@android:style/TextAppearance.Holo">
+    <style name="NormalTabTextStyle" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:textStyle">normal</item>
+    </style>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="AppTheme.WithoutActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.HomeActivity" parent="AppTheme">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
     </style>
 
     <style name="AppTheme.MainActivity">
@@ -10,9 +34,6 @@
         <item name="colorAccent">@color/accent</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:actionBarTabTextStyle">@style/CustomTabTextStyle</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="AppTheme.DiscoverDeviceActivity">
@@ -21,9 +42,6 @@
         <item name="colorAccent">@color/accent</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:actionBarTabTextStyle">@style/CustomTabTextStyle</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="AppTheme.DeviceDetailsActivity">
@@ -32,20 +50,25 @@
         <item name="colorAccent">@color/accent</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:actionBarTabTextStyle">@style/CustomTabTextStyle</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorAccent">@color/accent</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:actionBarTabTextStyle">@style/CustomTabTextStyle</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark"/>
+
+    <style name="AppTheme.ToolBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="actionMenuTextColor">#FFFFFF</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="AppTheme.ToolBarPopupTheme" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="actionMenuTextColor">#FFFFFF</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
 </resources>

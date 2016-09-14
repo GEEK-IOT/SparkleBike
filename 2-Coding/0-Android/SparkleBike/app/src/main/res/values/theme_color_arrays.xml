@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="color_primary" />
+    <item type="id" name="color_primary_dark" />
+    <item type="id" name="tab_filter" />
+    <item type="id" name="tab_blur" />
+    <item type="id" name="tab_mosaic" />
+    <item type="id" name="tab_doodle" />
+
+    <array name="theme_color_ids">
+        <item>@id/color_primary</item>
+        <item>@id/tab_facebeauty</item>
+        <item>@id/tab_filter</item>
+        <item>@id/tab_blur</item>
+        <item>@id/tab_mosaic</item>
+        <item>@id/tab_doodle</item>
+    </array>
+</resources>

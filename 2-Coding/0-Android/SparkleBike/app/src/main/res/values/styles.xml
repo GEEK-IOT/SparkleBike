@@ -10,7 +10,6 @@
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
         <item name="colorAccent">@color/accent</item>
-        <item name="android:actionBarTabTextStyle">@style/CustomTabTextStyle</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
@@ -60,14 +59,14 @@
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark"/>
 
-    <style name="AppTheme.ToolBarTheme" parent="ThemeOverlay.AppCompat.ActionBar">
+    <style name="AppTheme.ToolBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="actionMenuTextColor">#FFFFFF</item>
         <item name="android:textSize">18sp</item>
     </style>
 
-    <style name="AppTheme.ToolBarPopupTheme" parent="ThemeOverlay.AppCompat.Light">
+    <style name="AppTheme.ToolBarPopupTheme" parent="ThemeOverlay.AppCompat.Dark">
         <item name="actionMenuTextColor">#FFFFFF</item>
         <item name="android:textSize">18sp</item>
     </style>

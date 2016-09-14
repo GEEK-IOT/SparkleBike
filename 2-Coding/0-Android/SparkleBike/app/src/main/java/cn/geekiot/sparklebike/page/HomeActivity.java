@@ -2,7 +2,9 @@ package cn.geekiot.sparklebike.page;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,7 +25,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.stylingandroid.prism.ColorSetter;
+import com.stylingandroid.prism.Prism;
+import com.stylingandroid.prism.Setter;
+import com.stylingandroid.prism.filter.Filter;
+
 import cn.geekiot.sparklebike.R;
+import cn.geekiot.sparklebike.ui.ThemeColorHelper;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
                                                                FragmentControlLinker {
@@ -35,12 +43,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView          mNavigationView = null;
     private FloatingActionButton    mFabAction      = null;
 
-    private TabLayout                   mTabLayout       = null;
-    private ViewPager                   mFragmentPager   = null;
-    private InnerPagerAdapter           mPagerAdapter    = null;
-    private MainActivityDevicesFragment mDevicesFragment = null;
-    private MainActivityGroupsFragment  mGroupsFragment  = null;
-    private MainActivityAreasFragment   mAreasFragment   = null;
+    private TabLayout                   mTabLayout        = null;
+    private ViewPager                   mFragmentPager    = null;
+    private InnerPagerAdapter           mPagerAdapter     = null;
+    private MainActivityDevicesFragment mDevicesFragment  = null;
+    private MainActivityGroupsFragment  mGroupsFragment   = null;
+    private MainActivityAreasFragment   mAreasFragment    = null;
+
+    private ThemeColorHelper            mThemeColorHelper = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +61,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         setupListeners();
         setupLayout();
         setupFragment();
+        setupPalette();
     }
 
     @Override
@@ -70,6 +81,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                mThemeColorHelper.triggerNextColor();
             }
         });
     }
@@ -101,6 +113,26 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         mFragmentPager.setAdapter(mPagerAdapter);
         mTabLayout.setupWithViewPager(mFragmentPager);
         mPagerAdapter.setTabLayout(mTabLayout);
+    }
+
+    private void setupPalette() {
+        mThemeColorHelper.finishPaletteBuild(
+            mThemeColorHelper.buildPalette()
+                .add(new ColorSetter() {
+                    @Override
+                    public void setColor(@ColorInt int color) {
+                        mTabLayout.setSelectedTabIndicatorColor(color);
+                    }
+
+                    @Override
+                    public void setTransientColor(@ColorInt int color) {
+                        mTabLayout.setSelectedTabIndicatorColor(color);
+                    }
+                })
+                .background(mToolbar)
+                .background(mFabAction)
+                .build()
+        );
     }
 
     @Override

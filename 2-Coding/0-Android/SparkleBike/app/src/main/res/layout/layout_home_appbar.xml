@@ -40,7 +40,7 @@
         android:id="@+id/ViewPager_FragmentPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#6cb4ae"
+        android:background="#F5F5F5"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <FrameLayout
