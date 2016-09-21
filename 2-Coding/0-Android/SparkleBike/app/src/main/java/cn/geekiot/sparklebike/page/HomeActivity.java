@@ -1,8 +1,8 @@
 package cn.geekiot.sparklebike.page;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -12,6 +12,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,14 +28,13 @@ import android.widget.TextView;
 
 import com.stylingandroid.prism.ColorSetter;
 import com.stylingandroid.prism.Prism;
-import com.stylingandroid.prism.Setter;
-import com.stylingandroid.prism.filter.Filter;
 
 import cn.geekiot.sparklebike.R;
-import cn.geekiot.sparklebike.ui.ThemeColorHelper;
+import cn.geekiot.sparklebike.theme.MaterialDesignTheme;
+import cn.geekiot.sparklebike.theme.ThemeColorHelper;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-                                                               FragmentControlLinker {
+        FragmentControlLinker {
 
     private Toolbar                 mToolbar        = null;
     private CollapsingToolbarLayout mToolbarLayout  = null;
@@ -49,7 +49,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private MainActivityDevicesFragment mDevicesFragment  = null;
     private MainActivityGroupsFragment  mGroupsFragment   = null;
     private MainActivityAreasFragment   mAreasFragment    = null;
-
     private ThemeColorHelper            mThemeColorHelper = null;
 
     @Override
@@ -79,9 +78,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         mFabAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                String themeName = mThemeColorHelper.triggerNextColor();
+                Snackbar.make(
+                        view,
+                        String.format("%d/%d Switch to theme %s",
+                                mThemeColorHelper.getCurrentThemeIndex() + 1,
+                                mThemeColorHelper.getThemeSize(),
+                                themeName), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                mThemeColorHelper.triggerNextColor();
             }
         });
     }
@@ -116,22 +120,39 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setupPalette() {
+        mThemeColorHelper = ThemeColorHelper.createMaterialDesignThemeHelper(HomeActivity.this);
         mThemeColorHelper.finishPaletteBuild(
-            mThemeColorHelper.buildPalette()
-                .add(new ColorSetter() {
-                    @Override
-                    public void setColor(@ColorInt int color) {
-                        mTabLayout.setSelectedTabIndicatorColor(color);
-                    }
+                mThemeColorHelper.buildPalette()
+                        .add(MaterialDesignTheme.ACCENT, new MaterialDesignTheme.ThemeColorSetter() {
+                            @Override
+                            public void setThemeColor(@ColorInt int color) {
+                                mTabLayout.setSelectedTabIndicatorColor(color);
+                            }
 
-                    @Override
-                    public void setTransientColor(@ColorInt int color) {
-                        mTabLayout.setSelectedTabIndicatorColor(color);
-                    }
-                })
-                .background(mToolbar)
-                .background(mFabAction)
-                .build()
+                            @Override
+                            public void setThemeTransientColor(@ColorInt int color) {
+                                mTabLayout.setSelectedTabIndicatorColor(color);
+                            }
+                        })
+                        .add(MaterialDesignTheme.SECONDARY_TEXT, new MaterialDesignTheme.ThemeColorSetter() {
+                            @Override
+                            public void setThemeColor(@ColorInt int colour) {
+                                mNavigationView.setItemIconTintList(ColorStateList.valueOf(colour));
+                                mNavigationView.setItemTextColor(ColorStateList.valueOf(colour));
+                            }
+
+                            @Override
+                            public void setThemeTransientColor(@ColorInt int colour) {
+                                mNavigationView.setItemIconTintList(ColorStateList.valueOf(colour));
+                                mNavigationView.setItemTextColor(ColorStateList.valueOf(colour));
+                            }
+                        })
+                        .background(MaterialDesignTheme.PRIMARY_DARK, getWindow())
+                        .background(MaterialDesignTheme.PRIMARY, mTabLayout)
+                        .background(MaterialDesignTheme.PRIMARY, mToolbar)
+                        .background(MaterialDesignTheme.ACCENT, mFabAction)
+                        .background(MaterialDesignTheme.PRIMARY, mNavigationView.getHeaderView(0))
+                        .build()
         );
     }
 

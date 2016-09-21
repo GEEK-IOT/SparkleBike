@@ -2,17 +2,22 @@
 <resources>
     <item type="id" name="color_primary" />
     <item type="id" name="color_primary_dark" />
-    <item type="id" name="tab_filter" />
-    <item type="id" name="tab_blur" />
-    <item type="id" name="tab_mosaic" />
-    <item type="id" name="tab_doodle" />
+    <item type="id" name="color_primary_light" />
+    <item type="id" name="color_accent" />
+    <item type="id" name="color_primary_text" />
+    <item type="id" name="color_secondary_text" />
+    <item type="id" name="color_icons" />
+    <item type="id" name="color_divider" />
 
     <array name="theme_color_ids">
         <item>@id/color_primary</item>
-        <item>@id/tab_facebeauty</item>
-        <item>@id/tab_filter</item>
-        <item>@id/tab_blur</item>
-        <item>@id/tab_mosaic</item>
-        <item>@id/tab_doodle</item>
+        <item>@id/color_primary_dark</item>
+        <item>@id/color_primary_light</item>
+        <item>@id/color_accent</item>
+        <item>@id/color_primary_text</item>
+        <item>@id/color_secondary_text</item>
+        <item>@id/color_icons</item>
+        <item>@id/color_divider</item>
     </array>
+
 </resources>

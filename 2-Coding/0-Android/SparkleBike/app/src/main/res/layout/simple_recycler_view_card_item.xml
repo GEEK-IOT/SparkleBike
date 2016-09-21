@@ -4,11 +4,13 @@
     android:id="@+id/CardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:descendantFocusability="blocksDescendants"
     app:cardCornerRadius="8dp"
     app:cardElevation="5dp"
     app:cardMaxElevation="10dp"
     app:cardPreventCornerOverlap="true"
-    app:cardUseCompatPadding="true">
+    app:cardUseCompatPadding="true" >
 
     <ImageView
         android:id="@+id/ImageView_Image"

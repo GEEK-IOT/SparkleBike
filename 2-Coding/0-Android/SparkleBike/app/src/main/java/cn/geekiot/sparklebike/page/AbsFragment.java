@@ -121,6 +121,12 @@ public class AbsFragment extends Fragment {
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(mContext).inflate(R.layout.simple_recycler_view_card_item, null);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                }
+            });
             return new SimpleRecyclerViewHolder(itemView);
         }
 
