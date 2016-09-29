@@ -32,6 +32,7 @@
     <string name="SharedElementName_DeviceItem">DeviceItem</string>
     <string name="title_activity_device_details">DeviceDetailsActivity</string>
     <string name="title_activity_home">HomeActivity</string>
+    <string name="title_activity_setting_window">Setting</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

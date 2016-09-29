@@ -13,6 +13,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Layout;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -108,7 +109,9 @@ public class AbsFragment extends Fragment {
                 @Override
                 public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
                     SimpleRecyclerViewHolder viewHolder = (SimpleRecyclerViewHolder) holder;
-                    viewHolder.setText("# " + position);
+                    String content = "OPPO 手机 R7Plus 测试";
+                    String text = "# " + position + " " + content;
+                    viewHolder.setText(text);
                 }
             };
             return adapter;
@@ -168,8 +171,12 @@ public class AbsFragment extends Fragment {
         }
 
         public void setText(CharSequence text) {
-            mTxtTitle.setText(text);
+            CharSequence preivew = PostSuffix + text;
+            preivew = TextUtils.ellipsize(preivew, mTxtTitle.getPaint(), 400, TextUtils.TruncateAt.END);
+            mTxtTitle.setText(preivew.subSequence(1, preivew.length()) + PostSuffix);
         }
+
+        public static final String PostSuffix = "等";
     }
 
 }

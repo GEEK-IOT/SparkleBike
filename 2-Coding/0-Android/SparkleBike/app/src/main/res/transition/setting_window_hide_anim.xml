@@ -1,0 +1,23 @@
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
+               android:transitionOrdering="together">
+    <slide android:duration="250" android:slideEdge="top" >
+        <targets>
+            <target android:targetId="@id/Layout_SettingPage"/>
+        </targets>
+    </slide>
+    <fade android:duration="500" android:fadingMode="fade_out" >
+        <targets>
+            <target android:targetId="@id/Layout_SettingPage" />
+        </targets>
+    </fade>
+    <recolor android:duration="500">
+        <targets>
+            <target android:targetId="@id/ToolBar" />
+        </targets>
+    </recolor>
+    <changeBounds android:duration="500">
+        <targets>
+            <target android:targetId="@id/ToolBar" />
+        </targets>
+    </changeBounds>
+</transitionSet>
