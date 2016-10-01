@@ -1,44 +1,34 @@
 package cn.geekiot.sparklebike.page;
 
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
-import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Animatable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.ColorInt;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPager;
-import android.transition.Recolor;
-import android.transition.Scene;
-import android.transition.Transition;
-import android.transition.TransitionValues;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
-
-import com.stylingandroid.prism.ColorSetter;
-import com.stylingandroid.prism.Prism;
 
 import cn.geekiot.sparklebike.R;
 import cn.geekiot.sparklebike.theme.MaterialDesignTheme;
@@ -180,7 +170,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.home, menu);
+        getMenuInflater().inflate(R.menu.menu_home, menu);
         return true;
     }
 
@@ -188,7 +178,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            AnimatedVectorDrawableCompat icon = (AnimatedVectorDrawableCompat) item.getIcon();
+            Animatable icon = (Animatable) item.getIcon();
             if (icon.isRunning()) {
                 return true;
             } else {
@@ -201,14 +191,14 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
-
-
     private void startSettingWindowDelay() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                Intent intent = new Intent(HomeActivity.this, SettingWindow.class);
+                intent.putExtra(SettingWindow.KEY_NEED_LAUNCH_ANIM, true);
                 startActivity(
-                        new Intent(HomeActivity.this, SettingWindow.class),
+                        intent,
                         ActivityOptionsCompat.makeSceneTransitionAnimation(HomeActivity.this, mToolbar, "toolbar").toBundle());
             }
         }, 250);

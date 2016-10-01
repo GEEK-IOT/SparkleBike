@@ -5,6 +5,6 @@
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@null"
-        android:icon="@drawable/ani_home_router"
+        android:icon="@drawable/ani_setting_menu_close"
         app:showAsAction="always"/>
 </menu>

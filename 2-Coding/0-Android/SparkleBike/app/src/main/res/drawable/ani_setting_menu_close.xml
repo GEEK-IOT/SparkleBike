@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/ic_setting_menu">
+
+    <target
+        android:name="header"
+        android:animation="@animator/anim_menu_to_close_header" />
+
+    <target
+        android:name="body"
+        android:animation="@animator/anim_menu_to_close_body" />
+
+    <target
+        android:name="footer"
+        android:animation="@animator/anim_menu_to_close_footer" />
+
+</animated-vector>
