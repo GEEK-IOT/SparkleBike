@@ -17,7 +17,7 @@ int vsprintf(char *d, const char *s, va_list ap);
 //  外部函数  //
 ///////////////
 void ICACHE_FLASH_ATTR Log_initialize() {
-	uart_init(115200, 115200);
+	uart_init(74880, 74880);
 
 #if LOG_BY_UART
 	system_set_os_print(FALSE);

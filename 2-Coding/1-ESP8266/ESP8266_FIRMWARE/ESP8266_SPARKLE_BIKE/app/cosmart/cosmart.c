@@ -102,6 +102,8 @@ LOCAL void ICACHE_FLASH_ATTR onSystemInitialized() {
 #if ENABLE_SSD1306_DEBUG
 	// 启动SSD1306驱动
 	SSD1306_initialize();
+	SSD1306_bindDevice(0);
+	SSD1306_drawBuffer(0, 127, 0, 7, IMG_LOGO);
 #endif
 	// 初始化终端管理器
 	//InterruptManager_initialize();

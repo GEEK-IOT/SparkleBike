@@ -23,6 +23,10 @@
 
     <string name="DiscoveryDeviceActivity_Item_Ignore">Ignore</string>
 
+    <string name="SetingWindow_NetworkPermission_Title">Network</string>
+    <string name="SetingWindow_NetworkPermission_Option_OnlyWiFi">Only WiFi</string>
+    <string name="SetingWindow_NetworkPermission_Option_LANManagement">LAN Management</string>
+
     <string name="WiFiEnabledDialog_Title">WiFi disabled</string>
     <string name="WiFiEnabledDialog_Message">Please turn the WiFi on</string>
     <string name="WiFiEnabledDialog_Confirm">Confirm</string>

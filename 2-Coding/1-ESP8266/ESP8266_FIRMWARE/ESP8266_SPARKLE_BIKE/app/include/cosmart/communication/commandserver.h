@@ -13,16 +13,22 @@
 #include "espconn.h"
 #include "mem.h"
 
-//#define COSMART_IDENTIFY            "cosmart"
-//#define ANDROID_FLATFORM_IDENTIFY   "android"
-//#define IOS_FLATFORM_IDENTIFY       "ios"
-//#define PC_FLATFORM_IDENTIFY        "pc"
-//#define WEB_FLATFORM_IDENTIFY       "web"
-//#define UNKNOWN_FLATFORM_IDENTIFY   "unknown"
-//#define MONITOR_TERMINAL_IDENTIFY   "monitor"
-//#define COMMANDER_TERMINAL_IDENTIFY "commander"
-//#define DEVICE_TERMINAL_IDENTIFY    "device"
-//#define UNKNOWN_TERMINAL_IDENTIFY   "unknown"
+#define MAX_TERMINAL_SIZE           4
+
+#define COSMART_IDENTIFY            "cosmart"
+#define ANDROID_FLATFORM_IDENTIFY   "android"
+#define IOS_FLATFORM_IDENTIFY       "ios"
+#define PC_FLATFORM_IDENTIFY        "pc"
+#define WEB_FLATFORM_IDENTIFY       "web"
+#define UNKNOWN_FLATFORM_IDENTIFY   "unknown"
+#define MONITOR_TERMINAL_IDENTIFY   "monitor"
+#define COMMANDER_TERMINAL_IDENTIFY "commander"
+#define DEVICE_TERMINAL_IDENTIFY    "device"
+#define UNKNOWN_TERMINAL_IDENTIFY   "unknown"
+#define COLUMN_BROADCAST_IP         0
+#define COLUMN_BROADCAST_PORT       1
+#define COLUMN_BROADCAST_MSG        2
+#define COLUMN_CMD_PORT             3
 
 #ifndef MEMZERO
 	#define MEMZERO(ptr, len) {if (ptr != NULL) {os_bzero(ptr, len);}}
@@ -55,7 +61,6 @@ typedef struct {
 	enum TerminalType     terminalType;
 	uint8                 terminalIP[4];
 	int                   terminalPort;
-	int                   terminalBoardcast;
 	unsigned long         generation;
 	Connection*           connection;
 } Terminal;
@@ -64,7 +69,7 @@ void CMDServer_initialize();
 void CMDServer_startCommandServer();
 void CMDServer_stopCommandServer();
 bool CMDServer_verifyTerminal(const char* requestID, const char* securityCode);
-int  CMDServer_connectTerminal(Terminal* terminal);
+void CMDServer_connectTerminal(Terminal* terminal);
 void CMDServer_disconnectTerminal(Terminal* terminal);
 
 #endif /* APP_INCLUDE_COSMART_COMMANDSERVER_H_ */

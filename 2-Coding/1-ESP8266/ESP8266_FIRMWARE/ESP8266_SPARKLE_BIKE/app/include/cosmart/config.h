@@ -11,7 +11,7 @@
 #define ENABLE_LED_DEBUG     0
 #define ENABLE_SERVO_DEBUG   0
 #define ENABLE_MPU6050_DEBUG 0
-#define ENABLE_SSD1306_DEBUG 0
+#define ENABLE_SSD1306_DEBUG 1
 
 /**
  * Broadcast receive port

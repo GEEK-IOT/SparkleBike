@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
+    <fade
+        android:fadingMode="fade_in"
+        android:matchOrder="0"
+        android:duration="250">
+        <target android:targetId="@id/TextView_NetworkTitle" />
+    </fade>
+    <fade
+        android:fadingMode="fade_in"
+        android:matchOrder="1"
+        android:duration="250">
+        <target android:targetId="@id/TextView_OnlyWiFi" />
+        <target android:targetId="@id/Switch_OnlyWiFi" />
+    </fade>
+    <fade
+        android:fadingMode="fade_in"
+        android:matchOrder="2"
+        android:duration="250">
+        <target android:targetId="@id/TextView_LANManagement" />
+    </fade>
+</transitionSet>

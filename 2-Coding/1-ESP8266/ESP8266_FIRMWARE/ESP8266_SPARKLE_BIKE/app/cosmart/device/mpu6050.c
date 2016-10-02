@@ -790,14 +790,14 @@ LOCAL bool ICACHE_FLASH_ATTR readByteFromDevice(MPU6050Device* device, uint8 fie
 
 	i2c_master_start();
 	i2c_master_writeByte(address);
-	if ((ack = i2c_master_getAck()) != I2C_ACK_OK) {
+	if (!i2c_master_checkAck()) {
 		i2c_master_stop();
 		Log_printfln("[MPU6050] Device isn't ACK after requesting read register 0x%x on 0x%x",
 				      fieldAddress, address);
 		return false;
 	}
 	i2c_master_writeByte(fieldAddress);
-	if ((ack = i2c_master_getAck()) != I2C_ACK_OK) {
+	if (!i2c_master_checkAck()) {
 		i2c_master_stop();
 		Log_printfln("[MPU6050] Device isn't ACK after sending read register name 0x%x on 0x%x",
 				      fieldAddress, address);
@@ -805,7 +805,7 @@ LOCAL bool ICACHE_FLASH_ATTR readByteFromDevice(MPU6050Device* device, uint8 fie
 	}
 	i2c_master_start();
 	i2c_master_writeByte(getDeviceReadAddress(device));
-	if ((ack = i2c_master_getAck()) != I2C_ACK_OK) {
+	if (!i2c_master_checkAck()) {
 		i2c_master_stop();
 		Log_printfln("[MPU6050] Device isn't ACK after waiting read register 0x%x on 0x%x",
 				      fieldAddress, address);
@@ -829,21 +829,21 @@ LOCAL bool ICACHE_FLASH_ATTR writeByteToDevice(MPU6050Device* device, uint8 fiel
 
 	i2c_master_start();
 	i2c_master_writeByte(address);
-	if ((ack = i2c_master_getAck()) != I2C_ACK_OK) {
+	if (!i2c_master_checkAck()) {
 		i2c_master_stop();
 		Log_printfln("[MPU6050] Device isn't ACK after requesting write register 0x%x on 0x%x",
 				      fieldAddress, address);
 		return false;
 	}
 	i2c_master_writeByte(fieldAddress);
-	if ((ack = i2c_master_getAck()) != I2C_ACK_OK) {
+	if (!i2c_master_checkAck()) {
 		i2c_master_stop();
 		Log_printfln("[MPU6050] Device isn't ACK after sending write register name 0x%x on 0x%x",
 				      fieldAddress, address);
 		return false;
 	}
 	i2c_master_writeByte(data);
-	if ((ack = i2c_master_getAck()) != I2C_ACK_OK) {
+	if (!i2c_master_checkAck()) {
 		i2c_master_stop();
 		Log_printfln("[MPU6050] Device isn't ACK after writing value to 0x%x on 0x%x",
 				      fieldAddress, address);

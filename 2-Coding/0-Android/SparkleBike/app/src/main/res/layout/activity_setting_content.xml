@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/Layout_NetworkPermission"
+    android:layout_below="@id/ToolBar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp">
+
+    <TextView
+        android:id="@+id/TextView_NetworkTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="@string/SetingWindow_NetworkPermission_Title"
+        android:textColor="#CCCCCC"
+        android:textSize="14sp"/>
+
+    <TextView
+        android:id="@+id/TextView_OnlyWiFi"
+        android:layout_below="@id/TextView_NetworkTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:gravity="center_vertical"
+        android:text="@string/SetingWindow_NetworkPermission_Option_OnlyWiFi"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"/>
+
+    <Switch
+        android:id="@+id/Switch_OnlyWiFi"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_toRightOf="@id/TextView_OnlyWiFi"
+        android:layout_alignTop="@id/TextView_OnlyWiFi"
+        android:layout_alignBottom="@id/TextView_OnlyWiFi"
+        android:layout_alignParentRight="true"/>
+
+    <TextView
+        android:id="@+id/TextView_LANManagement"
+        android:layout_below="@id/TextView_OnlyWiFi"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:gravity="center_vertical"
+        android:text="@string/SetingWindow_NetworkPermission_Option_LANManagement"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:background="?android:attr/selectableItemBackground"
+        android:focusable="true"
+        android:clickable="true"/>
+
+</RelativeLayout>

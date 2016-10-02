@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.drawable.Animatable;
+import android.graphics.drawable.Animatable2;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.ColorInt;
@@ -14,6 +15,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -171,6 +173,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_home, menu);
+        MenuItem settingItem = menu.findItem(R.id.action_settings);
+        Animatable icon = (Animatable) settingItem.getIcon();
+        if (icon.isRunning()) {
+            icon.stop();
+        }
         return true;
     }
 
@@ -197,6 +204,8 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             public void run() {
                 Intent intent = new Intent(HomeActivity.this, SettingWindow.class);
                 intent.putExtra(SettingWindow.KEY_NEED_LAUNCH_ANIM, true);
+                intent.putExtra(SettingWindow.KEY_PAUSE_BACKGROUND_COLOR, mThemeColorHelper.getColor(MaterialDesignTheme.PRIMARY));
+                intent.putExtra(SettingWindow.KEY_RESUME_BACKGROUND_COLOR, getResources().getColor(R.color.SettingWindowActivity_Background));
                 startActivity(
                         intent,
                         ActivityOptionsCompat.makeSceneTransitionAnimation(HomeActivity.this, mToolbar, "toolbar").toBundle());

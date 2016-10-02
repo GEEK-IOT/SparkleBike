@@ -14,8 +14,18 @@
 LOCAL SSD1306Device* mCurrentDevice                  = NULL;
 LOCAL SSD1306Device* mDeviceList[SLAVE_DEVICE_COUNT] = {NULL, NULL};
 
-LOCAL bool   writeCMD(SSD1306Device* device, uint8 cmd, uint8 params, bool hasParams);
-LOCAL bool   writeDATA(SSD1306Device* device, uint8* data, uint8 dataLength);
+LOCAL bool   beginCMD(SSD1306Device* device);
+LOCAL bool   writeCMD_1(SSD1306Device* device, uint8 cmdA);
+LOCAL bool   writeCMD_2(SSD1306Device* device, uint8 cmdA, uint8 cmdB);
+LOCAL bool   writeCMD_3(SSD1306Device* device, uint8 cmdA, uint8 cmdB, uint8 cmdC);
+LOCAL bool   endCMD(SSD1306Device* device);
+
+LOCAL bool   beginRAM(SSD1306Device* device, uint8 colStart, uint8 colEnd, uint8 pageStart, uint8 pageEnd);
+LOCAL bool   writeRAM(SSD1306Device* device, uint8* data, uint16 dataLength);
+LOCAL bool   endRAM(SSD1306Device* device);
+
+LOCAL bool   flushFrameBuffer(SSD1306Device* device);
+
 LOCAL uint8  getDeviceReadAddress(SSD1306Device* device);
 LOCAL uint8  getDeviceWriteAddress(SSD1306Device* device);
 LOCAL bool   testDeviceAddress();
@@ -28,11 +38,11 @@ void ICACHE_FLASH_ATTR SSD1306_initialize() {
 	Log_printfln("[SSD1306] Start I2C manager in master mode");
 
 	i2c_master_gpio_init();
-	Timer_delayMS(500);
+	Timer_delayMS(50);
 	if (testDeviceAddress()) {
-		Timer_delayMS(100);
 		executeDefaultSetup();
 	}
+	Timer_delayMS(50);
 	SSD1306_cleanScreen();
 }
 
@@ -62,33 +72,33 @@ bool ICACHE_FLASH_ATTR SSD1306_bindDevice(int index) {
 	return true;
 }
 
-void ICACHE_FLASH_ATTR SSD1306_drawPixels(uint16 x, uint16 y, uint16 width, uint16 height, uint8* pixels) {
+void ICACHE_FLASH_ATTR SSD1306_drawPixels(uint16 x, uint16 y, uint16 width, uint16 height, const uint8* pixels) {
 	if (mCurrentDevice == NULL || mCurrentDevice->address == SSD1306_SLAVE_NO_ADDRESS) {
 		return;
 	}
 
-	uint8  page          = y / DEVICE_PAGE_COUNT;
-	uint16 column        = x;
-	uint8  pageLoop      = (y + height) / DEVICE_HEIGHT_PER_PAGE;
-	uint16 columnLoop    = x + width;
-	uint16 bufferAddress = page * DEVICE_COLUMN_COUNT + column;
-	uint8* buffer        = mCurrentDevice->frameBuffer + bufferAddress;
-
-	pageLoop   = pageLoop > DEVICE_PAGE_COUNT ? DEVICE_PAGE_COUNT : pageLoop;
-	columnLoop = columnLoop > DEVICE_SEGMENT_COUNT ? DEVICE_SEGMENT_COUNT : columnLoop;
-
-	uint16 w = 0;
-	uint16 h = 0;
-	for (; page < pageLoop; page ++) {
-		writeCMD(mCurrentDevice, CMD_SET_PAGE_POINTER(page), NaN, false);
-		writeCMD(mCurrentDevice, CMD_COLUMN_POINTER_LOW(column), NaN, false);
-		writeCMD(mCurrentDevice, CMD_COLUMN_POINTER_HIGH(column), NaN, false);
-
-		for (; column < columnLoop; column ++) {
+	uint16 startColumn = x;
+	uint16 endColumn   = x + width - 1;
+	uint16 startPage   = y / DEVICE_HEIGHT_PER_PAGE;
+	uint16 endPage     = (y + height - 1) / DEVICE_HEIGHT_PER_PAGE;
 
 
-		}
+	// TODO
+}
+
+void ICACHE_FLASH_ATTR SSD1306_drawBuffer(uint16 startColumn, uint16 endColumn, uint16 startPage, uint16 endPage, const uint8* buffer) {
+	if (mCurrentDevice == NULL || mCurrentDevice->address == SSD1306_SLAVE_NO_ADDRESS) {
+		return;
 	}
+
+	uint16 page;
+	for (page = startPage; page <= endPage; page++) {
+		uint16 strip = endColumn - startColumn + 1;
+		uint8*       dest  = mCurrentDevice->frameBuffer + (startColumn + page * strip);
+		const uint8* src   = buffer + (page - startPage) * strip;
+		os_memcpy(dest, src, strip);
+	}
+	flushFrameBuffer(mCurrentDevice);
 }
 
 void ICACHE_FLASH_ATTR SSD1306_cleanScreen() {
@@ -96,21 +106,11 @@ void ICACHE_FLASH_ATTR SSD1306_cleanScreen() {
 		return;
 	}
 
-	uint8  page       = 0;
-	uint8  pageLoop   = 8;
-	uint16 column     = 0;
-	uint16 columnLoop = 128;
-	uint8  dummyPixel = 0xAA;
-
-	for (; page < pageLoop; page ++) {
-		writeCMD(mCurrentDevice, CMD_SET_PAGE_POINTER(page), NaN, false);
-		writeCMD(mCurrentDevice, CMD_COLUMN_POINTER_LOW(column), NaN, false);
-		writeCMD(mCurrentDevice, CMD_COLUMN_POINTER_HIGH(column), NaN, false);
-
-		for (; column < columnLoop; column ++) {
-			writeDATA(mCurrentDevice, &dummyPixel, 1);
-		}
-	}
+	uint8 pixel = 0x00;
+	Log_printfln("[SSD1306] device is 0x%x begin clean screen", mCurrentDevice->address);
+	os_memset(mCurrentDevice->frameBuffer, pixel, DEVICE_COLUMN_COUNT * DEVICE_PAGE_COUNT);
+	flushFrameBuffer(mCurrentDevice);
+	Log_printfln("[SSD1306] device is 0x%x clean screen finished", mCurrentDevice->address);
 }
 
 void ICACHE_FLASH_ATTR SSD1306_reset() {
@@ -144,14 +144,14 @@ LOCAL bool ICACHE_FLASH_ATTR testDeviceAddress() {
 	if ((ack = i2c_master_getAck()) == I2C_ACK_OK) {
 		i2c_master_stop();
 		currentAddress = SSD1306_SLAVE_HIGH_ADDRESS;
-		mDeviceList[0] = (SSD1306Device*)os_zalloc(sizeof(SSD1306Device));
+		mDeviceList[0] = (SSD1306Device*)os_malloc(sizeof(SSD1306Device));
 		os_memset(mDeviceList[0], 0, sizeof(SSD1306Device));
 		mDeviceList[0]->address     = SSD1306_SLAVE_HIGH_ADDRESS;
 		mDeviceList[0]->colummSize  = DEVICE_COLUMN_COUNT;
 		mDeviceList[0]->segmentSize = DEVICE_SEGMENT_COUNT;
 		mDeviceList[0]->pageSize    = DEVICE_PAGE_COUNT;
 		mDeviceList[0]->comSize     = DEVICE_COM_COUNT;
-		mDeviceList[0]->frameBuffer = (uint8* )os_zalloc(sizeof(uint8) * mDeviceList[0]->pageSize * mDeviceList[0]->colummSize);
+		mDeviceList[0]->frameBuffer = (uint8*)os_malloc(sizeof(uint8) * mDeviceList[0]->pageSize * mDeviceList[0]->colummSize);
 		if (mDeviceList[0]->frameBuffer != NULL) {
 			os_memset(mDeviceList[0]->frameBuffer, 0, sizeof(uint8) * mDeviceList[0]->pageSize * mDeviceList[0]->colummSize);
 		}
@@ -172,14 +172,14 @@ LOCAL bool ICACHE_FLASH_ATTR testDeviceAddress() {
 	if ((ack = i2c_master_getAck()) == I2C_ACK_OK) {
 		i2c_master_stop();
 		currentAddress = SSD1306_SLAVE_LOW_ADDRESS;
-		mDeviceList[1] = (SSD1306Device*)os_zalloc(sizeof(SSD1306Device));
+		mDeviceList[1] = (SSD1306Device*)os_malloc(sizeof(SSD1306Device));
 		os_memset(mDeviceList[1], 0, sizeof(SSD1306Device));
 		mDeviceList[1]->address     = SSD1306_SLAVE_HIGH_ADDRESS;
 		mDeviceList[1]->colummSize  = DEVICE_COLUMN_COUNT;
 		mDeviceList[1]->segmentSize = DEVICE_SEGMENT_COUNT;
 		mDeviceList[1]->pageSize    = DEVICE_PAGE_COUNT;
 		mDeviceList[1]->comSize     = DEVICE_COM_COUNT;
-		mDeviceList[1]->frameBuffer = (uint8* )os_zalloc(sizeof(uint8) * mDeviceList[1]->pageSize * mDeviceList[1]->colummSize);
+		mDeviceList[1]->frameBuffer = (uint8* )os_malloc(sizeof(uint8) * mDeviceList[1]->pageSize * mDeviceList[1]->colummSize);
 		if (mDeviceList[1]->frameBuffer != NULL) {
 			os_memset(mDeviceList[1]->frameBuffer, 0, sizeof(uint8) * mDeviceList[1]->pageSize * mDeviceList[1]->colummSize);
 		}
@@ -214,115 +214,176 @@ LOCAL void ICACHE_FLASH_ATTR executeDefaultSetup() {
 
 LOCAL void ICACHE_FLASH_ATTR resetDevice(SSD1306Device* device) {
 	Log_printfln("[SSD1306] device is 0x%x reset to default", device->address);
-	writeCMD(device, DEFAULT_SCREEN_OFF);
-	writeCMD(device, DEFAULT_MEM_ADDRESSING_MODE);
-	writeCMD(device, DEFAULT_DISPLAY_START_LINE);
-	writeCMD(device, DEFAULT_DISPLAY_START_LINE_OFFSET);
-	writeCMD(device, DEFAULT_PAGE_POINTER);
-	writeCMD(device, DEFAULT_COLUMN_POINTER_LOW);
-	writeCMD(device, DEFAULT_COLUMN_POINTER_HIGH);
-	writeCMD(device, DEFAULT_COM_SCAN_DIRECTION);
-	writeCMD(device, DEFAULT_SEGMENT_REMAP);
-	writeCMD(device, DEFAULT_CONSTRAST);
-	writeCMD(device, DEFAULT_DISPLAY_MODE);
-	writeCMD(device, DEFAULT_MULTIPLEX_RATIO);
-	writeCMD(device, DEFAULT_COM_CONFIG);
-	writeCMD(device, DEFAULT_ALL_PIXEL_OFF);
-	writeCMD(device, DEFAULT_START_LINE_OFFSET);
-	writeCMD(device, DEFAULT_DISPLAY_CLOCK_DIVIDE_RATIO);
-	writeCMD(device, DFFAULT_PRECHARGE_INTERVAL);
-	writeCMD(device, DEFAULT_COMH_VOLTAGE);
-	writeCMD(device, DEFAULT_DC2DC_CONFIG);
-	writeCMD(device, DEFAULT_SCREEN_ON);
-//	writeCMD(device, DEFAULT_SCREEN_OFF);
-//	writeCMD(device, DFFAULT_PRECHARGE_INTERVAL);
-//	writeCMD(device, DEFAULT_COMH_VOLTAGE);
-//	writeCMD(device, DEFAULT_DC2DC_CONFIG);
-//	writeCMD(device, DEFAULT_SCREEN_ON);
-//	writeCMD(device, DEFAULT_ALL_PIXEL_ON);
+	beginCMD(device);
+	writeCMD_1(device, SSD1306_DISPLAYOFF);
+	writeCMD_2(device, SSD1306_SETDISPLAYCLOCKDIV, 0x80);
+	writeCMD_2(device, SSD1306_SETMULTIPLEX,       0x3F);
+	writeCMD_2(device, SSD1306_SETDISPLAYOFFSET,   0x00);
+	writeCMD_1(device, SSD1306_STARTLINE(0x00));
+	writeCMD_2(device, SSD1306_CHARGEPUMP,         SSD1306_CHARGEPUMP_ENABLE);
+	writeCMD_2(device, SSD1306_MEMORYMODE,         SSD1306_MEMORYMODE_HORIZONTAL);
+	writeCMD_1(device, SSD1306_INVERTSEGREMAP);
+	writeCMD_1(device, SSD1306_COMSCANDEC);
+	writeCMD_2(device, SSD1306_SETCOMPINS,         0x12);
+	writeCMD_2(device, SSD1306_SETCONTRAST,        0xCF);
+	writeCMD_2(device, SSD1306_SETPRECHARGE,       0xF1);
+	writeCMD_2(device, SSD1306_SETVCOMDETECT,      0x40);
+	writeCMD_1(device, SSD1306_DEACTIVESCROLL);
+	writeCMD_1(device, SSD1306_PIXELOFF);
+	writeCMD_1(device, SSD1306_NORMALDISPLAY);
+	writeCMD_1(device, SSD1306_DISPLAYON);
+	endCMD(device);
 	Log_printfln("[SSD1306] device is 0x%x reset completed", device->address);
 }
 
-LOCAL bool ICACHE_FLASH_ATTR writeCMD(SSD1306Device* device, uint8 cmd, uint8 params, bool hasParam) {
-	uint8 paramItr = 0;
-	uint8 address  = getDeviceWriteAddress(device);
+LOCAL bool ICACHE_FLASH_ATTR beginCMD(SSD1306Device* device) {
+	uint8 address = getDeviceWriteAddress(device);
 
 	i2c_master_start();
 	i2c_master_writeByte(address);
 #if !ENABLE_FAST_TRANSFER
-	if (i2c_master_checkAck()) {
+	if (!i2c_master_checkAck()) {
 		i2c_master_stop();
-		Log_printfln("[SSD1306] writeCMD(0x%x) failed, address 0x%x no ACK", cmd, address);
+		Log_printfln("[SSD1306] device 0x%x no ACK", device->address);
 		return false;
 	}
 #endif
 
 	i2c_master_writeByte(FLAG_COMMAND);
 #if !ENABLE_FAST_TRANSFER
-	if (i2c_master_checkAck()) {
+	if (!i2c_master_checkAck()) {
 		i2c_master_stop();
-		Log_printfln("[SSD1306] writeCMD(0x%x) failed, cmd flag no ACK", cmd);
+		Log_printfln("[SSD1306] device 0x%x no ACK", device->address);
+		return false;
+	}
+#endif
+}
+
+LOCAL bool ICACHE_FLASH_ATTR writeCMD_1(SSD1306Device* device, uint8 cmdA) {
+	i2c_master_writeByte(cmdA);
+#if !ENABLE_FAST_TRANSFER
+	if (!i2c_master_checkAck()) {
+		i2c_master_stop();
+		Log_printfln("[SSD1306] device 0x%x no ACK", device->address);
+		return false;
+	}
+#endif
+	return true;
+}
+
+LOCAL bool ICACHE_FLASH_ATTR writeCMD_2(SSD1306Device* device, uint8 cmdA, uint8 cmdB) {
+	i2c_master_writeByte(cmdA);
+#if !ENABLE_FAST_TRANSFER
+	if (!i2c_master_checkAck()) {
+		i2c_master_stop();
+		Log_printfln("[SSD1306] device 0x%x no ACK", device->address);
 		return false;
 	}
 #endif
 
-	i2c_master_writeByte(cmd);
+	i2c_master_writeByte(cmdB);
 #if !ENABLE_FAST_TRANSFER
-	if (i2c_master_checkAck()) {
+	if (!i2c_master_checkAck()) {
 		i2c_master_stop();
-		Log_printfln("[SSD1306] writeCMD(0x%x) failed, write byte no ACK", cmd);
+		Log_printfln("[SSD1306] device 0x%x no ACK", device->address);
 		return false;
 	}
 #endif
-
-	if (hasParam) {
-		i2c_master_writeByte(params);
-#if !ENABLE_FAST_TRANSFER
-		if (i2c_master_checkAck()) {
-			i2c_master_stop();
-			Log_printfln("[SSD1306] writeCMD(0x%x) failed, write param no ACK", cmd);
-			return false;
-		}
-#endif
-	}
-
-	i2c_master_stop();
 
 	return true;
 }
 
-LOCAL bool ICACHE_FLASH_ATTR writeDATA(SSD1306Device* device, uint8* data, uint8 dataLength) {
-	uint8 paramItr = 0;
-	uint8 address  = getDeviceWriteAddress(device);
-
-	i2c_master_start();
-	i2c_master_writeByte(address);
+LOCAL bool ICACHE_FLASH_ATTR writeCMD_3(SSD1306Device* device, uint8 cmdA, uint8 cmdB, uint8 cmdC) {
+	i2c_master_writeByte(cmdA);
 #if !ENABLE_FAST_TRANSFER
-	if (i2c_master_checkAck()) {
+	if (!i2c_master_checkAck()) {
 		i2c_master_stop();
+		Log_printfln("[SSD1306] device 0x%x no ACK", device->address);
 		return false;
 	}
 #endif
 
-	for (paramItr = 0; paramItr < dataLength; paramItr++) {
-		i2c_master_writeByte(FLAG_DATA);
+	i2c_master_writeByte(cmdB);
 #if !ENABLE_FAST_TRANSFER
-		if (i2c_master_checkAck()) {
-			i2c_master_stop();
-			return false;
-		}
+	if (!i2c_master_checkAck()) {
+		i2c_master_stop();
+		Log_printfln("[SSD1306] device 0x%x no ACK", device->address);
+		return false;
+	}
 #endif
+
+	i2c_master_writeByte(cmdC);
+#if !ENABLE_FAST_TRANSFER
+	if (!i2c_master_checkAck()) {
+		i2c_master_stop();
+		Log_printfln("[SSD1306] device 0x%x no ACK", device->address);
+		return false;
+	}
+#endif
+
+	return true;
+}
+
+LOCAL bool ICACHE_FLASH_ATTR endCMD(SSD1306Device* device) {
+	i2c_master_stop();
+	return true;
+}
+
+LOCAL bool ICACHE_FLASH_ATTR beginRAM(SSD1306Device* device, uint8 colStart, uint8 colEnd, uint8 pageStart, uint8 pageEnd) {
+	beginCMD(device);
+	writeCMD_3(device, SSD1306_COLUMNRANGE, colStart,  colEnd);
+	writeCMD_3(device, SSD1306_PAGERANGE,   pageStart, pageEnd);
+	endCMD(device);
+	Timer_delayMS(10);
+
+	uint8 address = getDeviceWriteAddress(device);
+
+	i2c_master_start();
+	i2c_master_writeByte(address);
+#if !ENABLE_FAST_TRANSFER
+	if (!i2c_master_checkAck()) {
+		i2c_master_stop();
+		Log_printfln("[SSD1306] device 0x%x no ACK", device->address);
+		return false;
+	}
+#endif
+
+	i2c_master_writeByte(FLAG_DATA);
+#if !ENABLE_FAST_TRANSFER
+	if (!i2c_master_checkAck()) {
+		i2c_master_stop();
+		Log_printfln("[SSD1306] device 0x%x no ACK", device->address);
+		return false;
+	}
+#endif
+}
+
+LOCAL bool ICACHE_FLASH_ATTR writeRAM(SSD1306Device* device, uint8* data, uint16 dataLength) {
+	uint16 paramItr = 0;
+	uint8  address  = getDeviceWriteAddress(device);
+
+	for (paramItr = 0; paramItr < dataLength; paramItr++) {
 		i2c_master_writeByte(*(data + paramItr));
 #if !ENABLE_FAST_TRANSFER
-		if (i2c_master_checkAck()) {
+		if (!i2c_master_checkAck()) {
 			i2c_master_stop();
+			Log_printfln("[SSD1306] device 0x%x no ACK", device->address);
 			return false;
 		}
 #endif
 	}
-	i2c_master_stop();
 
 	return true;
+}
+
+LOCAL bool ICACHE_FLASH_ATTR endRAM(SSD1306Device* device) {
+	i2c_master_stop();
+}
+
+LOCAL bool ICACHE_FLASH_ATTR flushFrameBuffer(SSD1306Device* device) {
+	beginRAM(mCurrentDevice, 0x00, DEVICE_COLUMN_COUNT - 1, 0x00, DEVICE_PAGE_COUNT - 1);
+	writeRAM(mCurrentDevice, mCurrentDevice->frameBuffer, DEVICE_COLUMN_COUNT * DEVICE_PAGE_COUNT);
+	endRAM(mCurrentDevice);
 }
 
 LOCAL uint8 getDeviceReadAddress(SSD1306Device* device) {

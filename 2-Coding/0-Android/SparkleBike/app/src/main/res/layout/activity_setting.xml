@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/primary">
+    android:background="@color/SettingWindowActivity_Background">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/ToolBar"
@@ -17,5 +17,14 @@
         app:popupTheme="@style/AppTheme.ToolBarPopupTheme"
         app:theme="@style/AppTheme.ToolBarTheme"
         app:title="@string/ApplicationName"/>
+
+    <FrameLayout
+        android:id="@+id/Layout_ContentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- PlaceHolder for Scene transtition -->
+
+    </FrameLayout>
 
 </LinearLayout>
