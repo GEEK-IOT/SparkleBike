@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.drawable.Animatable;
-import android.graphics.drawable.Animatable2;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.ColorInt;
@@ -15,7 +14,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.graphics.drawable.AnimatedVectorDrawableCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -32,11 +30,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import cn.geekiot.sparklebike.ColorActivity;
 import cn.geekiot.sparklebike.R;
 import cn.geekiot.sparklebike.theme.MaterialDesignTheme;
 import cn.geekiot.sparklebike.theme.ThemeColorHelper;
 
-public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+public class HomeActivity extends ColorActivity implements NavigationView.OnNavigationItemSelectedListener,
         FragmentControlLinker {
 
     private Toolbar                 mToolbar        = null;
@@ -53,7 +52,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     private MainActivityDevicesFragment mDevicesFragment  = null;
     private MainActivityGroupsFragment  mGroupsFragment   = null;
     private MainActivityAreasFragment   mAreasFragment    = null;
-    private ThemeColorHelper            mThemeColorHelper = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,12 +81,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         mFabAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String themeName = mThemeColorHelper.triggerNextColor();
+                ThemeColorHelper colorHelper = getThemeColorHelper();
+                String themeName = getThemeColorHelper().triggerNextColor();
                 Snackbar.make(
                         view,
                         String.format("%d/%d Switch to theme %s",
-                                mThemeColorHelper.getCurrentThemeIndex() + 1,
-                                mThemeColorHelper.getThemeSize(),
+                                colorHelper.getCurrentThemeIndex() + 1,
+                                colorHelper.getThemeSize(),
                                 themeName), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -125,9 +125,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setupPalette() {
-        mThemeColorHelper = ThemeColorHelper.createMaterialDesignThemeHelper(HomeActivity.this);
-        mThemeColorHelper.finishPaletteBuild(
-                mThemeColorHelper.buildPalette()
+        ThemeColorHelper colorHelper = getThemeColorHelper();
+        colorHelper.finishPaletteBuild(
+                colorHelper.buildPalette()
                         .add(MaterialDesignTheme.ACCENT, new MaterialDesignTheme.ThemeColorSetter() {
                             @Override
                             public void setThemeColor(@ColorInt int color) {
@@ -152,11 +152,27 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                                 mNavigationView.setItemTextColor(ColorStateList.valueOf(colour));
                             }
                         })
+                        .add(MaterialDesignTheme.PRIMARY, new MaterialDesignTheme.ThemeColorSetter() {
+                            @Override
+                            public void setThemeColor(@ColorInt int colour) {
+                                View item = mNavigationView.getHeaderView(0);
+                                if (item != null) {
+                                    item.setBackgroundTintList(ColorStateList.valueOf(colour));
+                                }
+                            }
+
+                            @Override
+                            public void setThemeTransientColor(@ColorInt int colour) {
+                                View item = mNavigationView.getHeaderView(0);
+                                if (item != null) {
+                                    item.setBackgroundTintList(ColorStateList.valueOf(colour));
+                                }
+                            }
+                        })
                         .background(MaterialDesignTheme.PRIMARY_DARK, getWindow())
                         .background(MaterialDesignTheme.PRIMARY, mTabLayout)
                         .background(MaterialDesignTheme.PRIMARY, mToolbar)
                         .background(MaterialDesignTheme.ACCENT, mFabAction)
-                        .background(MaterialDesignTheme.PRIMARY, mNavigationView.getHeaderView(0))
                         .build()
         );
     }
@@ -204,8 +220,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             public void run() {
                 Intent intent = new Intent(HomeActivity.this, SettingWindow.class);
                 intent.putExtra(SettingWindow.KEY_NEED_LAUNCH_ANIM, true);
-                intent.putExtra(SettingWindow.KEY_PAUSE_BACKGROUND_COLOR, mThemeColorHelper.getColor(MaterialDesignTheme.PRIMARY));
+                intent.putExtra(SettingWindow.KEY_PAUSE_BACKGROUND_COLOR, getThemeColorHelper().getColor(MaterialDesignTheme.PRIMARY));
                 intent.putExtra(SettingWindow.KEY_RESUME_BACKGROUND_COLOR, getResources().getColor(R.color.SettingWindowActivity_Background));
+                intent.putExtra(SettingWindow.KEY_PAUSE_STATUSBAR_COLOR, getThemeColorHelper().getColor(MaterialDesignTheme.PRIMARY_DARK));
+                intent.putExtra(SettingWindow.KEY_RESUME_STATUSBAR_COLOR, getResources().getColor(R.color.SettingWindowActivity_Background));
                 startActivity(
                         intent,
                         ActivityOptionsCompat.makeSceneTransitionAnimation(HomeActivity.this, mToolbar, "toolbar").toBundle());

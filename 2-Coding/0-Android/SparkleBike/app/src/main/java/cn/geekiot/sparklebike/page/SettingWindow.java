@@ -1,5 +1,6 @@
 package cn.geekiot.sparklebike.page;
 
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.animation.ObjectAnimator;
 import android.graphics.drawable.Animatable;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
+import cn.geekiot.sparklebike.ColorActivity;
 import cn.geekiot.sparklebike.R;
 
 /**
@@ -28,12 +30,14 @@ import cn.geekiot.sparklebike.R;
  * @Date 2016-09-29 14:04:59
  * Copyright (c) 2016 Cocoonshu
  */
-public class SettingWindow extends AppCompatActivity {
+public class SettingWindow extends ColorActivity {
 
     public static final String TAG                         = "SettingWindow";
     public static final String KEY_NEED_LAUNCH_ANIM        = "needLaunchAnimation";
     public static final String KEY_PAUSE_BACKGROUND_COLOR  = "pauseBackgroundColor";
     public static final String KEY_RESUME_BACKGROUND_COLOR = "resumeBackgroundColor";
+    public static final String KEY_PAUSE_STATUSBAR_COLOR   = "pauseStatusBarColor";
+    public static final String KEY_RESUME_STATUSBAR_COLOR  = "resumeStatusBarColor";
 
     private Handler       mHandler               = new Handler();
     private ColorDrawable mWindowBackground      = null;
@@ -42,6 +46,8 @@ public class SettingWindow extends AppCompatActivity {
     private Toolbar       mToolbar               = null;
     public  int           mPauseBackgroundColor  = 0x00000000;
     public  int           mResumeBackgroundColor = 0x00000000;
+    public  int           mPauseStatusBarColor   = 0x00000000;
+    public  int           mResumeStatusBarColor  = 0x00000000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,12 +59,14 @@ public class SettingWindow extends AppCompatActivity {
     }
 
     private void initializeIntent() {
-        Intent  intent                = getIntent();
-        boolean needLaunchAnim        = false;
+        Intent  intent         = getIntent();
+        boolean needLaunchAnim = false;
         if (intent != null) {
             needLaunchAnim         = intent.getBooleanExtra(KEY_NEED_LAUNCH_ANIM, false);
             mPauseBackgroundColor  = intent.getIntExtra(KEY_PAUSE_BACKGROUND_COLOR, mPauseBackgroundColor);
             mResumeBackgroundColor = intent.getIntExtra(KEY_RESUME_BACKGROUND_COLOR, mResumeBackgroundColor);
+            mPauseStatusBarColor   = intent.getIntExtra(KEY_PAUSE_STATUSBAR_COLOR, mPauseStatusBarColor);
+            mResumeStatusBarColor  = intent.getIntExtra(KEY_RESUME_STATUSBAR_COLOR, mResumeStatusBarColor);
         }
 
         if (needLaunchAnim) {
@@ -66,6 +74,7 @@ public class SettingWindow extends AppCompatActivity {
         } else {
             mContentView.setBackgroundColor(mResumeBackgroundColor);
             mToolbar.setBackgroundColor(mResumeBackgroundColor);
+            getWindow().setStatusBarColor(mResumeBackgroundColor);
         }
     }
 
@@ -131,14 +140,25 @@ public class SettingWindow extends AppCompatActivity {
             public void run() {
                 ColorDrawable toolBarBackground = (ColorDrawable)mToolbar.getBackground();
                 ColorDrawable layoutBackground  = new ColorDrawable();
-                int startColor = mPauseBackgroundColor;
-                int endColor   = mResumeBackgroundColor;
+                int startColor       = mPauseBackgroundColor;
+                int endColor         = mResumeBackgroundColor;
+                int startWindowColor = mPauseStatusBarColor;
+                int endWindowColor   = mResumeStatusBarColor;
                 ObjectAnimator.ofArgb(toolBarBackground, "color", startColor, endColor)
                         .setDuration(500)
                         .start();
                 ObjectAnimator.ofArgb(layoutBackground, "color", startColor, endColor)
                         .setDuration(500)
                         .start();
+                ValueAnimator animator = ValueAnimator.ofArgb(startWindowColor, endWindowColor);
+                animator.setDuration(500);
+                animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        getWindow().setStatusBarColor((Integer) animation.getAnimatedValue());
+                    }
+                });
+                animator.start();
                 mContentView.setBackground(layoutBackground);
                 scheduleSceneShowTranstion();
             }
@@ -151,14 +171,26 @@ public class SettingWindow extends AppCompatActivity {
             public void run() {
                 ColorDrawable toolBarBackground = (ColorDrawable)mToolbar.getBackground();
                 ColorDrawable layoutBackground  = new ColorDrawable();
-                int startColor = mResumeBackgroundColor;
-                int endColor   = mPauseBackgroundColor;
+                int startColor       = mResumeBackgroundColor;
+                int endColor         = mPauseBackgroundColor;
+                int startWindowColor = mResumeStatusBarColor;
+                int endWindowColor   = mPauseStatusBarColor;
                 ObjectAnimator.ofArgb(toolBarBackground, "color", startColor, endColor)
                         .setDuration(400)
                         .start();
                 ObjectAnimator.ofArgb(layoutBackground, "color", startColor, endColor)
                         .setDuration(400)
                         .start();
+                ValueAnimator animator = ValueAnimator.ofArgb(startWindowColor, endWindowColor);
+                animator.setDuration(400);
+                animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        getWindow().setStatusBarColor((Integer) animation.getAnimatedValue());
+                    }
+                });
+                animator.start();
+
                 mContentView.setBackground(layoutBackground);
                 scheduleSceneHideTranstion();
             }
@@ -166,15 +198,15 @@ public class SettingWindow extends AppCompatActivity {
     }
 
     private void scheduleSceneShowTranstion() {
-        TransitionManager manager = TransitionInflater.from(SettingWindow.this).inflateTransitionManager(R.transition.setting_window_fade_in_content, mSceneRoot);
+        Transition transition = TransitionInflater.from(SettingWindow.this).inflateTransition(R.transition.setting_window_fade_in_content);
         Scene scene = Scene.getSceneForLayout(mSceneRoot, R.layout.activity_setting_content, SettingWindow.this);
-        manager.transitionTo(scene);
+        TransitionManager.go(scene, transition);
     }
 
     private void scheduleSceneHideTranstion() {
-        TransitionManager manager = TransitionInflater.from(SettingWindow.this).inflateTransitionManager(R.transition.setting_window_fade_out_content, mSceneRoot);
+        Transition transition = TransitionInflater.from(SettingWindow.this).inflateTransition(R.transition.setting_window_fade_out_content);
         Scene scene = Scene.getSceneForLayout(mSceneRoot, R.layout.activity_setting_placeholder, SettingWindow.this);
-        manager.transitionTo(scene);
+        TransitionManager.go(scene, transition);
     }
 
     private void setupWindowStyle() {

@@ -81,6 +81,7 @@
 
     <style name="AppTheme.SettingWindow">
         <item name="android:windowContentTransitions">true</item>
+        <item name="android:statusBarColor">@color/SettingWindowActivity_Background</item>
     </style>
 
 </resources>

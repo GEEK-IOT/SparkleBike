@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
     <application
+        android:name=".ColorApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/ApplicationName"
@@ -22,7 +23,8 @@
         </activity>
         <activity
             android:name=".page.SettingWindow"
-            android:label="@string/title_activity_setting_window">
+            android:label="@string/title_activity_setting_window"
+            android:theme="@style/AppTheme.SettingWindow">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

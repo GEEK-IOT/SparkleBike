@@ -1,22 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
+               android:transitionOrdering="together"
+               android:startDelay="250">
     <fade
         android:fadingMode="fade_in"
-        android:matchOrder="0"
-        android:duration="250">
-        <target android:targetId="@id/TextView_NetworkTitle" />
+        android:duration="250"
+        android:startDelay="0">
+        <targets>
+            <target android:targetId="@id/TextView_NetworkTitle" />
+        </targets>
     </fade>
     <fade
         android:fadingMode="fade_in"
-        android:matchOrder="1"
-        android:duration="250">
-        <target android:targetId="@id/TextView_OnlyWiFi" />
-        <target android:targetId="@id/Switch_OnlyWiFi" />
+        android:duration="250"
+        android:startDelay="50">
+        <targets>
+            <target android:targetId="@id/TextView_OnlyWiFi" />
+            <target android:targetId="@id/Switch_OnlyWiFi" />
+        </targets>
     </fade>
     <fade
         android:fadingMode="fade_in"
-        android:matchOrder="2"
-        android:duration="250">
-        <target android:targetId="@id/TextView_LANManagement" />
+        android:duration="250"
+        android:startDelay="100">
+        <targets>
+            <target android:targetId="@id/TextView_LANManagement" />
+        </targets>
     </fade>
 </transitionSet>
