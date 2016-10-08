@@ -132,3 +132,18 @@ const char* ICACHE_FLASH_ATTR Text_physicalMode2STR(enum phy_mode physicalMode) 
 		return UNKNOWN;
 	}
 }
+
+const char* ICACHE_FLASH_ATTR Text_toConnectReasonString(int connectReason) {
+	switch (connectReason) {
+	case REASON_BEACON_TIMEOUT:
+		return RST_BEACON_TIMEOUT;
+	case REASON_NO_AP_FOUND:
+		return RST_NO_AP_FOUND;
+	case REASON_AUTH_FAIL:
+		return RST_AUTH_FAIL;
+	case REASON_ASSOC_FAIL:
+		return RST_ASSOC_FAIL;
+	case REASON_HANDSHAKE_TIMEOUT:
+		return RST_HANDSHAKE_TIMEOUT;
+	}
+}

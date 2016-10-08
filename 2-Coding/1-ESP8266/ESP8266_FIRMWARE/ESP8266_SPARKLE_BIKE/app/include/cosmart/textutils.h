@@ -43,4 +43,6 @@ const char* Text_flashSizeMap2STR(enum flash_size_map flashSizeMap);
 
 const char* Text_physicalMode2STR(enum phy_mode physicalMode);
 
+const char* Text_toConnectReasonString(int connectReason);
+
 #endif /* APP_INCLUDE_COSMART_TEXTUTILS_H_ */

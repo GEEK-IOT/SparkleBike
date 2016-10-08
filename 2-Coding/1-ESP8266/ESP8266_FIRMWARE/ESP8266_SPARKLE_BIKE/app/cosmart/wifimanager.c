@@ -15,12 +15,12 @@
 #include "user_interface.h"
 
 // 内部函数声明
-bool isNeedRebootAfterSetOpMode();
-char* generateAPSSID();
-void  deleteAPSSID(char** pAPSSID);
-char* generateAPPassword();
-void  deleteAPPassword(char** pAPPassword);
-void  onWifiEventReceived(System_Event_t* event);
+LOCAL bool  isNeedRebootAfterSetOpMode();
+LOCAL char* generateAPSSID();
+LOCAL void  deleteAPSSID(char** pAPSSID);
+LOCAL char* generateAPPassword();
+LOCAL void  deleteAPPassword(char** pAPPassword);
+LOCAL void  onWifiEventReceived(System_Event_t* event);
 
 ///////////////
 //  外部函数   //
@@ -85,10 +85,33 @@ void ICACHE_FLASH_ATTR WiFi_setupProtocolBridge() {
 	CMDServer_startCommandServer();
 }
 
+LOCAL struct station_config staConfig;
+
+void ICACHE_FLASH_ATTR WiFi_connectAP(const char* ssid, const char* password) {
+	Log_printf(LOG_WIFI_CONNECT_TO_AP, ssid);
+
+	os_memset(&staConfig, 0x00, sizeof(struct station_config));
+	staConfig.bssid_set = 0; // No check MAC of AP
+	os_strcpy(staConfig.ssid, ssid);
+	os_strcpy(staConfig.password, password);
+	wifi_station_set_config(&staConfig);
+	wifi_station_disconnect();
+	if (wifi_station_connect()) {
+		Log_printfln(LOG_WIFI_OPERATE_SUCCESSED);
+	} else {
+		Log_printfln(LOG_WIFI_OPERATE_FAILED);
+	}
+}
+
+void ICACHE_FLASH_ATTR WiFi_disconnectAP() {
+	Log_printfln(LOG_WIFI_DISCONNECT_TO_AP);
+	uint8 connectStatus = wifi_station_get_connect_status();
+}
+
 ///////////////
 //  内部函数   //
 ///////////////
-bool ICACHE_FLASH_ATTR isNeedRebootAfterSetOpMode() {
+LOCAL bool ICACHE_FLASH_ATTR isNeedRebootAfterSetOpMode() {
 	const char* refVersion = REF_VERSION;
 	const char* sdkVersion = system_get_sdk_version();
 	if (sdkVersion != 0x00) {
@@ -111,7 +134,7 @@ bool ICACHE_FLASH_ATTR isNeedRebootAfterSetOpMode() {
 	return true;
 }
 
-char* ICACHE_FLASH_ATTR generateAPSSID() {
+LOCAL char* ICACHE_FLASH_ATTR generateAPSSID() {
 	uint8  apMacAddr[6]  = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	size_t SSIDBytesSize = sizeof(char) * (os_strlen(SSID_PREFIX) + 12 + 1);
 	char*  APSSID        = (char*)os_malloc(SSIDBytesSize);
@@ -123,14 +146,14 @@ char* ICACHE_FLASH_ATTR generateAPSSID() {
 	return APSSID;
 }
 
-void ICACHE_FLASH_ATTR deleteAPSSID(char** pAPSSID) {
+LOCAL void ICACHE_FLASH_ATTR deleteAPSSID(char** pAPSSID) {
 	if (pAPSSID != 0x00) {
 		os_free(*pAPSSID);
 		*pAPSSID = 0x00;
 	}
 }
 
-char* ICACHE_FLASH_ATTR generateAPPassword() {
+LOCAL char* ICACHE_FLASH_ATTR generateAPPassword() {
 	uint8  apMacAddr[6]        = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	uint8  encodedMacAddr[6]   = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	size_t APPasswordBytesSize = 12 + 1;
@@ -151,14 +174,14 @@ char* ICACHE_FLASH_ATTR generateAPPassword() {
 	return APPassword;
 }
 
-void ICACHE_FLASH_ATTR deleteAPPassword(char** pAPPassword) {
+LOCAL void ICACHE_FLASH_ATTR deleteAPPassword(char** pAPPassword) {
 	if (pAPPassword != 0x00) {
 		os_free(*pAPPassword);
 		*pAPPassword = 0x00;
 	}
 }
 
-void ICACHE_FLASH_ATTR onWifiEventReceived(System_Event_t* event) {
+LOCAL void ICACHE_FLASH_ATTR onWifiEventReceived(System_Event_t* event) {
 	if (event != NULL) {
 		switch (event->event) {
 			case EVENT_SOFTAPMODE_STACONNECTED:{
@@ -175,8 +198,39 @@ void ICACHE_FLASH_ATTR onWifiEventReceived(System_Event_t* event) {
 						event->event_info.sta_disconnected.aid);
 				break;
 			}
-			case EVENT_SOFTAPMODE_PROBEREQRECVED:{ // probe-req-revceived
-
+			case EVENT_STAMODE_CONNECTED:{
+				// [Wifi] Connected to %s on channel %d
+//				Log_printfln("[WiFi] Connected to %s on channel %d",
+//						event->event_info.connected.ssid,
+//						event->event_info.connected.channel);
+				Log_printfln("[WiFi] EVENT_STAMODE_CONNECTED");
+				break;
+			}
+			case EVENT_STAMODE_DISCONNECTED:{
+				// [Wifi] Disconnect from %s on channel %d
+				Log_printfln("[WiFi] Disconnected from %s for %s",
+						event->event_info.disconnected.ssid,
+						Text_toConnectReasonString(event->event_info.disconnected.reason));
+				break;
+			}
+			case EVENT_STAMODE_GOT_IP:{
+				// [Wifi] Got address:
+                //       - IP:   %d.%d.%d.%d
+                //       - Mask: %d.%d.%d.%d
+                //       - Gate: %d.%d.%d.%d
+//				Log_printfln("[WiFi] Got address:\r\n       - IP:   %d.%d.%d.%d\r\n       - Mask: %d.%d.%d.%d\r\n       - Gate: %d.%d.%d.%d\r\n",
+//						IP2STR(event->event_info.got_ip.ip.addr),
+//						IP2STR(event->event_info.got_ip.mask.addr),
+//						IP2STR(event->event_info.got_ip.gw.addr));
+				Log_printfln("[WiFi] EVENT_STAMODE_GOT_IP");
+				break;
+			}
+			case EVENT_STAMODE_AUTHMODE_CHANGE:{
+				// [Wifi] Auth mode changed from %d to %d
+//				Log_printfln("[WiFi] Auth mode changed from %d to %d",
+//						Text_toAuthModeString(event->event_info.auth_change.old_mode),
+//						Text_toAuthModeString(event->event_info.auth_change.new_mode));
+				Log_printfln("[WiFi] EVENT_STAMODE_AUTHMODE_CHANGE");
 				break;
 			}
 			default:

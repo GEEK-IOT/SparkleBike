@@ -47,6 +47,34 @@ static const char AUTHMODE_WEP                            [] ICACHE_DATA_ATTR = 
 static const char AUTHMODE_WPA_PSK                        [] ICACHE_DATA_ATTR = {"Null"};
 static const char AUTHMODE_WPA2_PSK                       [] ICACHE_DATA_ATTR = {"Null"};
 static const char AUTHMODE_WPA_WPA2_PSK                   [] ICACHE_DATA_ATTR = {"Null"};
+//static const char RST_UNSPECIFIED                         [] ICACHE_DATA_ATTR = {"Unspecified"};
+//static const char RST_AUTH_EXPIRE                         [] ICACHE_DATA_ATTR = {"Auth expire"};
+//static const char RST_AUTH_LEAVE                          [] ICACHE_DATA_ATTR = {"Auth leave"};
+//static const char RST_ASSOC_EXPIRE                        [] ICACHE_DATA_ATTR = {"Assoc expire"};
+//static const char RST_ASSOC_TOOMANY                       [] ICACHE_DATA_ATTR = {"Assoc too many"};
+//static const char RST_NOT_AUTHED                          [] ICACHE_DATA_ATTR = {"Not authed"};
+//static const char RST_NOT_ASSOCED                         [] ICACHE_DATA_ATTR = {"Not assoced"};
+//static const char RST_ASSOC_LEAVE                         [] ICACHE_DATA_ATTR = {"Assoc leave"};
+//static const char RST_ASSOC_NOT_AUTHED                    [] ICACHE_DATA_ATTR = {"Assoc not authed"};
+//static const char RST_DISASSOC_PWRCAP_BAD                 [] ICACHE_DATA_ATTR = {"Disassoc powercap bad"};
+//static const char RST_DISASSOC_SUPCHAN_BAD                [] ICACHE_DATA_ATTR = {"Disassoc supchan bad"};
+//static const char RST_IE_INVALID                          [] ICACHE_DATA_ATTR = {"IE invalid"};
+//static const char RST_MIC_FAILURE                         [] ICACHE_DATA_ATTR = {"MIC failure"};
+//static const char RST_4WAY_HANDSHAKE_TIMEOUT              [] ICACHE_DATA_ATTR = {"4-way handshake timeout"};
+//static const char RST_GROUP_KEY_UPDATE_TIMEOUT            [] ICACHE_DATA_ATTR = {"Group key update timeout"};
+//static const char RST_IE_IN_4WAY_DIFFERS                  [] ICACHE_DATA_ATTR = {"IE in 4-way differs"};
+//static const char RST_GROUP_CIPHER_INVALID                [] ICACHE_DATA_ATTR = {"Group cipher invalid"};
+//static const char RST_PAIRWISE_CIPHER_INVALID             [] ICACHE_DATA_ATTR = {"Pairwise cipher invalid"};
+//static const char RST_AKMP_INVALID                        [] ICACHE_DATA_ATTR = {"AKMP invalid"};
+//static const char RST_UNSUPP_RSN_IE_VERSION               [] ICACHE_DATA_ATTR = {"Unsupported RSN IE version"};
+//static const char RST_INVALID_RSN_IE_CAP                  [] ICACHE_DATA_ATTR = {"Invalid RSN IE cap"};
+//static const char RST_802_1X_AUTH_FAILED                  [] ICACHE_DATA_ATTR = {"802.1x auth failed"};
+//static const char RST_CIPHER_SUITE_REJECTED               [] ICACHE_DATA_ATTR = {"Cipher suite rejected"};
+static const char RST_BEACON_TIMEOUT                      [] ICACHE_DATA_ATTR = {"Beacon timeout"};
+static const char RST_NO_AP_FOUND                         [] ICACHE_DATA_ATTR = {"No AP found"};
+static const char RST_AUTH_FAIL                           [] ICACHE_DATA_ATTR = {"Auth failed"};
+static const char RST_ASSOC_FAIL                          [] ICACHE_DATA_ATTR = {"Assoc failed"};
+static const char RST_HANDSHAKE_TIMEOUT                   [] ICACHE_DATA_ATTR = {"Handshake timeout"};
 
 // APPLICATION LOGS
 static const char LOG_EMPTY                               []                    = {""};
@@ -88,6 +116,10 @@ static const char LOG_WIFI_UPDATING_CONFIG_CHANNEL        [] ICACHE_DATA_ATTR = 
 static const char LOG_WIFI_UPDATING_CONFIG_MAX_CONNECTION [] ICACHE_DATA_ATTR = {"       - MaxConnection : %d"};
 static const char LOG_WIFI_STATION_CONNECTED              [] ICACHE_DATA_ATTR = {"[WiFi] Station: %02x:%02x:%02x:%02x:%02x:%02x(%d) connected!"};
 static const char LOG_WIFI_STATION_DISCONNECTED           [] ICACHE_DATA_ATTR = {"[WiFi] Station: %02x:%02x:%02x:%02x:%02x:%02x(%d) disconnected!"};
+static const char LOG_WIFI_CONNECT_TO_AP                  [] ICACHE_DATA_ATTR = {"[WiFi] Connect to AP: %s"};
+static const char LOG_WIFI_DISCONNECT_TO_AP               [] ICACHE_DATA_ATTR = {"[WiFi] Disconnect to AP: %s"};
+static const char LOG_WIFI_OPERATE_SUCCESSED              [] ICACHE_DATA_ATTR = {" - Successed"};
+static const char LOG_WIFI_OPERATE_FAILED                 [] ICACHE_DATA_ATTR = {" - Failed"};
 
 // JSON KEYWORDS
 static const char KEY_REQUEST_ID        [] ICACHE_DATA_ATTR = {"requestID"};
