@@ -33,7 +33,7 @@ void ICACHE_FLASH_ATTR user_init(void)
 *******************************************************************************/
 void user_rf_pre_init(void)
 {
-	// TODO
+	wifi_station_set_hostname("CoSmart");
 }
 
 /******************************************************************************

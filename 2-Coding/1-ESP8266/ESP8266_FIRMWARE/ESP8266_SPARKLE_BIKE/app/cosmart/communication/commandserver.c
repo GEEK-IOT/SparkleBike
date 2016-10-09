@@ -6,9 +6,6 @@
  */
 
 #include "cosmart/communication/commandserver.h"
-#include "cosmart/communication/commandqueue.h"
-#include "cosmart/communication/commandexecutor.h"
-#include "cosmart/communication/cmdprotocol.h"
 #include "ets_sys.h"
 #include "os_type.h"
 #include "osapi.h"
@@ -19,22 +16,9 @@
 
 LOCAL void          startBroadcastReceiver();
 LOCAL void          stopBroadcastReceiver();
-LOCAL void          startCommandQueue();
-LOCAL void          stopCommandQueue();
-LOCAL bool          moveTerminalToConnectedList(Terminal* terminal);
-LOCAL bool          isConnected(Terminal* terminal);
-LOCAL unsigned long getGenerationID();
 LOCAL void          onBroadcastReceived(void *espconn, char *pdata, unsigned short length);
 LOCAL void          onUDPBridgeReceived(void *espconn, char *pdata, unsigned short length);
 LOCAL void          onUDPBridgeConnected(void *espconn);
-LOCAL void          onCommand(Terminal* terminal, const char* command);
-LOCAL void          onMethod(Terminal* terminal, const char* command, Request* inRequest, Response* outResponse);
-LOCAL void          onData(Terminal* terminal, const char* command, Request* inRequest, Response* outResponse);
-
-// 接入的Terminal列表
-LOCAL Terminal*     mConnectingTerminalList[MAX_TERMINAL_SIZE];
-LOCAL Terminal*     mConnectedTerminalList[MAX_TERMINAL_SIZE];
-LOCAL unsigned long mGenerationCounter;
 
 // UDP广播接收器
 LOCAL struct espconn mBroadcastReceiverConnection;
@@ -42,23 +26,14 @@ LOCAL struct espconn mBroadcastReceiverConnection;
 void ICACHE_FLASH_ATTR CMDServer_initialize() {
 	Log_printfln("");
 	Log_printfln("[CMD] Start command server");
-
-	int i = 0;
-	for (; i < MAX_TERMINAL_SIZE; i++) {
-		mConnectingTerminalList[i] = NULL;
-		mConnectedTerminalList[i]  = NULL;
-	}
-	mGenerationCounter = 0;
 }
 
 void ICACHE_FLASH_ATTR CMDServer_startCommandServer() {
-	startCommandQueue();
 	startBroadcastReceiver();
 }
 
 void ICACHE_FLASH_ATTR CMDServer_stopCommandServer() {
 	stopBroadcastReceiver();
-	stopCommandQueue();
 }
 
 bool ICACHE_FLASH_ATTR CMDServer_verifyTerminal(const char* requestID, const char* securityCode) {
@@ -188,89 +163,6 @@ LOCAL void ICACHE_FLASH_ATTR stopBroadcastReceiver() {
 	mBroadcastReceiverConnection.proto.udp = 0x00;
 }
 
-LOCAL void ICACHE_FLASH_ATTR startCommandQueue() {
-	CMDQueue_initialize();
-	CMDQueue_setCommandListener(onCommand);
-	CMDQueue_startLoop();
-}
-
-LOCAL void ICACHE_FLASH_ATTR stopCommandQueue() {
-	CMDQueue_setCommandListener(NULL);
-	CMDQueue_stopLoop();
-	CMDQueue_clear();
-}
-
-LOCAL bool moveTerminalToConnectedList(Terminal* terminal) {
-//	if (terminal != NULL) {
-//		int i;
-//		int foundPosition = -1;
-//		for (i = 0; i < MAX_TERMINAL_SIZE; i++) {
-//			foundPosition = mConnectingTerminalList[i] == terminal ? i : foundPosition;
-//			if (foundPosition != -1) {
-//				break;
-//			}
-//		}
-//
-//		int  emptyPosition   = -1;
-//		bool hasSameTerminal = false;
-//		for (i = 0; i < MAX_TERMINAL_SIZE; i++) {
-//			if (emptyPosition == -1) {
-//				emptyPosition = mConnectedTerminalList[i] == NULL ? i : emptyPosition;
-//			}
-//			if (mConnectedTerminalList[i] == terminal) {
-//				hasSameTerminal = true;
-//				break;
-//			}
-//		}
-//		if (hasSameTerminal) {
-//			mConnectingTerminalList[foundPosition] = NULL;
-//			return true;
-//		} else {
-//			if (emptyPosition != -1) {
-//				mConnectingTerminalList[foundPosition] = NULL;
-//				mConnectedTerminalList[emptyPosition]  = terminal;
-//				return true;
-//			} else {
-//				// 已连接列表中没有空位，断开最老连接
-//			}
-//		}
-//	}
-}
-
-LOCAL bool ICACHE_FLASH_ATTR isConnected(Terminal* terminal) {
-//	if (terminal != NULL) {
-//		Connection* connection = terminal->connection;
-//		if (connection != NULL) {
-//			// 因为UDP连接获取的remote_info.state是始终为ESPCONN_NONE
-//			// 所以在此只判断Terminal是否处于mConnectedList中
-//			// espconn_get_connection_info(connection, &info, 0);
-//			int i;
-//			for (i = 0; i < MAX_TERMINAL_SIZE; i++) {
-//				if (mConnectedTerminalList[i] == terminal) {
-//					return true;
-//				}
-//			}
-//		}
-//	}
-//	return false;
-}
-
-LOCAL unsigned long ICACHE_FLASH_ATTR getGenerationID() {
-//	mGenerationCounter ++;
-//	if (mGenerationCounter == 0) {
-//		int i;
-//		for (i = 0; i < MAX_TERMINAL_SIZE; i++) {
-//			if (mConnectingTerminalList[i] != NULL) {
-//				mConnectingTerminalList[i]->generation = mGenerationCounter;
-//			}
-//			if (mConnectedTerminalList[i] != NULL) {
-//				mConnectedTerminalList[i]->generation = mGenerationCounter;
-//			}
-//		}
-//	}
-//	return mGenerationCounter;
-}
-
 LOCAL void ICACHE_FLASH_ATTR onBroadcastReceived(void *espconn, char *data, unsigned short length) {
 	/**
 	 * Broadcast Message protocol:
@@ -305,7 +197,6 @@ LOCAL void ICACHE_FLASH_ATTR onBroadcastReceived(void *espconn, char *data, unsi
 
 	Log_printfln("[CMD] Broadcast: content = %s, length = %d", data, length);
 	// 提交一条指令到命令队列中等待执行
-	CMDQueue_push(NULL, data);
 }
 
 LOCAL void ICACHE_FLASH_ATTR onUDPBridgeConnected(void *espconn) {
@@ -336,76 +227,4 @@ LOCAL void ICACHE_FLASH_ATTR onUDPBridgeConnected(void *espconn) {
 
 LOCAL void ICACHE_FLASH_ATTR onUDPBridgeReceived(void *espconn, char *data, unsigned short length) {
 	Log_printfln("[CMD] UDP Bridge: PData = %s, length = %d", data, length);
-}
-
-LOCAL void ICACHE_FLASH_ATTR onCommand(Terminal* terminal, const char* command) {
-//	if (command == NULL) {
-//		return;
-//	}
-//
-//	Request*  request  = NULL;
-//	Response* response = NULL;
-//	if (CMDDecoder_command(command, &request, &response)) {
-//		return;
-//	}
-//
-//	if (request == NULL) {
-//		if (response == NULL) {
-//			Log_printfln("[CMD][onCommand][OutOfMemory] Cannot alloc Response object");
-//			return;
-//		} else {
-//			Log_printfln("[CMD][onCommand][OutOfMemory] Cannot alloc Request object");
-//			response->requestState->stateCode        = State_OutOfMemoryError;
-//			response->requestState->stateMessage     = NULL;
-//			response->requestState->stateDescription = NULL;
-//		}
-//	} else {
-//		onMethod(terminal, command, request, response);
-//	}
-}
-
-LOCAL void ICACHE_FLASH_ATTR onMethod(Terminal* terminal, const char* command, Request* inRequest, Response* outResponse) {
-//	// 分配方法调用
-//	int           i          = 0;
-//	const int     methodSize = CMDExecutor_getMethodSize();
-//	const Method* methods    = CMDExecutor_getMethods();
-//	bool foundExecutor = false;
-//	for (i = 0; i < methodSize; i++) {
-//		Method method = methods[i];
-//		if (os_strcmp(method.name, inRequest->method)) {
-//			if (method.decoder(command, inRequest, outResponse)) {
-//				method.executor(inRequest, outResponse);
-//				if (terminal != NULL) {
-//					char* packet = method.encoder(inRequest, outResponse);
-//					if (terminal->connection != NULL) {
-//						espconn_sendto(terminal->connection, packet, os_strlen(packet));
-//						FREEMEM(packet); // FIXME Should FREEMEM packet string here ?
-//					}
-//				}
-//			} else {
-//				// 指令解析失败
-//				Log_printfln("[CMD][onMethod][IncompletedRequestException] method is %s", inRequest->method);
-//				outResponse->requestState->stateCode        = State_IncompletedRequestException;
-//				outResponse->requestState->stateMessage     = NULL;
-//				outResponse->requestState->stateDescription = inRequest->method;
-//			}
-//			foundExecutor = true;
-//			break;
-//		}
-//	}
-//
-//	if (!foundExecutor) {
-//		// 不支持的方法
-//		Log_printfln("[CMD][onMethod][UnimplementedMethodException] method is %s", inRequest->method);
-//		outResponse->requestState->stateCode        = State_UnimplementedMethodException;
-//		outResponse->requestState->stateMessage     = NULL;
-//		outResponse->requestState->stateDescription = inRequest->method;
-//	}
-}
-
-LOCAL void ICACHE_FLASH_ATTR onData(Terminal* terminal, const char* command, Request* inRequest, Response* outResponse) {
-	// 分配数据处理
-	// # if
-	// 未知数据格式
-	// # else
 }

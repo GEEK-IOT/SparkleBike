@@ -85,17 +85,35 @@ void ICACHE_FLASH_ATTR WiFi_setupProtocolBridge() {
 	CMDServer_startCommandServer();
 }
 
-LOCAL struct station_config staConfig;
-
 void ICACHE_FLASH_ATTR WiFi_connectAP(const char* ssid, const char* password) {
 	Log_printf(LOG_WIFI_CONNECT_TO_AP, ssid);
+	struct station_config staConfig;
+	struct ip_info        ipInfo;
 
+	// Query
+	wifi_station_get_config(&staConfig);
+	wifi_get_ip_info(0x00, &ipInfo);
+	if(ipInfo.ip.addr != 0) {
+		if(staConfig.ssid != NULL) {
+			if (os_strcmp(ssid, staConfig.ssid) == 0) {
+				Log_printfln(LOG_WIFI_OPERATE_SUCCESSED);
+				Log_printfln("[WiFi] Already connect to %s on %d.%d.%d.%d",
+						staConfig.ssid,
+						IP2STR(ipInfo.ip.addr));
+				return;
+			}
+		}
+	}
+
+	// Prepare
 	os_memset(&staConfig, 0x00, sizeof(struct station_config));
 	staConfig.bssid_set = 0; // No check MAC of AP
-	os_strcpy(staConfig.ssid, ssid);
-	os_strcpy(staConfig.password, password);
-	wifi_station_set_config(&staConfig);
+	os_memcpy(&staConfig.ssid, ssid, 32);
+	os_memcpy(&staConfig.password, password, 64);
+
+	// Setup
 	wifi_station_disconnect();
+	wifi_station_set_config(&staConfig);
 	if (wifi_station_connect()) {
 		Log_printfln(LOG_WIFI_OPERATE_SUCCESSED);
 	} else {
@@ -106,6 +124,7 @@ void ICACHE_FLASH_ATTR WiFi_connectAP(const char* ssid, const char* password) {
 void ICACHE_FLASH_ATTR WiFi_disconnectAP() {
 	Log_printfln(LOG_WIFI_DISCONNECT_TO_AP);
 	uint8 connectStatus = wifi_station_get_connect_status();
+	wifi_station_disconnect();
 }
 
 ///////////////
@@ -200,9 +219,9 @@ LOCAL void ICACHE_FLASH_ATTR onWifiEventReceived(System_Event_t* event) {
 			}
 			case EVENT_STAMODE_CONNECTED:{
 				// [Wifi] Connected to %s on channel %d
-//				Log_printfln("[WiFi] Connected to %s on channel %d",
-//						event->event_info.connected.ssid,
-//						event->event_info.connected.channel);
+				Log_printfln("[WiFi] Connected to %s on channel %d",
+						event->event_info.connected.ssid,
+						event->event_info.connected.channel);
 				Log_printfln("[WiFi] EVENT_STAMODE_CONNECTED");
 				break;
 			}
@@ -218,19 +237,17 @@ LOCAL void ICACHE_FLASH_ATTR onWifiEventReceived(System_Event_t* event) {
                 //       - IP:   %d.%d.%d.%d
                 //       - Mask: %d.%d.%d.%d
                 //       - Gate: %d.%d.%d.%d
-//				Log_printfln("[WiFi] Got address:\r\n       - IP:   %d.%d.%d.%d\r\n       - Mask: %d.%d.%d.%d\r\n       - Gate: %d.%d.%d.%d\r\n",
-//						IP2STR(event->event_info.got_ip.ip.addr),
-//						IP2STR(event->event_info.got_ip.mask.addr),
-//						IP2STR(event->event_info.got_ip.gw.addr));
-				Log_printfln("[WiFi] EVENT_STAMODE_GOT_IP");
+				Log_printfln("[WiFi] Got address:\r\n       - IP:   %d.%d.%d.%d\r\n       - Mask: %d.%d.%d.%d\r\n       - Gate: %d.%d.%d.%d\r\n",
+						IP2STR(event->event_info.got_ip.ip.addr),
+						IP2STR(event->event_info.got_ip.mask.addr),
+						IP2STR(event->event_info.got_ip.gw.addr));
 				break;
 			}
 			case EVENT_STAMODE_AUTHMODE_CHANGE:{
 				// [Wifi] Auth mode changed from %d to %d
-//				Log_printfln("[WiFi] Auth mode changed from %d to %d",
-//						Text_toAuthModeString(event->event_info.auth_change.old_mode),
-//						Text_toAuthModeString(event->event_info.auth_change.new_mode));
-				Log_printfln("[WiFi] EVENT_STAMODE_AUTHMODE_CHANGE");
+				Log_printfln("[WiFi] Auth mode changed from %d to %d",
+						Text_toAuthModeString(event->event_info.auth_change.old_mode),
+						Text_toAuthModeString(event->event_info.auth_change.new_mode));
 				break;
 			}
 			default:
