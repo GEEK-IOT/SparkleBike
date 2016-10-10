@@ -118,26 +118,28 @@ LOCAL void ICACHE_FLASH_ATTR onSystemInitialized() {
 }
 
 LOCAL void ICACHE_FLASH_ATTR showSystemInformation() {
-	uint32      chipID             = system_get_chip_id();
-	uint32      spiFlashID         = spi_flash_get_id();
-	const char* sdkVersion         = system_get_sdk_version();
-	uint8       bootVersion        = system_get_boot_version();
-	uint8       bootMode           = system_get_boot_mode();
-	uint32      bootAddress        = system_get_userbin_addr();
-	uint8       cpuFrequency       = system_get_cpu_freq();
-	uint32      physicalMode       = wifi_get_phy_mode();
-	uint32      freeHeapSize       = system_get_free_heap_size();
-	uint32      flashSizeMap       = system_get_flash_size_map();
-	uint32      rtcClock           = system_rtc_clock_cali_proc();
-	uint32      rtcClockInteger    = rtcClock >> 12;
-	uint32      rtcClockFractional = -(rtcClock | 0xFFFFF000) & 0xFFFFF000;
-	uint16      systemVoltLevel    = clampu16(system_get_vdd33(), MIN_SYS_VOLT, MAX_SYS_VOLT);
-	float       systemVolt         = (float)systemVoltLevel / 1024.0f;
-	uint16      systemVoltInt      = (uint16)systemVolt;
-	uint16      systemVoltDec      = (uint16)((systemVolt - systemVoltInt) * 100.0f);
-	uint32      pwmVersion         = pwm_get_period();
-	uint8       apMacAddr[6]       = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
-	uint8       staMacAddr[6]      = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+	uint32           chipID             = system_get_chip_id();
+	uint32           spiFlashID         = spi_flash_get_id();
+	const char*      sdkVersion         = system_get_sdk_version();
+	uint8            bootVersion        = system_get_boot_version();
+	uint8            bootMode           = system_get_boot_mode();
+	uint32           bootAddress        = system_get_userbin_addr();
+	uint8            cpuFrequency       = system_get_cpu_freq();
+	struct rst_info *resetInfo          = system_get_rst_info();
+	uint32           time               = system_get_time();
+	uint32           physicalMode       = wifi_get_phy_mode();
+	uint32           freeHeapSize       = system_get_free_heap_size();
+	uint32           flashSizeMap       = system_get_flash_size_map();
+	uint32           rtcClock           = system_rtc_clock_cali_proc();
+	uint32           rtcClockInteger    = rtcClock >> 12;
+	uint32           rtcClockFractional = -(rtcClock | 0xFFFFF000) & 0xFFFFF000;
+	uint16           systemVoltLevel    = clampu16(system_get_vdd33(), MIN_SYS_VOLT, MAX_SYS_VOLT);
+	float            systemVolt         = (float)systemVoltLevel / 1024.0f;
+	uint16           systemVoltInt      = (uint16)systemVolt;
+	uint16           systemVoltDec      = (uint16)((systemVolt - systemVoltInt) * 100.0f);
+	uint32           pwmVersion         = get_pwm_version();
+	uint8            apMacAddr[6]       = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+	uint8            staMacAddr[6]      = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
 	wifi_get_macaddr(SOFTAP_IF, apMacAddr);
 	wifi_get_macaddr(STATION_IF, staMacAddr);
@@ -160,4 +162,14 @@ LOCAL void ICACHE_FLASH_ATTR showSystemInformation() {
 	Log_printfln(LOG_SYS_INFO_PWM_VERSION,   pwmVersion);
 	Log_printfln(LOG_SYS_INFO_AP_MAC,        MAC2STR(apMacAddr));
 	Log_printfln(LOG_SYS_INFO_STA_MAC,       MAC2STR(staMacAddr));
+
+	Log_printfln(LOG_EMPTY);
+	Log_printfln(LOG_RST_INFO);
+	Log_printfln(LOG_RST_MODE,             Text_toResetReasonString(resetInfo->reason));
+	Log_printfln(LOG_RST_CAUSE,            resetInfo->exccause);
+	Log_printfln(LOG_RST_EXCEPTION_ADDR_1, resetInfo->epc1);
+	Log_printfln(LOG_RST_EXCEPTION_ADDR_2, resetInfo->epc2);
+	Log_printfln(LOG_RST_EXCEPTION_ADDR_3, resetInfo->epc3);
+	Log_printfln(LOG_RST_EXCEPTION_VADDR,  resetInfo->excvaddr);
+	Log_printfln(LOG_RST_EXCEPTION_DESC,   resetInfo->depc);
 }

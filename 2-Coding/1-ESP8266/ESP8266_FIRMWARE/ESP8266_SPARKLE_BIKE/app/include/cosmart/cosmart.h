@@ -75,6 +75,13 @@ static const char RST_NO_AP_FOUND                         [] ICACHE_DATA_ATTR = 
 static const char RST_AUTH_FAIL                           [] ICACHE_DATA_ATTR = {"Auth failed"};
 static const char RST_ASSOC_FAIL                          [] ICACHE_DATA_ATTR = {"Assoc failed"};
 static const char RST_HANDSHAKE_TIMEOUT                   [] ICACHE_DATA_ATTR = {"Handshake timeout"};
+static const char RST_POWER_ON                            [] ICACHE_DATA_ATTR = {"Power on"};
+static const char RST_HW_WDT_RST                          [] ICACHE_DATA_ATTR = {"Hardware watchdog reset"};
+static const char RST_EXCEPTION_RST                       [] ICACHE_DATA_ATTR = {"Exception reset"};
+static const char RST_SW_WDT_RST                          [] ICACHE_DATA_ATTR = {"Software watchdog reset"};
+static const char RST_SW_RESTART                          [] ICACHE_DATA_ATTR = {"Software system restart"};
+static const char RST_DEEP_SLEEP_AWAKE                    [] ICACHE_DATA_ATTR = {"Wake up from deep sleep"};
+static const char RST_EXTERNAL_SYSTEM_RST                 [] ICACHE_DATA_ATTR = {"External system restart"};
 
 // APPLICATION LOGS
 static const char LOG_EMPTY                               []                    = {""};
@@ -98,6 +105,15 @@ static const char LOG_SYS_INFO_SYSTEM_VOLT                [] ICACHE_DATA_ATTR = 
 static const char LOG_SYS_INFO_PWM_VERSION                [] ICACHE_DATA_ATTR = {"       PWN Version   : %d"};
 static const char LOG_SYS_INFO_AP_MAC                     [] ICACHE_DATA_ATTR = {"       AP MAC        : %02x:%02x:%02x:%02x:%02x:%02x"};
 static const char LOG_SYS_INFO_STA_MAC                    [] ICACHE_DATA_ATTR = {"       STA MAC       : %02x:%02x:%02x:%02x:%02x:%02x"};
+
+static const char LOG_RST_INFO                            [] ICACHE_DATA_ATTR = {"[CoSmart] Reset Information:"};
+static const char LOG_RST_MODE                            [] ICACHE_DATA_ATTR = {"       Reset reason  : %s"};
+static const char LOG_RST_CAUSE                           [] ICACHE_DATA_ATTR = {"       Error cause   : %d"};
+static const char LOG_RST_EXCEPTION_ADDR_1                [] ICACHE_DATA_ATTR = {"       Error addr 1  : 0x%X"};
+static const char LOG_RST_EXCEPTION_ADDR_2                [] ICACHE_DATA_ATTR = {"       Error addr 2  : 0x%X"};
+static const char LOG_RST_EXCEPTION_ADDR_3                [] ICACHE_DATA_ATTR = {"       Error addr 3  : 0x%X"};
+static const char LOG_RST_EXCEPTION_VADDR                 [] ICACHE_DATA_ATTR = {"       Error v-addr  : 0x%X"};
+static const char LOG_RST_EXCEPTION_DESC                  [] ICACHE_DATA_ATTR = {"       Description   : %d"};
 
 static const char LOG_TIMER_INITIALIZED                   [] ICACHE_DATA_ATTR = {"[Timer] Timer initialized"};
 static const char LOG_TIMER_SETUP_US_SCALE                [] ICACHE_DATA_ATTR = {"       - Timer is under micro-second scale"};

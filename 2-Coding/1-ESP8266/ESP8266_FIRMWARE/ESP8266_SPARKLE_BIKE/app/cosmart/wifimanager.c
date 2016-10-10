@@ -99,7 +99,10 @@ void ICACHE_FLASH_ATTR WiFi_connectAP(const char* ssid, const char* password) {
 				Log_printfln(LOG_WIFI_OPERATE_SUCCESSED);
 				Log_printfln("[WiFi] Already connect to %s on %d.%d.%d.%d",
 						staConfig.ssid,
-						IP2STR(ipInfo.ip.addr));
+						((ipInfo.ip.addr >> 24) && 0xFF),
+						((ipInfo.ip.addr >> 16) && 0xFF),
+						((ipInfo.ip.addr >>  8) && 0xFF),
+						((ipInfo.ip.addr >>  0) && 0xFF));
 				return;
 			}
 		}
@@ -202,6 +205,9 @@ LOCAL void ICACHE_FLASH_ATTR deleteAPPassword(char** pAPPassword) {
 
 LOCAL void ICACHE_FLASH_ATTR onWifiEventReceived(System_Event_t* event) {
 	if (event != NULL) {
+		if (event->event != EVENT_SOFTAPMODE_PROBEREQRECVED) {
+			Log_printfln("[WiFi] event->event = %d", event->event);
+		}
 		switch (event->event) {
 			case EVENT_SOFTAPMODE_STACONNECTED:{
 				// [Wifi] Station: %02x:%02x:%02x:%02x:%02x:%02x(%d) connected!
@@ -238,9 +244,18 @@ LOCAL void ICACHE_FLASH_ATTR onWifiEventReceived(System_Event_t* event) {
                 //       - Mask: %d.%d.%d.%d
                 //       - Gate: %d.%d.%d.%d
 				Log_printfln("[WiFi] Got address:\r\n       - IP:   %d.%d.%d.%d\r\n       - Mask: %d.%d.%d.%d\r\n       - Gate: %d.%d.%d.%d\r\n",
-						IP2STR(event->event_info.got_ip.ip.addr),
-						IP2STR(event->event_info.got_ip.mask.addr),
-						IP2STR(event->event_info.got_ip.gw.addr));
+						((event->event_info.got_ip.ip.addr >> 24) && 0xFF),
+						((event->event_info.got_ip.ip.addr >> 16) && 0xFF),
+						((event->event_info.got_ip.ip.addr >>  8) && 0xFF),
+						((event->event_info.got_ip.ip.addr >>  0) && 0xFF),
+						((event->event_info.got_ip.mask.addr >> 24) && 0xFF),
+						((event->event_info.got_ip.mask.addr >> 16) && 0xFF),
+						((event->event_info.got_ip.mask.addr >>  8) && 0xFF),
+						((event->event_info.got_ip.mask.addr >>  0) && 0xFF),
+						((event->event_info.got_ip.gw.addr >> 24) && 0xFF),
+						((event->event_info.got_ip.gw.addr >> 16) && 0xFF),
+						((event->event_info.got_ip.gw.addr >>  8) && 0xFF),
+						((event->event_info.got_ip.gw.addr >>  0) && 0xFF));
 				break;
 			}
 			case EVENT_STAMODE_AUTHMODE_CHANGE:{

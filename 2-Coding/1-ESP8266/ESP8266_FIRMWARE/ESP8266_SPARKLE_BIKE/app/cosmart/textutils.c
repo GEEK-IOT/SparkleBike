@@ -145,5 +145,48 @@ const char* ICACHE_FLASH_ATTR Text_toConnectReasonString(int connectReason) {
 		return RST_ASSOC_FAIL;
 	case REASON_HANDSHAKE_TIMEOUT:
 		return RST_HANDSHAKE_TIMEOUT;
+
+	case REASON_UNSPECIFIED              : return "1";
+	case REASON_AUTH_EXPIRE              : return "2";
+	case REASON_AUTH_LEAVE               : return "3";
+	case REASON_ASSOC_EXPIRE             : return "4";
+	case REASON_ASSOC_TOOMANY            : return "5";
+	case REASON_NOT_AUTHED               : return "6";
+	case REASON_NOT_ASSOCED              : return "7";
+	case REASON_ASSOC_LEAVE              : return "8";
+	case REASON_ASSOC_NOT_AUTHED         : return "9";
+	case REASON_DISASSOC_PWRCAP_BAD      : return "10";
+	case REASON_DISASSOC_SUPCHAN_BAD     : return "11";
+	case REASON_IE_INVALID               : return "12";
+	case REASON_MIC_FAILURE              : return "13";
+	case REASON_4WAY_HANDSHAKE_TIMEOUT   : return "14";
+	case REASON_GROUP_KEY_UPDATE_TIMEOUT : return "15";
+	case REASON_IE_IN_4WAY_DIFFERS       : return "16";
+	case REASON_GROUP_CIPHER_INVALID     : return "17";
+	case REASON_PAIRWISE_CIPHER_INVALID  : return "18";
+	case REASON_AKMP_INVALID             : return "19";
+	case REASON_UNSUPP_RSN_IE_VERSION    : return "20";
+	case REASON_INVALID_RSN_IE_CAP       : return "21";
+	case REASON_802_1X_AUTH_FAILED       : return "22";
+	case REASON_CIPHER_SUITE_REJECTED    : return "23";
+	}
+}
+
+const char* ICACHE_FLASH_ATTR Text_toResetReasonString(uint32 resetReason) {
+	switch (resetReason) {
+	case REASON_DEFAULT_RST:
+		return RST_POWER_ON;
+	case REASON_WDT_RST:
+		return RST_HW_WDT_RST;
+	case REASON_EXCEPTION_RST:
+		return RST_EXCEPTION_RST;
+	case REASON_SOFT_WDT_RST:
+		return RST_SW_WDT_RST;
+	case REASON_SOFT_RESTART:
+		return RST_SW_RESTART;
+	case REASON_DEEP_SLEEP_AWAKE:
+		return RST_DEEP_SLEEP_AWAKE;
+	case REASON_EXT_SYS_RST:
+		return RST_EXTERNAL_SYSTEM_RST;
 	}
 }
