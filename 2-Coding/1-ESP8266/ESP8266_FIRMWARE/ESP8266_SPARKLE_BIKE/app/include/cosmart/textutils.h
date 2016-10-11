@@ -35,6 +35,8 @@ const char* Text_toOPModeString(uint8 opMode);
  */
 uint32 Text_parseIPAddressString(const char* strSource, unsigned short start, unsigned short length);
 
+uint32 Text_parsePortString(const char* strSource, unsigned short start, unsigned short length);
+
 const char* Text_terminalPlatformEnumToString(enum TerminalPlatform platform);
 
 const char* Text_terminalTypeEnumToString(enum TerminalType type);
@@ -44,5 +46,7 @@ const char* Text_flashSizeMap2STR(enum flash_size_map flashSizeMap);
 const char* Text_physicalMode2STR(enum phy_mode physicalMode);
 
 const char* Text_toConnectReasonString(int connectReason);
+
+int Text_indexOfOrder(const char* strSource, const char mod, bool forward, int order);
 
 #endif /* APP_INCLUDE_COSMART_TEXTUTILS_H_ */

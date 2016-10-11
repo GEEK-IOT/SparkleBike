@@ -21,7 +21,14 @@
 /**
  * command receive port
  */
-#define DEFAULT_CMD_PORT 7629
+#define DEFAULT_CMD_PORT 7630
+
+/**
+ * Station command multicast group address
+ * in (239.0.0.0～239.255.255.255)
+ */
+#define STATION_CMD_MULTICAST_GROUP_IP   "239.100.15.32"
+#define STATION_CMD_MULTICAST_GROUP_PORT 7631
 
 /**
  * Function definition

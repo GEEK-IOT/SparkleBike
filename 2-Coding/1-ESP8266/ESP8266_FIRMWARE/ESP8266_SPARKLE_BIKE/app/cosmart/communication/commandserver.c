@@ -14,11 +14,17 @@
 #include "cosmart/config.h"
 #include "cosmart/log.h"
 
-LOCAL void          startBroadcastReceiver();
-LOCAL void          stopBroadcastReceiver();
-LOCAL void          onBroadcastReceived(void *espconn, char *pdata, unsigned short length);
-LOCAL void          onUDPBridgeReceived(void *espconn, char *pdata, unsigned short length);
-LOCAL void          onUDPBridgeConnected(void *espconn);
+LOCAL void startBroadcastReceiver();
+LOCAL void stopBroadcastReceiver();
+LOCAL void onBroadcastReceived(void *espconn, char *pdata, unsigned short length);
+LOCAL void onUDPBridgeReceived(void *espconn, char *pdata, unsigned short length);
+LOCAL void onUDPBridgeConnected(void *espconn);
+LOCAL bool verifyCasterIdentity(char *data, unsigned short length);
+LOCAL void responseStationBridgeVerify(char *data, unsigned short length, bool verified);
+LOCAL bool sendUDPMessageOnce(uint32 ip, uint32 port, const char* message);
+
+LOCAL uint32 mCommandMulticastGroupIP   = 0;
+LOCAL uint32 mCommandMulticastGroupPort = 0;
 
 // UDP广播接收器
 LOCAL struct espconn mBroadcastReceiverConnection;
@@ -26,6 +32,9 @@ LOCAL struct espconn mBroadcastReceiverConnection;
 void ICACHE_FLASH_ATTR CMDServer_initialize() {
 	Log_printfln("");
 	Log_printfln("[CMD] Start command server");
+
+	mCommandMulticastGroupIP   = ipaddr_addr(STATION_CMD_MULTICAST_GROUP_IP);
+	mCommandMulticastGroupPort = STATION_CMD_MULTICAST_GROUP_PORT;
 }
 
 void ICACHE_FLASH_ATTR CMDServer_startCommandServer() {
@@ -167,8 +176,8 @@ LOCAL void ICACHE_FLASH_ATTR onBroadcastReceived(void *espconn, char *data, unsi
 	/**
 	 * Broadcast Message protocol:
 	 *   #Version1:
-	 *     [BROADCAST_IP]:[BROADCAST_PORT]:[cosmart.PLATFORM.NODETYPE]:[CMD_PORT]
-	 *     192.168.4.2:7629:cosmart.android.commander:7630
+	 *     [BROADCAST_IP]:[BROADCAST_PORT]:[CMD_PORT]:[IDENTITY]:[cosmart.PLATFORM.NODETYPE]
+	 *     192.168.4.2:7629:7630:identity
 	 *
 	 *   #Version2:
 	 *     request ->
@@ -196,7 +205,9 @@ LOCAL void ICACHE_FLASH_ATTR onBroadcastReceived(void *espconn, char *data, unsi
 	 */
 
 	Log_printfln("[CMD] Broadcast: content = %s, length = %d", data, length);
-	// 提交一条指令到命令队列中等待执行
+	// 通知发广播的主机加入多播组
+	// 多播地址在239.0.0.0～239.255.255.255
+	responseStationBridgeVerify(data, length, verifyCasterIdentity(data, length));
 }
 
 LOCAL void ICACHE_FLASH_ATTR onUDPBridgeConnected(void *espconn) {
@@ -227,4 +238,95 @@ LOCAL void ICACHE_FLASH_ATTR onUDPBridgeConnected(void *espconn) {
 
 LOCAL void ICACHE_FLASH_ATTR onUDPBridgeReceived(void *espconn, char *data, unsigned short length) {
 	Log_printfln("[CMD] UDP Bridge: PData = %s, length = %d", data, length);
+}
+
+LOCAL bool ICACHE_FLASH_ATTR verifyCasterIdentity(char *data, unsigned short length) {
+	/**
+	 * Broadcast Message protocol:
+	 *   #Version1:
+	 *     [BROADCAST_IP]:[BROADCAST_PORT]:[CMD_PORT]:[IDENTITY]:[cosmart.PLATFORM.NODETYPE]
+	 *     192.168.4.2:7629:7630:identity
+	 */
+	int start = Text_indexOfOrder(data, ':', true, 2);
+	int end   = Text_indexOfOrder(data, ':', true, 3);
+	end = (end == -1 ? length : end);
+	if (start == -1 || end <= start) {
+		return false;
+	}
+
+	const char* reference = WiFi_generateSTAIdentify();
+	char identify[end - start] = {0};
+	os_bzero(&identify, end - start);
+
+	int i = 0;
+	for (i = 0; i < end - start; i++) {
+		identify[i] = data[start + i];
+	}
+
+	bool result = os_strcmp(reference, identify);
+	WiFi_freeSTAIdentify(&reference);
+	return result;
+}
+
+LOCAL void ICACHE_FLASH_ATTR responseStationBridgeVerify(char *data, unsigned short length, bool verified) {
+	/**
+	 * Broadcast Message protocol:
+	 *   #Version1:
+	 *      input:
+	 *         [BROADCAST_IP]:[BROADCAST_PORT]:[CMD_PORT]:[IDENTITY]:[cosmart.PLATFORM.NODETYPE]
+	 *         192.168.4.2:7629:7630:identity
+	 *
+	 *      output:
+	 *         [VERIFY_MESSAGE]:[STATION_MULTICAST_GROUP_ADDRESS]:[STATION_MULTICAST_GROUP_PORT]
+	 *         pass:239.120.101.32:7631
+	 *         fail:0.0.0.0:0
+	 */
+
+	if (verified) {
+		Log_printfln("[CMD] Caster identity verify pass, send multicast group");
+	} else {
+		Log_printfln("[CMD] Caster identity verify failed, reject");
+	}
+
+	uint32 ip   = 0;
+	uint32 port = 0;
+
+	int start = 0;
+	int pos   = Text_indexOfOrder(data, ':', true, 0);
+	if (pos > -1) {
+		ip = Text_parseIPAddressString(data, start, pos - start);
+	} else {
+		return;
+	}
+
+	start = Text_indexOfOrder(data, ':', true, 1);
+	pos   = Text_indexOfOrder(data, ':', true, 2);
+	if (start > -1 && pos > -1) {
+		port = Text_parsePortString(data, start, pos - start);
+	} else {
+		return;
+	}
+
+	// Responding
+	if (ip > 0 && port > 0) {
+		char* message = (char*) os_malloc(32);
+		os_bzero(message, 32);
+		if (verified) {
+			os_sprintf(message, "%s:%d.%d.%d.%d:%d",
+							CMD_VERIFY_PASS,
+							IP2STR(&mCommandMulticastGroupIP), mCommandMulticastGroupPort);
+		} else {
+			os_sprintf(message, "%s:%d.%d.%d.%d:%d",
+							CMD_VERIFY_FAIL,
+							0, 0, 0, 0, 0);
+		}
+
+		sendUDPMessageOnce(ip, port, message);
+	} else {
+		return;
+	}
+}
+
+LOCAL bool ICACHE_FLASH_ATTR sendUDPMessageOnce(uint32 ip, uint32 port, const char* message) {
+
 }

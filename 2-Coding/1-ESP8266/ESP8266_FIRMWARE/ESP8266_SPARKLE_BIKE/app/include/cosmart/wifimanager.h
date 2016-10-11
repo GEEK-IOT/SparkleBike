@@ -10,28 +10,13 @@
 
 #include "cosmart/cosmart.h"
 
-/**
- * 初始化WiFi组件
- */
-void WiFi_initialize();
-
-/**
- * 设置为AP & STA混合模式
- */
-void WiFi_setupAPAndSTA();
-
-/**
- * 设置AP模式接入监听
- */
-void WiFi_setupAPRecevier();
-
-/**
- * 设置控制协议桥
- */
-void WiFi_setupProtocolBridge();
-
-void WiFi_connectAP();
-
-void WiFi_disconnectAP();
+void        WiFi_initialize();
+void        WiFi_setupAPAndSTA();
+void        WiFi_setupAPRecevier();
+void        WiFi_setupProtocolBridge();
+void        WiFi_connectAP();
+void        WiFi_disconnectAP();
+const char* WiFi_generateSTAIdentify();
+void        WiFi_freeSTAIdentify(const char** identify);
 
 #endif /* APP_INCLUDE_COSMART_WIFIMANAGER_H_ */

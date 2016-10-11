@@ -47,29 +47,29 @@ static const char AUTHMODE_WEP                            [] ICACHE_DATA_ATTR = 
 static const char AUTHMODE_WPA_PSK                        [] ICACHE_DATA_ATTR = {"Null"};
 static const char AUTHMODE_WPA2_PSK                       [] ICACHE_DATA_ATTR = {"Null"};
 static const char AUTHMODE_WPA_WPA2_PSK                   [] ICACHE_DATA_ATTR = {"Null"};
-//static const char RST_UNSPECIFIED                         [] ICACHE_DATA_ATTR = {"Unspecified"};
-//static const char RST_AUTH_EXPIRE                         [] ICACHE_DATA_ATTR = {"Auth expire"};
-//static const char RST_AUTH_LEAVE                          [] ICACHE_DATA_ATTR = {"Auth leave"};
-//static const char RST_ASSOC_EXPIRE                        [] ICACHE_DATA_ATTR = {"Assoc expire"};
-//static const char RST_ASSOC_TOOMANY                       [] ICACHE_DATA_ATTR = {"Assoc too many"};
-//static const char RST_NOT_AUTHED                          [] ICACHE_DATA_ATTR = {"Not authed"};
-//static const char RST_NOT_ASSOCED                         [] ICACHE_DATA_ATTR = {"Not assoced"};
-//static const char RST_ASSOC_LEAVE                         [] ICACHE_DATA_ATTR = {"Assoc leave"};
-//static const char RST_ASSOC_NOT_AUTHED                    [] ICACHE_DATA_ATTR = {"Assoc not authed"};
-//static const char RST_DISASSOC_PWRCAP_BAD                 [] ICACHE_DATA_ATTR = {"Disassoc powercap bad"};
-//static const char RST_DISASSOC_SUPCHAN_BAD                [] ICACHE_DATA_ATTR = {"Disassoc supchan bad"};
-//static const char RST_IE_INVALID                          [] ICACHE_DATA_ATTR = {"IE invalid"};
-//static const char RST_MIC_FAILURE                         [] ICACHE_DATA_ATTR = {"MIC failure"};
-//static const char RST_4WAY_HANDSHAKE_TIMEOUT              [] ICACHE_DATA_ATTR = {"4-way handshake timeout"};
-//static const char RST_GROUP_KEY_UPDATE_TIMEOUT            [] ICACHE_DATA_ATTR = {"Group key update timeout"};
-//static const char RST_IE_IN_4WAY_DIFFERS                  [] ICACHE_DATA_ATTR = {"IE in 4-way differs"};
-//static const char RST_GROUP_CIPHER_INVALID                [] ICACHE_DATA_ATTR = {"Group cipher invalid"};
-//static const char RST_PAIRWISE_CIPHER_INVALID             [] ICACHE_DATA_ATTR = {"Pairwise cipher invalid"};
-//static const char RST_AKMP_INVALID                        [] ICACHE_DATA_ATTR = {"AKMP invalid"};
-//static const char RST_UNSUPP_RSN_IE_VERSION               [] ICACHE_DATA_ATTR = {"Unsupported RSN IE version"};
-//static const char RST_INVALID_RSN_IE_CAP                  [] ICACHE_DATA_ATTR = {"Invalid RSN IE cap"};
-//static const char RST_802_1X_AUTH_FAILED                  [] ICACHE_DATA_ATTR = {"802.1x auth failed"};
-//static const char RST_CIPHER_SUITE_REJECTED               [] ICACHE_DATA_ATTR = {"Cipher suite rejected"};
+static const char RST_UNSPECIFIED                         [] ICACHE_DATA_ATTR = {"Unspecified"};
+static const char RST_AUTH_EXPIRE                         [] ICACHE_DATA_ATTR = {"Auth expire"};
+static const char RST_AUTH_LEAVE                          [] ICACHE_DATA_ATTR = {"Auth leave"};
+static const char RST_ASSOC_EXPIRE                        [] ICACHE_DATA_ATTR = {"Assoc expire"};
+static const char RST_ASSOC_TOOMANY                       [] ICACHE_DATA_ATTR = {"Assoc too many"};
+static const char RST_NOT_AUTHED                          [] ICACHE_DATA_ATTR = {"Not authed"};
+static const char RST_NOT_ASSOCED                         [] ICACHE_DATA_ATTR = {"Not assoced"};
+static const char RST_ASSOC_LEAVE                         [] ICACHE_DATA_ATTR = {"Assoc leave"};
+static const char RST_ASSOC_NOT_AUTHED                    [] ICACHE_DATA_ATTR = {"Assoc not authed"};
+static const char RST_DISASSOC_PWRCAP_BAD                 [] ICACHE_DATA_ATTR = {"Disassoc powercap bad"};
+static const char RST_DISASSOC_SUPCHAN_BAD                [] ICACHE_DATA_ATTR = {"Disassoc supchan bad"};
+static const char RST_IE_INVALID                          [] ICACHE_DATA_ATTR = {"IE invalid"};
+static const char RST_MIC_FAILURE                         [] ICACHE_DATA_ATTR = {"MIC failure"};
+static const char RST_4WAY_HANDSHAKE_TIMEOUT              [] ICACHE_DATA_ATTR = {"4-way handshake timeout"};
+static const char RST_GROUP_KEY_UPDATE_TIMEOUT            [] ICACHE_DATA_ATTR = {"Group key update timeout"};
+static const char RST_IE_IN_4WAY_DIFFERS                  [] ICACHE_DATA_ATTR = {"IE in 4-way differs"};
+static const char RST_GROUP_CIPHER_INVALID                [] ICACHE_DATA_ATTR = {"Group cipher invalid"};
+static const char RST_PAIRWISE_CIPHER_INVALID             [] ICACHE_DATA_ATTR = {"Pairwise cipher invalid"};
+static const char RST_AKMP_INVALID                        [] ICACHE_DATA_ATTR = {"AKMP invalid"};
+static const char RST_UNSUPP_RSN_IE_VERSION               [] ICACHE_DATA_ATTR = {"Unsupported RSN IE version"};
+static const char RST_INVALID_RSN_IE_CAP                  [] ICACHE_DATA_ATTR = {"Invalid RSN IE cap"};
+static const char RST_802_1X_AUTH_FAILED                  [] ICACHE_DATA_ATTR = {"802.1x auth failed"};
+static const char RST_CIPHER_SUITE_REJECTED               [] ICACHE_DATA_ATTR = {"Cipher suite rejected"};
 static const char RST_BEACON_TIMEOUT                      [] ICACHE_DATA_ATTR = {"Beacon timeout"};
 static const char RST_NO_AP_FOUND                         [] ICACHE_DATA_ATTR = {"No AP found"};
 static const char RST_AUTH_FAIL                           [] ICACHE_DATA_ATTR = {"Auth failed"};
@@ -109,11 +109,11 @@ static const char LOG_SYS_INFO_STA_MAC                    [] ICACHE_DATA_ATTR = 
 static const char LOG_RST_INFO                            [] ICACHE_DATA_ATTR = {"[CoSmart] Reset Information:"};
 static const char LOG_RST_MODE                            [] ICACHE_DATA_ATTR = {"       Reset reason  : %s"};
 static const char LOG_RST_CAUSE                           [] ICACHE_DATA_ATTR = {"       Error cause   : %d"};
-static const char LOG_RST_EXCEPTION_ADDR_1                [] ICACHE_DATA_ATTR = {"       Error addr 1  : 0x%X"};
-static const char LOG_RST_EXCEPTION_ADDR_2                [] ICACHE_DATA_ATTR = {"       Error addr 2  : 0x%X"};
-static const char LOG_RST_EXCEPTION_ADDR_3                [] ICACHE_DATA_ATTR = {"       Error addr 3  : 0x%X"};
-static const char LOG_RST_EXCEPTION_VADDR                 [] ICACHE_DATA_ATTR = {"       Error v-addr  : 0x%X"};
-static const char LOG_RST_EXCEPTION_DESC                  [] ICACHE_DATA_ATTR = {"       Description   : %d"};
+static const char LOG_RST_EXCEPTION_ADDR_1                [] ICACHE_DATA_ATTR = {"       Error addr 1  : 0x%8X"};
+static const char LOG_RST_EXCEPTION_ADDR_2                [] ICACHE_DATA_ATTR = {"       Error addr 2  : 0x%8X"};
+static const char LOG_RST_EXCEPTION_ADDR_3                [] ICACHE_DATA_ATTR = {"       Error addr 3  : 0x%8X"};
+static const char LOG_RST_EXCEPTION_VADDR                 [] ICACHE_DATA_ATTR = {"       Error v-addr  : 0x%8X"};
+static const char LOG_RST_EXCEPTION_DESC                  [] ICACHE_DATA_ATTR = {"       Description   : 0x%8X"};
 
 static const char LOG_TIMER_INITIALIZED                   [] ICACHE_DATA_ATTR = {"[Timer] Timer initialized"};
 static const char LOG_TIMER_SETUP_US_SCALE                [] ICACHE_DATA_ATTR = {"       - Timer is under micro-second scale"};
@@ -132,8 +132,11 @@ static const char LOG_WIFI_UPDATING_CONFIG_CHANNEL        [] ICACHE_DATA_ATTR = 
 static const char LOG_WIFI_UPDATING_CONFIG_MAX_CONNECTION [] ICACHE_DATA_ATTR = {"       - MaxConnection : %d"};
 static const char LOG_WIFI_STATION_CONNECTED              [] ICACHE_DATA_ATTR = {"[WiFi] Station: %02x:%02x:%02x:%02x:%02x:%02x(%d) connected!"};
 static const char LOG_WIFI_STATION_DISCONNECTED           [] ICACHE_DATA_ATTR = {"[WiFi] Station: %02x:%02x:%02x:%02x:%02x:%02x(%d) disconnected!"};
-static const char LOG_WIFI_CONNECT_TO_AP                  [] ICACHE_DATA_ATTR = {"[WiFi] Connect to AP: %s"};
-static const char LOG_WIFI_DISCONNECT_TO_AP               [] ICACHE_DATA_ATTR = {"[WiFi] Disconnect to AP: %s"};
+static const char LOG_WIFI_CONNECT_TO_AP                  [] ICACHE_DATA_ATTR = {"[WiFi] Connected to %s on channel %d"};
+static const char LOG_WIFI_DISCONNECT_TO_AP               [] ICACHE_DATA_ATTR = {"[WiFi] Disconnected from %s for %s"};
+static const char LOG_WIFI_GOT_IP_FROM_AP                 [] ICACHE_DATA_ATTR = {"[WiFi] Got address:\r\n       - IP:   %d.%d.%d.%d\r\n       - Mask: %d.%d.%d.%d\r\n       - Gate: %d.%d.%d.%d\r\n"};
+static const char LOG_WIFI_AUTH_MODE_CHANGED              [] ICACHE_DATA_ATTR = {"[WiFi] Auth mode changed from %d to %d"};
+static const char LOG_WIFI_ALREADY_CONNECTED_TO_AP        [] ICACHE_DATA_ATTR = {"[WiFi] Already connect to %s on %d.%d.%d.%d"};
 static const char LOG_WIFI_OPERATE_SUCCESSED              [] ICACHE_DATA_ATTR = {" - Successed"};
 static const char LOG_WIFI_OPERATE_FAILED                 [] ICACHE_DATA_ATTR = {" - Failed"};
 
@@ -152,6 +155,10 @@ static const char KEY_SECURITY_CODE     [] ICACHE_DATA_ATTR = {"securityCode"};
 static const char KEY_STATE_CODE        [] ICACHE_DATA_ATTR = {"stateCode"};
 static const char KEY_STATE_MESSAGE     [] ICACHE_DATA_ATTR = {"stateMessage"};
 static const char KEY_STATE_DESCRIPTION [] ICACHE_DATA_ATTR = {"stateDescription"};
+
+// COMMAND
+static const char CMD_VERIFY_PASS [] ICACHE_DATA_ATTR = {"pass"};
+static const char CMD_VERIFY_FAIL [] ICACHE_DATA_ATTR = {"fail"};
 
 // IMAGES
 static const uint8 IMG_LOGO [] ICACHE_DATA_ATTR = {
@@ -203,3 +210,4 @@ static const uint8 IMG_LOGO [] ICACHE_DATA_ATTR = {
 void Cosmart_initialize();
 
 #endif /* APP_INCLUDE_COSMART_COSMART_H_ */
+

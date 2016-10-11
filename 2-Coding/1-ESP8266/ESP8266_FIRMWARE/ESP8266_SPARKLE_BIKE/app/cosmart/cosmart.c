@@ -67,8 +67,8 @@ LOCAL void ICACHE_FLASH_ATTR onSystemInitialized() {
 	WiFi_initialize();
 	WiFi_setupAPAndSTA();
 	WiFi_setupAPRecevier();
-	WiFi_connectAP("OS_Media", "medie@oppo.com");
-//	WiFi_connectAP("OPPO_SZ", NULL);
+	WiFi_connectAP("OS_Media", "media@oppo.com");
+//	WiFi_connectAP("OPPO_SZ", "");
 
 	// 启动Timer管理器
 	Timer_initialize();

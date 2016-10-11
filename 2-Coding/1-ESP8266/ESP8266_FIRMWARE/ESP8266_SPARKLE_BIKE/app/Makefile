@@ -61,9 +61,9 @@ COMPONENTS_eagle.app.v6 =                            \
 LINKFLAGS_eagle.app.v6 =     \
 	-L../lib                 \
 	-nostdlib	             \
-    -T$(LD_FILE)             \
+	-T$(LD_FILE)             \
 	-Wl,--no-check-sections	 \
-    -u call_user_start	     \
+	-u call_user_start	     \
 	-Wl,-static			     \
 	-Wl,--start-group	     \
 	-lmirom                  \
