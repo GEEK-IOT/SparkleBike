@@ -14,20 +14,31 @@
 #include "cosmart/config.h"
 #include "cosmart/log.h"
 
+#define SIMPLE_UDP_SEND_ONCE
+
+
+typedef struct {
+	Connection* connection;
+	char*       message;
+	bool        hasSent;
+} UDPMessage;
+
 LOCAL void startBroadcastReceiver();
 LOCAL void stopBroadcastReceiver();
 LOCAL void onBroadcastReceived(void *espconn, char *pdata, unsigned short length);
 LOCAL void onUDPBridgeReceived(void *espconn, char *pdata, unsigned short length);
 LOCAL void onUDPBridgeConnected(void *espconn);
+LOCAL void onUDPMessageOnceConnected(void *espconn);
+LOCAL void onUDPMessageOnceSent(void *espconn);
 LOCAL bool verifyCasterIdentity(char *data, unsigned short length);
 LOCAL void responseStationBridgeVerify(char *data, unsigned short length, bool verified);
-LOCAL bool sendUDPMessageOnce(uint32 ip, uint32 port, const char* message);
+LOCAL bool sendUDPMessageOnce(uint32 ip, uint32 port, char* message);
 
-LOCAL uint32 mCommandMulticastGroupIP   = 0;
-LOCAL uint32 mCommandMulticastGroupPort = 0;
-
-// UDP广播接收器
-LOCAL struct espconn mBroadcastReceiverConnection;
+LOCAL uint32      mCommandMulticastGroupIP   = 0;
+LOCAL uint32      mCommandMulticastGroupPort = 0;
+LOCAL UDPMessage* mUDPMessageQueue[UDP_MESSAGE_QUEUE_SIZE];
+LOCAL Connection  mBroadcastReceiverConnection;
+LOCAL Connection* mLANCommandUDPGroupConnection;
 
 void ICACHE_FLASH_ATTR CMDServer_initialize() {
 	Log_printfln("");
@@ -35,6 +46,7 @@ void ICACHE_FLASH_ATTR CMDServer_initialize() {
 
 	mCommandMulticastGroupIP   = ipaddr_addr(STATION_CMD_MULTICAST_GROUP_IP);
 	mCommandMulticastGroupPort = STATION_CMD_MULTICAST_GROUP_PORT;
+	os_memset(mUDPMessageQueue, NULL, sizeof(UDPMessage*) * UDP_MESSAGE_QUEUE_SIZE);
 }
 
 void ICACHE_FLASH_ATTR CMDServer_startCommandServer() {
@@ -43,6 +55,14 @@ void ICACHE_FLASH_ATTR CMDServer_startCommandServer() {
 
 void ICACHE_FLASH_ATTR CMDServer_stopCommandServer() {
 	stopBroadcastReceiver();
+}
+
+void ICACHE_FLASH_ATTR CMDServer_startLANCommandGroup() {
+
+}
+
+void ICACHE_FLASH_ATTR CMDServer_stopLANCommandGroup() {
+
 }
 
 bool ICACHE_FLASH_ATTR CMDServer_verifyTerminal(const char* requestID, const char* securityCode) {
@@ -211,33 +231,7 @@ LOCAL void ICACHE_FLASH_ATTR onBroadcastReceived(void *espconn, char *data, unsi
 }
 
 LOCAL void ICACHE_FLASH_ATTR onUDPBridgeConnected(void *espconn) {
-//	int i = 0;
-//	for (; i < MAX_TERMINAL_SIZE; i++) {
-//		Terminal* terminal = mConnectingTerminalList[i];
-//		if (terminal != NULL) {
-//			if (terminal->connection == espconn) {
-//				terminal->generation = getGenerationID();
-//				if (!moveTerminalToConnectedList(terminal)) {
-//					CMDServer_disconnectTerminal(terminal);
-//					terminal = NULL;
-//					return;
-//				}
-//
-//				char* connectConfirmMessage = "Confirm command bridge connect";
-//				espconn_sendto(terminal->connection, connectConfirmMessage, os_strlen(connectConfirmMessage)); // FIXME
-//				Log_printfln("[CMD] Command bridge connected!");
-//				Log_printfln("     - Terminal : %d.%d.%d.%d:%d", IPARRAY2STR(terminal->terminalIP), terminal->terminalPort);
-//				Log_printfln("     - Platform : %s", Text_terminalPlatformEnumToString(terminal->terminalPlatform));
-//				Log_printfln("     - Type     : %s", Text_terminalTypeEnumToString(terminal->terminalType));
-//				break;
-//			}
-//		}
-//		continue;
-//	}
-}
 
-LOCAL void ICACHE_FLASH_ATTR onUDPBridgeReceived(void *espconn, char *data, unsigned short length) {
-	Log_printfln("[CMD] UDP Bridge: PData = %s, length = %d", data, length);
 }
 
 LOCAL bool ICACHE_FLASH_ATTR verifyCasterIdentity(char *data, unsigned short length) {
@@ -254,8 +248,8 @@ LOCAL bool ICACHE_FLASH_ATTR verifyCasterIdentity(char *data, unsigned short len
 		return false;
 	}
 
-	const char* reference = WiFi_generateSTAIdentify();
-	char identify[end - start] = {0};
+	char* reference = (char*)WiFi_generateSTAIdentify();
+	char identify[end - start];
 	os_bzero(&identify, end - start);
 
 	int i = 0;
@@ -327,6 +321,86 @@ LOCAL void ICACHE_FLASH_ATTR responseStationBridgeVerify(char *data, unsigned sh
 	}
 }
 
-LOCAL bool ICACHE_FLASH_ATTR sendUDPMessageOnce(uint32 ip, uint32 port, const char* message) {
+LOCAL bool ICACHE_FLASH_ATTR sendUDPMessageOnce(uint32 ip, uint32 port, char* message) {
+	sint8 result = ESPCONN_OK;
 
+	Connection* connection = (Connection *) os_malloc(sizeof(Connection));
+	connection->proto.udp = (UDP *) os_malloc(sizeof(UDP));
+	connection->type = ESPCONN_UDP;
+	os_memcpy(connection->proto.udp->remote_ip, ip, sizeof(uint32));
+	connection->proto.udp->remote_port = port;
+	connection->proto.udp->local_port  = espconn_port();
+
+	// Put connection and messag to queue
+	int i;
+	UDPMessage* udpMessage = NULL;
+	for (i = 0; i < UDP_MESSAGE_QUEUE_SIZE; i++) {
+		if (mUDPMessageQueue[i] == NULL) {
+			udpMessage = (UDPMessage *) os_malloc(sizeof(UDPMessage));
+			mUDPMessageQueue[i] = udpMessage;
+			mUDPMessageQueue[i]->connection = connection;
+			mUDPMessageQueue[i]->message = message;
+			mUDPMessageQueue[i]->hasSent = false;
+			break;
+		}
+	}
+
+	if (udpMessage == NULL) {
+		os_free(connection->proto.udp);
+		os_free(connection);
+		os_free(udpMessage);
+		return false;
+	}
+
+#ifndef SIMPLE_UDP_SEND_ONCE
+	sint8 result = espconn_regist_connectcb(connection, onUDPMessageOnceConnected);
+	espconn_regist_sentcb(connection, onUDPMessageOnceSent);
+#endif
+
+	result = espconn_create(connection);
+	if (result != 0) {
+		espconn_delete(connection);
+		os_free(connection->proto.udp);
+		os_free(connection);
+		os_free(udpMessage);
+		connection = NULL;
+		mUDPMessageQueue[i] = NULL;
+		Log_printfln("[CMD] Response CMD broadcast failed! Error code = %d", result);
+		return false;
+	}
+
+#ifdef SIMPLE_UDP_SEND_ONCE
+	espconn_sendto(connection, message, os_strlen(message));
+	espconn_delete(connection);
+	os_free(connection->proto.udp);
+	os_free(connection);
+	os_free(udpMessage);
+	connection = NULL;
+	mUDPMessageQueue[i] = NULL;
+#endif
+
+	return true;
+}
+
+LOCAL void ICACHE_FLASH_ATTR onUDPMessageOnceConnected(void *espconn) {
+	int i;
+	UDPMessage* udpMessage = NULL;
+	for (i = 0; i < UDP_MESSAGE_QUEUE_SIZE; i++) {
+		if (mUDPMessageQueue[i] != NULL && mUDPMessageQueue[i]->connection == espconn && !mUDPMessageQueue[i]->hasSent) {
+			espconn_sendto(mUDPMessageQueue[i]->connection, mUDPMessageQueue[i]->message, os_strlen(mUDPMessageQueue[i]->message));
+			mUDPMessageQueue[i]->hasSent = true;
+		}
+	}
+}
+
+LOCAL void ICACHE_FLASH_ATTR onUDPMessageOnceSent(void *espconn) {
+	int i;
+	for (i = 0; i < UDP_MESSAGE_QUEUE_SIZE; i++) {
+		if (mUDPMessageQueue[i]->hasSent) {
+			os_free(mUDPMessageQueue[i]->connection->proto.udp);
+			os_free(mUDPMessageQueue[i]->connection);
+			os_free(mUDPMessageQueue[i]);
+			mUDPMessageQueue[i] = NULL;
+		}
+	}
 }

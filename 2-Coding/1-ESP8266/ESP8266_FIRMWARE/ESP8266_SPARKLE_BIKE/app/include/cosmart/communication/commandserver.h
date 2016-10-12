@@ -40,6 +40,7 @@
 
 typedef struct espconn Connection;
 typedef esp_udp        UDP;
+typedef esp_tcp        TCP;
 
 enum TerminalPlatform {
 	UnknownPlatform = 0,
@@ -68,6 +69,8 @@ typedef struct {
 void CMDServer_initialize();
 void CMDServer_startCommandServer();
 void CMDServer_stopCommandServer();
+void CMDServer_startLANCommandGroup();
+void CMDServer_stopLANCommandGroup();
 bool CMDServer_verifyTerminal(const char* requestID, const char* securityCode);
 void CMDServer_connectTerminal(Terminal* terminal);
 void CMDServer_disconnectTerminal(Terminal* terminal);

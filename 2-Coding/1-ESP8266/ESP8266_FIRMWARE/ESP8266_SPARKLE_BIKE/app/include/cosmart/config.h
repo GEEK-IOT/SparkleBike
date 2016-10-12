@@ -30,6 +30,8 @@
 #define STATION_CMD_MULTICAST_GROUP_IP   "239.100.15.32"
 #define STATION_CMD_MULTICAST_GROUP_PORT 7631
 
+#define UDP_MESSAGE_QUEUE_SIZE 5
+
 /**
  * Function definition
  */

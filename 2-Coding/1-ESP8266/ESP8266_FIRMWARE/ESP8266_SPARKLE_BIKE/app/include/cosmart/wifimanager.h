@@ -16,7 +16,7 @@ void        WiFi_setupAPRecevier();
 void        WiFi_setupProtocolBridge();
 void        WiFi_connectAP();
 void        WiFi_disconnectAP();
-const char* WiFi_generateSTAIdentify();
-void        WiFi_freeSTAIdentify(const char** identify);
+char*       WiFi_generateSTAIdentify();
+void        WiFi_freeSTAIdentify(char** identify);
 
 #endif /* APP_INCLUDE_COSMART_WIFIMANAGER_H_ */

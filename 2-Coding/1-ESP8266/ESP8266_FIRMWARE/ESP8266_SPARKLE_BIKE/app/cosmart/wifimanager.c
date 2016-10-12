@@ -130,7 +130,7 @@ void ICACHE_FLASH_ATTR WiFi_disconnectAP() {
 	wifi_station_disconnect();
 }
 
-const char* ICACHE_FLASH_ATTR WiFi_generateSTAIdentify() {
+char* ICACHE_FLASH_ATTR WiFi_generateSTAIdentify() {
 	uint8  staMacAddr[6]       = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	uint8  encodedMacAddr[6]   = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	size_t APPasswordBytesSize = 12 + 1;
@@ -151,9 +151,9 @@ const char* ICACHE_FLASH_ATTR WiFi_generateSTAIdentify() {
 	return APPassword;
 }
 
-void ICACHE_FLASH_ATTR WiFi_freeSTAIdentify(const char** identify) {
+void ICACHE_FLASH_ATTR WiFi_freeSTAIdentify(char** identify) {
 	if (identify != NULL && *identify != NULL) {
-		free(*identify);
+		os_free(*identify);
 		identify = NULL;
 	}
 }
@@ -260,7 +260,8 @@ LOCAL void ICACHE_FLASH_ATTR onWifiEventReceived(System_Event_t* event) {
 				Log_printfln(LOG_WIFI_DISCONNECT_TO_AP,
 						event->event_info.disconnected.ssid,
 						Text_toConnectReasonString(event->event_info.disconnected.reason));
-				// TODO Break UDP multi-cast command bridge
+				// Break UDP multi-cast command bridge
+				CMDServer_stopLANCommandGroup();
 				break;
 			}
 			case EVENT_STAMODE_GOT_IP:{
@@ -272,7 +273,8 @@ LOCAL void ICACHE_FLASH_ATTR onWifiEventReceived(System_Event_t* event) {
 						IP2STR(&(event->event_info.got_ip.ip.addr)),
 						IP2STR(&(event->event_info.got_ip.mask.addr)),
 						IP2STR(&(event->event_info.got_ip.gw.addr)));
-				// TODO Launch UDP multi-cast command bridge
+				// Launch UDP multi-cast command bridge
+				CMDServer_startLANCommandGroup();
 				break;
 			}
 			case EVENT_STAMODE_AUTHMODE_CHANGE:{
