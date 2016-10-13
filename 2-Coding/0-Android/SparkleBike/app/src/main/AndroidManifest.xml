@@ -24,11 +24,21 @@
         <activity
             android:name=".page.SettingWindow"
             android:label="@string/title_activity_setting_window"
-            android:theme="@style/AppTheme.SettingWindow">
+            android:theme="@style/AppTheme.DialogWindow">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".page.ScanningWindow"
+            android:label="@string/title_activity_scanning_window"
+            android:theme="@style/AppTheme.DialogWindow">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
 

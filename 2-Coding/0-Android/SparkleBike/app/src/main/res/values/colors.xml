@@ -32,7 +32,7 @@
     <color name="DiscoverDeviceActivity_Item_CapabilitiesTextColor">@color/primary</color>
     <color name="DiscoverDeviceActivity_Item_LevelAndFrequencyTextColor">@color/primary</color>
 
-    <color name="SettingWindowActivity_Background">#FF36AE9E</color>
+    <color name="DialogWindowActivity_Background">#FF36AE9E</color>
 
 </resources>
 

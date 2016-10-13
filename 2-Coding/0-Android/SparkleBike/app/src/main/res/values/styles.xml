@@ -78,9 +78,9 @@
         <item name="android:textSize">18sp</item>
     </style>
 
-    <style name="AppTheme.SettingWindow">
+    <style name="AppTheme.DialogWindow">
         <item name="android:windowContentTransitions">true</item>
-        <item name="android:statusBarColor">@color/SettingWindowActivity_Background</item>
+        <item name="android:statusBarColor">@color/DialogWindowActivity_Background</item>
     </style>
 
 </resources>

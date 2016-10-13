@@ -58,11 +58,11 @@ void ICACHE_FLASH_ATTR CMDServer_stopCommandServer() {
 }
 
 void ICACHE_FLASH_ATTR CMDServer_startLANCommandGroup() {
-
+	Log_printfln("[CMD] Start LAN command group");
 }
 
 void ICACHE_FLASH_ATTR CMDServer_stopLANCommandGroup() {
-
+	Log_printfln("[CMD] Stop LAN command group");
 }
 
 bool ICACHE_FLASH_ATTR CMDServer_verifyTerminal(const char* requestID, const char* securityCode) {

@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/SettingWindowActivity_Background">
+    android:background="@color/DialogWindowActivity_Background">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/ToolBar"

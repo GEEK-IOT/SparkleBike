@@ -34,6 +34,7 @@ import cn.geekiot.sparklebike.ColorActivity;
 import cn.geekiot.sparklebike.R;
 import cn.geekiot.sparklebike.theme.MaterialDesignTheme;
 import cn.geekiot.sparklebike.theme.ThemeColorHelper;
+import cn.geekiot.sparklebike.ui.DialogWindow;
 
 public class HomeActivity extends ColorActivity implements NavigationView.OnNavigationItemSelectedListener,
         FragmentControlLinker {
@@ -90,6 +91,8 @@ public class HomeActivity extends ColorActivity implements NavigationView.OnNavi
                                 colorHelper.getThemeSize(),
                                 themeName), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                startScanningWindowDelay();
             }
         });
     }
@@ -219,11 +222,28 @@ public class HomeActivity extends ColorActivity implements NavigationView.OnNavi
             @Override
             public void run() {
                 Intent intent = new Intent(HomeActivity.this, SettingWindow.class);
-                intent.putExtra(SettingWindow.KEY_NEED_LAUNCH_ANIM, true);
-                intent.putExtra(SettingWindow.KEY_PAUSE_BACKGROUND_COLOR, getThemeColorHelper().getColor(MaterialDesignTheme.PRIMARY));
-                intent.putExtra(SettingWindow.KEY_RESUME_BACKGROUND_COLOR, getResources().getColor(R.color.SettingWindowActivity_Background));
-                intent.putExtra(SettingWindow.KEY_PAUSE_STATUSBAR_COLOR, getThemeColorHelper().getColor(MaterialDesignTheme.PRIMARY_DARK));
-                intent.putExtra(SettingWindow.KEY_RESUME_STATUSBAR_COLOR, getResources().getColor(R.color.SettingWindowActivity_Background));
+                intent.putExtra(DialogWindow.KEY_NEED_LAUNCH_ANIM, true);
+                intent.putExtra(DialogWindow.KEY_PAUSE_BACKGROUND_COLOR, getThemeColorHelper().getColor(MaterialDesignTheme.PRIMARY));
+                intent.putExtra(DialogWindow.KEY_RESUME_BACKGROUND_COLOR, getResources().getColor(R.color.DialogWindowActivity_Background));
+                intent.putExtra(DialogWindow.KEY_PAUSE_STATUSBAR_COLOR, getThemeColorHelper().getColor(MaterialDesignTheme.PRIMARY_DARK));
+                intent.putExtra(DialogWindow.KEY_RESUME_STATUSBAR_COLOR, getResources().getColor(R.color.DialogWindowActivity_Background));
+                startActivity(
+                        intent,
+                        ActivityOptionsCompat.makeSceneTransitionAnimation(HomeActivity.this, mToolbar, "toolbar").toBundle());
+            }
+        }, 250);
+    }
+
+    private void startScanningWindowDelay() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(HomeActivity.this, ScanningWindow.class);
+                intent.putExtra(DialogWindow.KEY_NEED_LAUNCH_ANIM, true);
+                intent.putExtra(DialogWindow.KEY_PAUSE_BACKGROUND_COLOR, getThemeColorHelper().getColor(MaterialDesignTheme.PRIMARY));
+                intent.putExtra(DialogWindow.KEY_RESUME_BACKGROUND_COLOR, getResources().getColor(R.color.DialogWindowActivity_Background));
+                intent.putExtra(DialogWindow.KEY_PAUSE_STATUSBAR_COLOR, getThemeColorHelper().getColor(MaterialDesignTheme.PRIMARY_DARK));
+                intent.putExtra(DialogWindow.KEY_RESUME_STATUSBAR_COLOR, getResources().getColor(R.color.DialogWindowActivity_Background));
                 startActivity(
                         intent,
                         ActivityOptionsCompat.makeSceneTransitionAnimation(HomeActivity.this, mToolbar, "toolbar").toBundle());
