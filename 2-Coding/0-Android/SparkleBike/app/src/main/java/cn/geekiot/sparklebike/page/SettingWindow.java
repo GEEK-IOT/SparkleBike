@@ -43,4 +43,8 @@ public class SettingWindow extends DialogWindow {
         return R.layout.activity_scanning_placeholder;
     }
 
+    @Override
+    protected void onContentViewInflated() {
+
+    }
 }

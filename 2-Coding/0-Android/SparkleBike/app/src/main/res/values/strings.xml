@@ -27,6 +27,11 @@
     <string name="SetingWindow_NetworkPermission_Option_OnlyWiFi">Only WiFi</string>
     <string name="SetingWindow_NetworkPermission_Option_LANManagement">LAN Management</string>
 
+    <string name="ScanningWindow_NoDeviceFound">No device found</string>
+    <string name="ScanningWindow_DeviceCount_ZeroDevice">device</string>
+    <string name="ScanningWindow_DeviceCount_OneDevice">device</string>
+    <string name="ScanningWindow_DeviceCount_MoreDevice">devices</string>
+
     <string name="WiFiEnabledDialog_Title">WiFi disabled</string>
     <string name="WiFiEnabledDialog_Message">Please turn the WiFi on</string>
     <string name="WiFiEnabledDialog_Confirm">Confirm</string>

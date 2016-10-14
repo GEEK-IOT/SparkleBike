@@ -24,14 +24,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Singleton;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.cobox.cosmart.devicebridge.DeviceBridge;
+
 import cn.geekiot.sparklebike.ColorActivity;
 import cn.geekiot.sparklebike.R;
+import cn.geekiot.sparklebike.adapter.DeviceManager;
 import cn.geekiot.sparklebike.theme.MaterialDesignTheme;
 import cn.geekiot.sparklebike.theme.ThemeColorHelper;
 import cn.geekiot.sparklebike.ui.DialogWindow;
@@ -39,13 +43,13 @@ import cn.geekiot.sparklebike.ui.DialogWindow;
 public class HomeActivity extends ColorActivity implements NavigationView.OnNavigationItemSelectedListener,
         FragmentControlLinker {
 
-    private Toolbar                 mToolbar        = null;
-    private CollapsingToolbarLayout mToolbarLayout  = null;
-    private CoordinatorLayout       mAppRootLayout  = null;
-    private DrawerLayout            mDrawerLayout   = null;
-    private ActionBarDrawerToggle   mDrawerToggle   = null;
-    private NavigationView          mNavigationView = null;
-    private FloatingActionButton    mFabAction      = null;
+    private Toolbar                     mToolbar          = null;
+    private CollapsingToolbarLayout     mToolbarLayout    = null;
+    private CoordinatorLayout           mAppRootLayout    = null;
+    private DrawerLayout                mDrawerLayout     = null;
+    private ActionBarDrawerToggle       mDrawerToggle     = null;
+    private NavigationView              mNavigationView   = null;
+    private FloatingActionButton        mFabAction        = null;
 
     private TabLayout                   mTabLayout        = null;
     private ViewPager                   mFragmentPager    = null;
@@ -53,7 +57,6 @@ public class HomeActivity extends ColorActivity implements NavigationView.OnNavi
     private MainActivityDevicesFragment mDevicesFragment  = null;
     private MainActivityGroupsFragment  mGroupsFragment   = null;
     private MainActivityAreasFragment   mAreasFragment    = null;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

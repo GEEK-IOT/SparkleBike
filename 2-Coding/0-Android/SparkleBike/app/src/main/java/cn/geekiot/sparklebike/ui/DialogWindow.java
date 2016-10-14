@@ -48,12 +48,13 @@ public abstract class DialogWindow extends ColorActivity {
     public  int           mPauseStatusBarColor   = 0x00000000;
     public  int           mResumeStatusBarColor  = 0x00000000;
 
-    abstract protected int onMenuInflate();
-    abstract protected int getColorMenuItemId();
-    abstract protected int getWindowInTransitionResource();
-    abstract protected int getWindowOutTransitionResource();
-    abstract protected int getWindowInTransitionLayout();
-    abstract protected int getWindowOutTransitionLayout();
+    abstract protected int  onMenuInflate();
+    abstract protected void onContentViewInflated();
+    abstract protected int  getColorMenuItemId();
+    abstract protected int  getWindowInTransitionResource();
+    abstract protected int  getWindowOutTransitionResource();
+    abstract protected int  getWindowInTransitionLayout();
+    abstract protected int  getWindowOutTransitionLayout();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +63,7 @@ public abstract class DialogWindow extends ColorActivity {
         setContentView(R.layout.activity_dialog_window);
         setupActionBar();
         findViews();
+        onContentViewInflated();
     }
 
     private void initializeIntent() {
