@@ -34,11 +34,11 @@
 
     <color name="DialogWindowActivity_Background">#FF36AE9E</color>
 
-    <color name="ScanningWindow_EmptyText_TextSize">#FFFFFFFF</color>
-    <color name="ScanningWindow_DeviceItemTitle_TextSize">#FFFFFFFF</color>
-    <color name="ScanningWindow_DeviceItemMAC_TextSize">#FFFFFFFF</color>
-    <color name="ScanningWindow_DeviceCount_Number_TextSize">#FFFFFFFF</color>
-    <color name="ScanningWindow_DeviceCount_Unit_TextSize">#FFFFFFFF</color>
+    <color name="ScanningWindow_EmptyText_TextColor">#FFFFFFFF</color>
+    <color name="ScanningWindow_DeviceItemTitle_TextColor">#FFFFFFFF</color>
+    <color name="ScanningWindow_DeviceItemMAC_TextColor">#FFFFFFFF</color>
+    <color name="ScanningWindow_DeviceCount_Number_TextColor">#FFFFFFFF</color>
+    <color name="ScanningWindow_DeviceCount_Unit_TextColor">#FFFFFFFF</color>
 
 </resources>
 

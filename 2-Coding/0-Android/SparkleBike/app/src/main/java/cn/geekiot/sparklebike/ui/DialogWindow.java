@@ -63,7 +63,6 @@ public abstract class DialogWindow extends ColorActivity {
         setContentView(R.layout.activity_dialog_window);
         setupActionBar();
         findViews();
-        onContentViewInflated();
     }
 
     private void initializeIntent() {
@@ -212,6 +211,7 @@ public abstract class DialogWindow extends ColorActivity {
         Transition transition = TransitionInflater.from(DialogWindow.this).inflateTransition(getWindowInTransitionResource());
         Scene scene = Scene.getSceneForLayout(mSceneRoot, getWindowInTransitionLayout(), DialogWindow.this);
         TransitionManager.go(scene, transition);
+        onContentViewInflated();
     }
 
     private void scheduleSceneHideTranstion() {

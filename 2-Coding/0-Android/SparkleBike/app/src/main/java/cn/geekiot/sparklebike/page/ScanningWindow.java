@@ -80,7 +80,7 @@ public class ScanningWindow extends DialogWindow implements OnBridgeConnectionLi
         mDeviceListViewHelper.setEmptyTextParameters(
                 R.string.ScanningWindow_NoDeviceFound,
                 R.dimen.ScanningWindow_EmptyText_TextSize,
-                R.color.ScanningWindow_EmptyText_TextSize);
+                R.color.ScanningWindow_EmptyText_TextColor);
     }
 
     @Override

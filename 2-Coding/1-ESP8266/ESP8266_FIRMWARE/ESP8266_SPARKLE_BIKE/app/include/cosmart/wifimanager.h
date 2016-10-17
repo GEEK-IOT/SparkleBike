@@ -18,5 +18,6 @@ void        WiFi_connectAP();
 void        WiFi_disconnectAP();
 char*       WiFi_generateSTAIdentify();
 void        WiFi_freeSTAIdentify(char** identify);
+void        WiFi_updateNTPTime();
 
 #endif /* APP_INCLUDE_COSMART_WIFIMANAGER_H_ */

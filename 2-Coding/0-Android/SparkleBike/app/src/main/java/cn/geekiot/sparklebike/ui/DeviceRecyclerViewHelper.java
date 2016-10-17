@@ -15,10 +15,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.cobox.cosmart.devicebridge.Device;
+import com.cobox.utils.Differ;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -58,37 +60,43 @@ public class DeviceRecyclerViewHelper {
             mDeviceList = new ArrayList<Device>();
         }
 
+        int[] adds    = null;
+        int[] removes = null;
         mDeviceComparator.setNameOrder(false);
-        Collections.sort(dataset, mDeviceComparator);
-
+        mDeviceListDiffer.setComparator(mDeviceComparator);
         synchronized (mDeviceList) {
-            mDeviceListDiffer.diff(mDeviceList, dataset);
-            int[] adds    = mDeviceListDiffer.getAdds();
-            int[] removes = mDeviceListDiffer.getRemoves();
+            if (mDeviceListDiffer.diff(mDeviceList, dataset)) {
+                adds    = mDeviceListDiffer.getAdds();
+                removes = mDeviceListDiffer.getRemoves();
+            }
             mDeviceList = dataset;
         }
 
         mAdapter.setDataSet(mDeviceList);
+        if (removes != null) {
+            for (int remove : removes) {
+                mAdapter.notifyItemRemoved(remove);
+            }
+        }
+        if (adds != null) {
+            for (int add : adds) {
+                mAdapter.notifyItemInserted(add);
+            }
+        }
     }
 
-    private class DeviceListDiffer {
+    /**
+     * Device list differ
+     * @Auther Cocoonshu
+     * @Date 2016-09-29 14:04:59
+     * Copyright (c) 2016 Cocoonshu
+     */
+    private class DeviceListDiffer extends Differ<Device> {
 
-        public boolean diff(List<Device> reference, List<Device> current) {
-            int deviceCount = dataset.size();
-            for (int i = 0; i < deviceCount; i++) {
-                boolean hasFound = false;
-                Device  device   = dataset.get(i);
-                for (Device exsitDevice : mDeviceList) {
-                    if (device.getSSID().equals(exsitDevice.getSSID())
-                            && device.getBSSID().equals(exsitDevice.getBSSID())) {
-                        hasFound = true;
-                        break;
-                    }
-                }
-                if (!hasFound) {
-
-                }
-            }
+        @Override
+        protected boolean isSame(Device current, Device reference) {
+            return current.getSSID().equals(reference.getSSID())
+                    && current.getBSSID().equals(reference.getBSSID());
         }
 
     }

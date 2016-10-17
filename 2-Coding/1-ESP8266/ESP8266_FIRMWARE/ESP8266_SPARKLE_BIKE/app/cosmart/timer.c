@@ -102,3 +102,8 @@ void ICACHE_FLASH_ATTR Timer_stop(Timer* timer) {
 	}
 	os_timer_disarm(&(timer->timer));
 }
+
+uint32 ICACHE_FLASH_ATTR Timer_getTime() {
+	return system_get_time();
+}
+

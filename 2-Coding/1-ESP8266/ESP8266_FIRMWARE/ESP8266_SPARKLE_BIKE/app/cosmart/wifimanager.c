@@ -12,6 +12,7 @@
 #include "cosmart/communication/commandserver.h"
 #include "mem.h"
 #include "osapi.h"
+#include "sntp.h"
 #include "user_interface.h"
 
 // 内部函数声明
@@ -158,6 +159,25 @@ void ICACHE_FLASH_ATTR WiFi_freeSTAIdentify(char** identify) {
 	}
 }
 
+void ICACHE_FLASH_ATTR WiFi_updateNTPTime() {
+	if (sntp_getservername(0) == NULL) {
+		// 上海交通大学网络中心NTP服务器地址
+		sntp_setservername(0, "ntp.sjtu.edu.cn");
+	}
+	if (sntp_getservername(1) == NULL) {
+		sntp_setservername(1, "us.pool.ntp.org");
+	}
+	if (sntp_getservername(2) == NULL) {
+		// CERNET桂林主节点
+		sntp_setservername(2, "s2k.time.edu.cn");
+	}
+
+	sntp_init();
+	sntp_set_timezone(+8);
+	uint32 timeStamp = sntp_get_current_timestamp();
+	Log_printfln("[WiFi] SNTP updated, %s", sntp_get_real_time(timeStamp));
+}
+
 ///////////////
 //  内部函数   //
 ///////////////
@@ -275,6 +295,7 @@ LOCAL void ICACHE_FLASH_ATTR onWifiEventReceived(System_Event_t* event) {
 						IP2STR(&(event->event_info.got_ip.gw.addr)));
 				// Launch UDP multi-cast command bridge
 				CMDServer_startLANCommandGroup();
+				WiFi_updateNTPTime();
 				break;
 			}
 			case EVENT_STAMODE_AUTHMODE_CHANGE:{
@@ -289,3 +310,4 @@ LOCAL void ICACHE_FLASH_ATTR onWifiEventReceived(System_Event_t* event) {
 		}
 	}
 }
+

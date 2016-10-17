@@ -107,6 +107,9 @@ LOCAL void ICACHE_FLASH_ATTR onSystemInitialized() {
 	SSD1306_bindDevice(0);
 	SSD1306_drawBuffer(0, 127, 0, 7, IMG_LOGO);
 #endif
+
+	UI_initialize();
+
 	// 初始化终端管理器
 	//InterruptManager_initialize();
 
