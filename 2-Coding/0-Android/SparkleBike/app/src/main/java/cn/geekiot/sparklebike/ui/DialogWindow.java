@@ -15,6 +15,7 @@ import android.transition.Scene;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -74,6 +75,9 @@ public abstract class DialogWindow extends ColorActivity {
             mResumeBackgroundColor = intent.getIntExtra(KEY_RESUME_BACKGROUND_COLOR, mResumeBackgroundColor);
             mPauseStatusBarColor   = intent.getIntExtra(KEY_PAUSE_STATUSBAR_COLOR, mPauseStatusBarColor);
             mResumeStatusBarColor  = intent.getIntExtra(KEY_RESUME_STATUSBAR_COLOR, mResumeStatusBarColor);
+
+            Log.i(TAG, String.format("[initializeIntent] Background (#%08X -> #%08X)", mPauseBackgroundColor, mResumeBackgroundColor));
+            Log.i(TAG, String.format("[initializeIntent] StatusBar  (#%08X -> #%08X)", mPauseStatusBarColor, mResumeStatusBarColor));
         }
 
         if (needLaunchAnim) {
@@ -260,3 +264,4 @@ public abstract class DialogWindow extends ColorActivity {
         super.finishAfterTransition();
     }
 }
+

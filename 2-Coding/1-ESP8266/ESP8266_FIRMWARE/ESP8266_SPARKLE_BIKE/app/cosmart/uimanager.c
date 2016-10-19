@@ -42,7 +42,7 @@ LOCAL void ICACHE_FLASH_ATTR onTimeCount(void* msg) {
 	{
 		Timer_stop(&mUiTimer);
 		//SSD1306_cleanScreen();
-		SSD1306_drawText("00:00:00", 43, 0);
+		SSD1306_drawText("--:--:--", 43, 0);
 
 		Timer_setCallbackWithParam(&mUiTimer, onTimeCount, (void*)MSG_UPDATE_TIME);
 		Timer_setLoopable(&mUiTimer, true);

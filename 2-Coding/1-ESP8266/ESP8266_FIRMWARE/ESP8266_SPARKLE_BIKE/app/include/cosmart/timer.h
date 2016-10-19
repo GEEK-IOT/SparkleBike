@@ -18,9 +18,10 @@ typedef os_timer_t      NativeTimer;
 typedef os_timer_func_t TimerCallback;
 typedef void*           TimerCallbackParam;
 typedef struct {
-	int year, month, day;
-	int dayOfWeek;
-	int hour, minute, second;
+	int  year, month, day;
+	int  dayOfWeek;
+	int  hour, minute, second;
+	bool isValid;
 } DateTime;
 
 typedef enum {

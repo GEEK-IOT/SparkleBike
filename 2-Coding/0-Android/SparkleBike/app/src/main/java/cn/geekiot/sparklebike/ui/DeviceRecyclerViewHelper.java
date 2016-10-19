@@ -6,22 +6,27 @@ import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.cobox.cosmart.devicebridge.Device;
 import com.cobox.utils.Differ;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
+
+import cn.geekiot.sparklebike.R;
 
 /**
  * Device list recycler view helper
@@ -42,16 +47,18 @@ public class DeviceRecyclerViewHelper {
     public DeviceRecyclerViewHelper(RecyclerView recyclerView) {
         mRecyclerView     = recyclerView;
         mDeviceListDiffer = new DeviceListDiffer();
+        mDeviceComparator = new DeviceComparator();
         mEmptyBackground  = new TextDrawable(recyclerView.getContext());
         mLayoutManager    = new LinearLayoutManager(recyclerView.getContext(), LinearLayoutManager.VERTICAL, false);
-        mAdapter          = new DeviceAdapter();
+        mAdapter          = new DeviceAdapter(recyclerView.getContext());
         mLayoutManager.setAutoMeasureEnabled(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     public void setEmptyTextParameters(int textResid, int textSizeResid, int textColorResid) {
         mEmptyBackground.setText(textResid);
-        mEmptyBackground.setTextSize(textSizeResid);
+        mEmptyBackground.setTextSizeResid(textSizeResid);
         mEmptyBackground.setTextColorResid(textColorResid);
     }
 
@@ -62,7 +69,7 @@ public class DeviceRecyclerViewHelper {
 
         int[] adds    = null;
         int[] removes = null;
-        mDeviceComparator.setNameOrder(false);
+        mDeviceComparator.setNameOrder(true);
         mDeviceListDiffer.setComparator(mDeviceComparator);
         synchronized (mDeviceList) {
             if (mDeviceListDiffer.diff(mDeviceList, dataset)) {
@@ -109,10 +116,10 @@ public class DeviceRecyclerViewHelper {
      */
     private class DeviceComparator implements Comparator<Device> {
 
-        private boolean mIsNameDESC = false;
+        private boolean mIsNameASC = false;
 
-        public void setNameOrder(boolean isDESC) {
-            mIsNameDESC = isDESC;
+        public void setNameOrder(boolean isASC) {
+            mIsNameASC = isASC;
         }
 
         @Override
@@ -124,7 +131,7 @@ public class DeviceRecyclerViewHelper {
             } else if (rhs == null) {
                 return 1;
             } else {
-                int titleCompare = mIsNameDESC ? lhs.getSSID().compareTo(rhs.getSSID()) : rhs.getSSID().compareTo(lhs.getSSID());
+                int titleCompare = mIsNameASC ? lhs.getSSID().compareTo(rhs.getSSID()) : rhs.getSSID().compareTo(lhs.getSSID());
                 int rssiCompare  = lhs.getLevel() - rhs.getLevel();
                 return titleCompare == 0 ? rssiCompare : titleCompare;
             }
@@ -139,7 +146,20 @@ public class DeviceRecyclerViewHelper {
      */
     private class DeviceAdapter extends RecyclerView.Adapter {
 
-        private List<Device> mDataSet = null;
+        private Context      mContext          = null;
+        private List<Device> mDataSet          = null;
+        private Drawable     mDblDefaultDevice = null;
+        private Drawable     mDblStateInfo     = null;
+        private Drawable     mDblStateQuestion = null;
+        private Drawable     mDblStateExchange = null;
+
+        public DeviceAdapter(Context context) {
+            mContext          = context;
+            mDblDefaultDevice = context.getDrawable(R.drawable.ic_default_device);
+            mDblStateInfo     = context.getDrawable(R.drawable.ic_device_info);
+            mDblStateQuestion = context.getDrawable(R.drawable.ic_device_question);
+            mDblStateExchange = context.getDrawable(R.drawable.ic_device_exchange);
+        }
 
         public void setDataSet(List<Device> dataSet) {
             mDataSet = new ArrayList<>(dataSet);
@@ -147,12 +167,30 @@ public class DeviceRecyclerViewHelper {
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return null;
+            View itemView = LayoutInflater.from(mContext).inflate(R.layout.layout_scanning_device_item, null);
+            DeviceViewHolder holder = new DeviceViewHolder(itemView);
+            return holder;
         }
 
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            String title    = null;
+            String subTitle = null;
+            synchronized (mDataSet) {
+                Device device = mDataSet.get(position);
+                title    = device.getSSID();
+                subTitle = device.getMACString();
+            }
 
+            DeviceViewHolder viewHolder = (DeviceViewHolder) holder;
+            if (title.length() > 12) {
+                viewHolder.setTitle(title.substring(0, title.length() - 12));
+            } else {
+                viewHolder.setTitle(title);
+            }
+            viewHolder.setSubtitle(subTitle);
+            viewHolder.setIcon(mDblDefaultDevice);
+            viewHolder.setSubicon(mDblStateInfo);
         }
 
         @Override
@@ -170,8 +208,33 @@ public class DeviceRecyclerViewHelper {
      */
     private class DeviceViewHolder extends RecyclerView.ViewHolder {
 
+        private ImageView   mImgIcon     = null;
+        private TextView    mTxvTitle    = null;
+        private TextView    mTxvSubTitle = null;
+        private ImageButton mBtnOption   = null;
+
         public DeviceViewHolder(View itemView) {
             super(itemView);
+            mImgIcon     = (ImageView) itemView.findViewById(R.id.ImageView_Icon);
+            mTxvTitle    = (TextView) itemView.findViewById(R.id.TextView_Title);
+            mTxvSubTitle = (TextView) itemView.findViewById(R.id.TextView_Subtitle);
+            mBtnOption   = (ImageButton) itemView.findViewById(R.id.ImageButton_Option);
+        }
+
+        public void setIcon(Drawable icon) {
+            mImgIcon.setImageDrawable(icon);
+        }
+
+        public void setTitle(String title) {
+            mTxvTitle.setText(title);
+        }
+
+        public void setSubtitle(String subtitle) {
+            mTxvSubTitle.setText(subtitle);
+        }
+
+        public void setSubicon(Drawable subicon) {
+            mBtnOption.setImageDrawable(subicon);
         }
     }
 
@@ -215,8 +278,9 @@ public class DeviceRecyclerViewHelper {
             onBoundsChange(getBounds());
         }
 
-        public void setTextSize(int resid) {
-            setTextSize(mContext.getResources().getDimensionPixelSize(resid));
+        public void setTextSizeResid(int resid) {
+            mPaint.setTextSize(mContext.getResources().getDimensionPixelSize(resid));
+            onBoundsChange(getBounds());
         }
 
         public void setTextSize(float textSize) {

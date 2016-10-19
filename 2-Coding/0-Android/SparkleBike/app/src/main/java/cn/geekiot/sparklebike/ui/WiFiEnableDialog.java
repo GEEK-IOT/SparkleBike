@@ -1,6 +1,8 @@
 package cn.geekiot.sparklebike.ui;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AlertDialog;
 import android.content.Context;
 

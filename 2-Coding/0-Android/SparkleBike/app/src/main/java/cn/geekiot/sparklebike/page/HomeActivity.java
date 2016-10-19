@@ -85,15 +85,15 @@ public class HomeActivity extends ColorActivity implements NavigationView.OnNavi
         mFabAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ThemeColorHelper colorHelper = getThemeColorHelper();
-                String themeName = getThemeColorHelper().triggerNextColor();
-                Snackbar.make(
-                        view,
-                        String.format("%d/%d Switch to theme %s",
-                                colorHelper.getCurrentThemeIndex() + 1,
-                                colorHelper.getThemeSize(),
-                                themeName), Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                ThemeColorHelper colorHelper = getThemeColorHelper();
+//                String themeName = getThemeColorHelper().triggerNextColor();
+//                Snackbar.make(
+//                        view,
+//                        String.format("%d/%d Switch to theme %s",
+//                                colorHelper.getCurrentThemeIndex() + 1,
+//                                colorHelper.getThemeSize(),
+//                                themeName), Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
 
                 startScanningWindowDelay();
             }
