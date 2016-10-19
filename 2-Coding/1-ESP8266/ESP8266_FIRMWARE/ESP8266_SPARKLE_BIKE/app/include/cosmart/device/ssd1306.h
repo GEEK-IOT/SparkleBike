@@ -6,6 +6,10 @@
  */
 #include "c_types.h"
 
+#ifndef ICACHE_DATA_ATTR
+#define ICACHE_DATA_ATTR ICACHE_RODATA_ATTR
+#endif
+
 #ifndef APP_INCLUDE_COSMART_DEVICE_SSD1306_H_
 #define APP_INCLUDE_COSMART_DEVICE_SSD1306_H_
 
@@ -72,6 +76,8 @@
 #define DEVICE_WRITE_RETRY_COUNT            3    // 写入IIC从机设备重试次数
 #define SLAVE_DEVICE_COUNT                  2    // 额定设备挂在数量
 
+extern uint8 ASCII[][7];
+
 typedef struct {
 	uint8  address;
 	uint8* frameBuffer;
@@ -81,30 +87,13 @@ typedef struct {
 	uint16 segmentSize;
 } SSD1306Device;
 
-//int MAP_NUMBER [][] = {
-//		5, 8, {0x3E, 0x41, 0x41, 0x41, 0x3E}, // 0
-//		5, 8, {0x00, 0x42, 0x7F, 0x40, 0x00}, // 1
-//		5, 8, {0x42, 0x61, 0x51, 0x49, 0x46}, // 2
-//		5, 8, {0x22, 0x41, 0x49, 0x49, 0x36}, // 3
-//		5, 8, {0x18, 0x14, 0x12, 0x7F, 0x10}, // 4
-//		5, 8, {0x27, 0x49, 0x49, 0x49, 0x31}, // 5
-//		5, 8, {0x38, 0x4C, 0x4A, 0x49, 0x30}, // 6
-//		5, 8, {0x01, 0x01, 0x71, 0x0D, 0x03}, // 7
-//		5, 8, {0x36, 0x49, 0x49, 0x49, 0x36}, // 8
-//		5, 8, {0x06, 0x49, 0x29, 0x19, 0x0E}, // 9
-//};
-//		24H;                 // :
-//		40H;                 // 。
-//		08H 08H 08H;         // -
-//		};
-
-
 void SSD1306_initialize();
 int  SSD1306_getSlaveDeviceCount();
 int  SSD1306_getValidSlaveDeviceCount();
 bool SSD1306_bindDevice(int index);
 void SSD1306_drawPixels(uint16 x, uint16 y, uint16 width, uint16 height, const uint8* pixels);
 void SSD1306_drawBuffer(uint16 startColumn, uint16 endColumn, uint16 startPage, uint16 endPage, const uint8* buffer);
+void SSD1306_drawText(char* text, uint16 x, uint16 y);
 void SSD1306_cleanScreen();
 void SSD1306_reset();
 

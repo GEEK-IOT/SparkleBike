@@ -175,7 +175,7 @@ void ICACHE_FLASH_ATTR WiFi_updateNTPTime() {
 	sntp_init();
 	sntp_set_timezone(+8);
 	uint32 timeStamp = sntp_get_current_timestamp();
-	Log_printfln("[WiFi] SNTP updated, %s", sntp_get_real_time(timeStamp));
+	Log_printfln("[WiFi] SNTP updating triggered");
 }
 
 ///////////////

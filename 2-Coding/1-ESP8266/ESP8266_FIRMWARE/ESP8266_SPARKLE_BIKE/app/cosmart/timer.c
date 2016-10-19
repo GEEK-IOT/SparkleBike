@@ -8,6 +8,7 @@
 #include "cosmart/cosmart.h"
 #include "cosmart/timer.h"
 #include "cosmart/log.h"
+#include "mem.h"
 #include "osapi.h"
 
 void ICACHE_FLASH_ATTR Timer_initialize() {
@@ -103,7 +104,80 @@ void ICACHE_FLASH_ATTR Timer_stop(Timer* timer) {
 	os_timer_disarm(&(timer->timer));
 }
 
-uint32 ICACHE_FLASH_ATTR Timer_getTime() {
+uint32 ICACHE_FLASH_ATTR Timer_getSystemTime() {
 	return system_get_time();
 }
 
+DateTime* ICACHE_FLASH_ATTR Timer_getDateTime() {
+	/**
+	 *  format: Tue Oct 18 14:07:07 2016
+	 *          %s %s %02d %02d:%02d:%02d %02d
+	 */
+	static const char day_name[7][4] = {
+			"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
+	};
+	static const char month_name[12][4] = {
+			"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+			"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+	};
+	long      timeStamp = sntp_get_current_timestamp();
+	char*     timeStr   = sntp_get_real_time(timeStamp);
+	DateTime* dateTime  = (DateTime*) os_malloc(sizeof(DateTime));
+	int i, j;
+
+	os_memset(dateTime, NULL, sizeof(DateTime));
+
+	// Days of week
+	for (j = 0; j < 7; j++) {
+		bool isMatch = true;
+		for (i = 0; i < 3; i++) {
+			if (day_name[j][i] != timeStr[i]) {
+				isMatch = false;
+				break;
+			}
+		}
+		if (isMatch) {
+			dateTime->dayOfWeek = j;
+		}
+	}
+
+	// Month
+	for (j = 0; j < 12; j++) {
+		bool isMatch = true;
+		for (i = 4; i < 7; i++) {
+			if (month_name[j][i - 4] != timeStr[i]) {
+				isMatch = false;
+				break;
+			}
+		}
+		if (isMatch) {
+			dateTime->month = j + 1;
+		}
+	}
+
+	// Day
+	char dayStr[3] = {timeStr[8], timeStr[9], 0};
+	dateTime->day = atoi(dayStr);
+
+	// Hour
+	char hourStr[3] = {timeStr[11], timeStr[12], 0};
+	dateTime->hour = atoi(hourStr);
+
+	// Minute
+	char minuteStr[3] = {timeStr[14], timeStr[15], 0};
+	dateTime->minute = atoi(minuteStr);
+
+	// Second
+	char secondStr[3] = {timeStr[17], timeStr[18], 0};
+	dateTime->second = atoi(secondStr);
+
+	// Year
+	char yearStr[5] = {timeStr[20], timeStr[21], timeStr[22], timeStr[23], 0};
+	dateTime->year = atoi(yearStr);
+
+	return dateTime;
+}
+
+char* ICACHE_FLASH_ATTR Timer_getDateTimeString() {
+	return sntp_get_real_time(sntp_get_current_timestamp());
+}

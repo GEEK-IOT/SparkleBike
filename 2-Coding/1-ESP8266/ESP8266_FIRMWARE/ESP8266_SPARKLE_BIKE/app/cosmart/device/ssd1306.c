@@ -10,6 +10,24 @@
 #include "cosmart/Timer.h"
 #include "driver/i2c_master.h"
 #include "mem.h"
+#include "math.h"
+
+//uint8 ASCII [14][7] = {
+//		{3, 8, 0x08, 0x08, 0x08}, // 2D -
+//		{1, 8, 0x40}, // 2E .
+//		{0, 0}, // 2F /
+//		{5, 8, 0x3E, 0x41, 0x41, 0x41, 0x3E}, // 30 0
+//		{5, 8, 0x00, 0x42, 0x7F, 0x40, 0x00}, // 31 1
+//		{5, 8, 0x42, 0x61, 0x51, 0x49, 0x46}, // 32 2
+//		{5, 8, 0x22, 0x41, 0x49, 0x49, 0x36}, // 33 3
+//		{5, 8, 0x18, 0x14, 0x12, 0x7F, 0x10}, // 34 4
+//		{5, 8, 0x27, 0x49, 0x49, 0x49, 0x31}, // 35 5
+//		{5, 8, 0x38, 0x4C, 0x4A, 0x49, 0x30}, // 36 6
+//		{5, 8, 0x01, 0x01, 0x71, 0x0D, 0x03}, // 37 7
+//		{5, 8, 0x36, 0x49, 0x49, 0x49, 0x36}, // 38 8
+//		{5, 8, 0x06, 0x49, 0x29, 0x19, 0x0E}, // 39 9
+//		{1, 8, 0x24} // 3A :
+//};
 
 LOCAL SSD1306Device* mCurrentDevice                  = NULL;
 LOCAL SSD1306Device* mDeviceList[SLAVE_DEVICE_COUNT] = {NULL, NULL};
@@ -19,13 +37,10 @@ LOCAL bool   writeCMD_1(SSD1306Device* device, uint8 cmdA);
 LOCAL bool   writeCMD_2(SSD1306Device* device, uint8 cmdA, uint8 cmdB);
 LOCAL bool   writeCMD_3(SSD1306Device* device, uint8 cmdA, uint8 cmdB, uint8 cmdC);
 LOCAL bool   endCMD(SSD1306Device* device);
-
 LOCAL bool   beginRAM(SSD1306Device* device, uint8 colStart, uint8 colEnd, uint8 pageStart, uint8 pageEnd);
 LOCAL bool   writeRAM(SSD1306Device* device, uint8* data, uint16 dataLength);
 LOCAL bool   endRAM(SSD1306Device* device);
-
 LOCAL bool   flushFrameBuffer(SSD1306Device* device);
-
 LOCAL uint8  getDeviceReadAddress(SSD1306Device* device);
 LOCAL uint8  getDeviceWriteAddress(SSD1306Device* device);
 LOCAL bool   testDeviceAddress();
@@ -101,6 +116,53 @@ void ICACHE_FLASH_ATTR SSD1306_drawBuffer(uint16 startColumn, uint16 endColumn, 
 	flushFrameBuffer(mCurrentDevice);
 }
 
+void ICACHE_FLASH_ATTR SSD1306_drawText(char* text, uint16 x, uint16 y) {
+	if (mCurrentDevice == NULL || mCurrentDevice->address == SSD1306_SLAVE_NO_ADDRESS) {
+		return;
+	}
+
+	bool   isDirty        = false;
+	char*  letter         = text;
+	uint16 currentAddress = x + (y / DEVICE_HEIGHT_PER_PAGE) * DEVICE_COLUMN_COUNT;
+
+	while (letter != NULL && *letter != '\0') {
+		char  ascii    = *letter;
+		uint8 asciiPos = ascii - 0x00;//0x2D;
+		if (asciiPos < 0 || asciiPos >= 128) {
+			letter++;
+			continue;
+		}
+
+		uint8 pixelWidth  = ASCII[asciiPos][0];
+		uint8 pixelHeight = ASCII[asciiPos][1];
+
+		system_soft_wdt_feed();
+		if (pixelWidth != 0 && pixelHeight != 0) {
+			int i, j;
+			int column    = pixelWidth > (DEVICE_COLUMN_COUNT - x) ? (DEVICE_COLUMN_COUNT - x): pixelWidth;
+			int page      = floor(pixelHeight / DEVICE_COM_COUNT);
+			int startPage = y / DEVICE_HEIGHT_PER_PAGE;
+			for (j = 0; j < page; j++) {
+				for (i = 0; i < column; i++) {
+					int bufferIndex = (startPage + j) * DEVICE_COLUMN_COUNT + i;
+					int asciiIndex  = 2 + j * pixelWidth + i;
+					mCurrentDevice->frameBuffer[currentAddress + bufferIndex] = ASCII[ascii][asciiIndex];
+					isDirty = true;
+				}
+			}
+
+			currentAddress += column * page + 1;
+		}
+
+		letter++;
+	}
+
+	if (isDirty) {
+		system_soft_wdt_feed();
+		flushFrameBuffer(mCurrentDevice);
+	}
+}
+
 void ICACHE_FLASH_ATTR SSD1306_cleanScreen() {
 	if (mCurrentDevice == NULL || mCurrentDevice->address == SSD1306_SLAVE_NO_ADDRESS) {
 		return;
@@ -159,7 +221,7 @@ LOCAL bool ICACHE_FLASH_ATTR testDeviceAddress() {
 		mCurrentDevice = mDeviceList[0];
 		Log_printfln("       - Found SSD1306 slave on I2C Bus port 0x%x", SSD1306_SLAVE_HIGH_ADDRESS);
 		if (mDeviceList[0]->frameBuffer != NULL) {
-			Log_printfln("       - SSD1306 device on 0x%x zalloc framebuffer successes", SSD1306_SLAVE_HIGH_ADDRESS);
+			Log_printfln("       - SSD1306 device on 0x%x malloc framebuffer successes", SSD1306_SLAVE_HIGH_ADDRESS);
 		} else {
 			Log_printfln("       - SSD1306 device on 0x%x failed to zalloc framebuffer", SSD1306_SLAVE_HIGH_ADDRESS);
 		}
@@ -189,7 +251,7 @@ LOCAL bool ICACHE_FLASH_ATTR testDeviceAddress() {
 		}
 		Log_printfln("       - Found SSD1306 slave on I2C Bus port 0x%x", SSD1306_SLAVE_LOW_ADDRESS);
 		if (mDeviceList[1]->frameBuffer != NULL) {
-			Log_printfln("       - SSD1306 device on 0x%x zalloc framebuffer successes", SSD1306_SLAVE_LOW_ADDRESS);
+			Log_printfln("       - SSD1306 device on 0x%x malloc framebuffer successes", SSD1306_SLAVE_LOW_ADDRESS);
 		} else {
 			Log_printfln("       - SSD1306 device on 0x%x failed to zalloc framebuffer", SSD1306_SLAVE_LOW_ADDRESS);
 		}

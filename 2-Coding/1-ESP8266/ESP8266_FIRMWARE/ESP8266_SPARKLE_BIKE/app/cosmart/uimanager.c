@@ -9,13 +9,14 @@
 #include "cosmart/Log.h"
 #include "cosmart/Timer.h"
 #include "user_interface.h"
+#include "mem.h"
 
 LOCAL void onTimeCount(void* msg);
 
-static const int MSG_DISPLAY_MAIN_UI = 0x0001;
-static const int MSG_UPDATE_TIME     = 0x0002;
+#define MSG_DISPLAY_MAIN_UI  0x0001
+#define MSG_UPDATE_TIME      0x0002
 
-LOCAL Timer mUITimer;
+LOCAL Timer mUiTimer;
 
 void ICACHE_FLASH_ATTR UI_initialize() {
 	Log_printfln("");
@@ -26,31 +27,44 @@ void ICACHE_FLASH_ATTR UI_initialize() {
 
 	Log_printfln("[GUI] Display LOGO for 5s");
 	SSD1306_drawBuffer(0, 127, 0, 7, IMG_LOGO);
-	Timer_setCallbackWithParam(&mUITimer, onTimeCount, (void*)MSG_DISPLAY_MAIN_UI);
-	Timer_setLoopable(&mUITimer, false);
-	Timer_setInterval(&mUITimer, 5000);
-	Timer_start(&mUITimer);
+	int msg = MSG_DISPLAY_MAIN_UI;
+	Timer_setCallbackWithParam(&mUiTimer, onTimeCount, (void*)MSG_DISPLAY_MAIN_UI);
+	Timer_setLoopable(&mUiTimer, false);
+	Timer_setInterval(&mUiTimer, 5000);
+	Timer_start(&mUiTimer);
 }
 
 LOCAL void ICACHE_FLASH_ATTR onTimeCount(void* msg) {
-	int* what = (int*)msg;
-	switch (*what) {
+	int what = (int)msg;
+
+	switch (what) {
 	case MSG_DISPLAY_MAIN_UI:
 	{
-		Timer_stop(&mUITimer);
-		SSD1306_cleanScreen();
-		SSD1306_drawText("00:00", 0, 0);
+		Timer_stop(&mUiTimer);
+		//SSD1306_cleanScreen();
+		SSD1306_drawText("00:00:00", 43, 0);
 
-		Timer_setCallbackWithParam(&mUITimer, onTimeCount, (void*)MSG_UPDATE_TIME);
-		Timer_setLoopable(&mUITimer, true);
-		Timer_setInterval(&mUITimer, 500);
-		Timer_start(&mUITimer);
+		Timer_setCallbackWithParam(&mUiTimer, onTimeCount, (void*)MSG_UPDATE_TIME);
+		Timer_setLoopable(&mUiTimer, true);
+		Timer_setInterval(&mUiTimer, 1000);
+		Timer_start(&mUiTimer);
 	}
 		break;
 
 	case MSG_UPDATE_TIME:
 	{
 		// TODO
+		char timeText[16];
+		DateTime* time = Timer_getDateTime();
+//		Log_printfln("[UI] Time = %04d-%02d-%02d %02d:%02d:%02d",
+//				time->year, time->month, time->day,
+//				time->hour, time->minute, time->second);
+		os_bzero(timeText, 16),
+		os_sprintf(timeText, "%02d:%02d:%02d", time->hour, time->minute, time->second);
+		os_free(time);
+		time = NULL;
+
+		SSD1306_drawText(timeText, 43, 0);
 	}
 		break;
 	}
