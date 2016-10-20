@@ -4,7 +4,7 @@
 
     <target
         android:name="header"
-        android:animation="@animator/anim_menu_to_open_header" />
+        android:animation="@animator/anim_menu_to_open_header"/>
 
     <target
         android:name="body"

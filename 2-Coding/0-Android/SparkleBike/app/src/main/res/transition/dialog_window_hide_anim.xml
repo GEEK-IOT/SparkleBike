@@ -2,12 +2,12 @@
                android:transitionOrdering="together">
     <slide android:duration="250" android:slideEdge="top" >
         <targets>
-            <target android:targetId="@id/Layout_SettingPage"/>
+            <target android:targetId="@id/Layout_DialogWindow"/>
         </targets>
     </slide>
     <fade android:duration="500" android:fadingMode="fade_out" >
         <targets>
-            <target android:targetId="@id/Layout_SettingPage" />
+            <target android:targetId="@id/Layout_DialogWindow" />
         </targets>
     </fade>
 </transitionSet>

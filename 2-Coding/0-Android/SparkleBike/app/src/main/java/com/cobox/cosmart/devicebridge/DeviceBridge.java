@@ -11,6 +11,7 @@ import com.cobox.cosmart.devicebridge.DeviceBridgeService.DeviceBridgeServiceBin
 import com.cobox.cosmart.devicebridge.listeners.OnBridgeConnectionListener;
 import com.cobox.cosmart.devicebridge.listeners.OnDeviceConnectionListener;
 import com.cobox.cosmart.devicebridge.listeners.OnDeviceScanListener;
+import com.cobox.cosmart.devicebridge.listeners.OnGuideDeviceListener;
 
 import java.util.List;
 
@@ -156,6 +157,12 @@ public class DeviceBridge {
     public void disconnectDevice(Device device) {
         if (mService != null) {
             mService.disconnectDevice(device);
+        }
+    }
+
+    public void guideDeviceToAP(Device device, String apSSID, String apPassword, OnGuideDeviceListener listener) {
+        if (mService != null) {
+            mService.guideDeviceToAP(device, apSSID, apPassword, listener);
         }
     }
 }

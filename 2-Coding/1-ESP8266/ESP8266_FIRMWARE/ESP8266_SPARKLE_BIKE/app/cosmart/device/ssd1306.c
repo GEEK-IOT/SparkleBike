@@ -113,7 +113,6 @@ void ICACHE_FLASH_ATTR SSD1306_drawBuffer(uint16 startColumn, uint16 endColumn, 
 		const uint8* src   = buffer + (page - startPage) * strip;
 		os_memcpy(dest, src, strip);
 	}
-	flushFrameBuffer(mCurrentDevice);
 }
 
 void ICACHE_FLASH_ATTR SSD1306_drawText(char* text, uint16 x, uint16 y) {
@@ -121,7 +120,6 @@ void ICACHE_FLASH_ATTR SSD1306_drawText(char* text, uint16 x, uint16 y) {
 		return;
 	}
 
-	bool   isDirty        = false;
 	char*  letter         = text;
 	uint16 currentAddress = x + (y / DEVICE_HEIGHT_PER_PAGE) * DEVICE_COLUMN_COUNT;
 
@@ -147,7 +145,6 @@ void ICACHE_FLASH_ATTR SSD1306_drawText(char* text, uint16 x, uint16 y) {
 					int bufferIndex = (startPage + j) * DEVICE_COLUMN_COUNT + i;
 					int asciiIndex  = 2 + j * pixelWidth + i;
 					mCurrentDevice->frameBuffer[currentAddress + bufferIndex] = ASCII[ascii][asciiIndex];
-					isDirty = true;
 				}
 			}
 
@@ -156,10 +153,48 @@ void ICACHE_FLASH_ATTR SSD1306_drawText(char* text, uint16 x, uint16 y) {
 
 		letter++;
 	}
+}
 
-	if (isDirty) {
-		system_soft_wdt_feed();
-		flushFrameBuffer(mCurrentDevice);
+void ICACHE_FLASH_ATTR SSD1306_erase(uint16 x, uint16 y, uint16 width, uint16 height) {
+	if (mCurrentDevice == NULL || mCurrentDevice->address == SSD1306_SLAVE_NO_ADDRESS) {
+		return;
+	}
+
+	int  startPage        = y / DEVICE_COM_COUNT;
+	int  endPage          = (y + height - 1) / DEVICE_COM_COUNT;
+	bool isHalfHeaderPage = (y % DEVICE_COM_COUNT) != 0;
+	bool isHalfFooterPage = ((y + height) % DEVICE_COM_COUNT) != 0;
+	int w, h;
+	for (h = startPage; h <= endPage; h++) {
+		uint8 mask = 0x00;
+
+		// Generate mask
+		if (h == startPage && isHalfHeaderPage) {
+			// [0 ~ coverBitSize] = 0
+			int coverBitSize = DEVICE_COM_COUNT - (y % DEVICE_COM_COUNT);
+			int i;
+			for (i = 0; i < coverBitSize; i++) {
+				mask |= (0b1000000 >> i);
+			}
+		} else if (h == endPage && isHalfFooterPage) {
+			// [8 - coverBitSize ~ 8]
+			int coverBitSize = (y + height) % DEVICE_COM_COUNT;
+			int i;
+			for (i = 0; i < coverBitSize; i++) {
+				mask |= (0b00000001 << i);
+			}
+		} else {
+			mask = 0xFF;
+		}
+
+		// Erase buffer
+		int count = (x + width) > DEVICE_COLUMN_COUNT ? DEVICE_COLUMN_COUNT : (x + width);
+		for (w = x; w < count; w++) {
+			int bufferAddress = h * DEVICE_COLUMN_COUNT + w;
+			int pixel = mCurrentDevice->frameBuffer[bufferAddress];
+			pixel = (pixel ^ mask) & pixel;
+			mCurrentDevice->frameBuffer[bufferAddress] = pixel;
+		}
 	}
 }
 
@@ -173,6 +208,13 @@ void ICACHE_FLASH_ATTR SSD1306_cleanScreen() {
 	os_memset(mCurrentDevice->frameBuffer, pixel, DEVICE_COLUMN_COUNT * DEVICE_PAGE_COUNT);
 	flushFrameBuffer(mCurrentDevice);
 	Log_printfln("[SSD1306] device is 0x%x clean screen finished", mCurrentDevice->address);
+}
+
+void ICACHE_FLASH_ATTR SSD1306_flush() {
+	if (mCurrentDevice == NULL || mCurrentDevice->address == SSD1306_SLAVE_NO_ADDRESS) {
+		return;
+	}
+	flushFrameBuffer(mCurrentDevice);
 }
 
 void ICACHE_FLASH_ATTR SSD1306_reset() {

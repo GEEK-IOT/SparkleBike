@@ -36,6 +36,12 @@
     <string name="WiFiEnabledDialog_Message">Please turn the WiFi on</string>
     <string name="WiFiEnabledDialog_Confirm">Confirm</string>
     <string name="WiFiEnabledDialog_Cancel">Cancel</string>
+    <string name="APGuideDialog_Title">Guide to AP</string>
+    <string name="APGuideDialog_SSID_Hint">AP SSID</string>
+    <string name="APGuideDialog_Password_Hint">AP password</string>
+    <string name="APGuideDialog_Rememeber_AP">Remember this AP</string>
+    <string name="APGuideDialog_Confirm">Guide</string>
+    <string name="APGuideDialog_Cancel">Cancel</string>
     <string name="SharedElementName_FloatingActionButton">FloatingActionButton</string>
     <string name="SharedElementName_TitleText">TitleText</string>
     <string name="SharedElementName_DeviceItem">DeviceItem</string>

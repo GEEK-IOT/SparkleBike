@@ -10,14 +10,15 @@
 
 #include "cosmart/cosmart.h"
 
-void        WiFi_initialize();
-void        WiFi_setupAPAndSTA();
-void        WiFi_setupAPRecevier();
-void        WiFi_setupProtocolBridge();
-void        WiFi_connectAP();
-void        WiFi_disconnectAP();
-char*       WiFi_generateSTAIdentify();
-void        WiFi_freeSTAIdentify(char** identify);
-void        WiFi_updateNTPTime();
+void  WiFi_initialize();
+void  WiFi_setupAPAndSTA();
+void  WiFi_setupAPRecevier();
+void  WiFi_setupProtocolBridge();
+sint8 WiFi_getSTARssi();
+void  WiFi_connectAP();
+void  WiFi_disconnectAP();
+char* WiFi_generateSTAIdentify();
+void  WiFi_freeSTAIdentify(char** identify);
+void  WiFi_updateNTPTime();
 
 #endif /* APP_INCLUDE_COSMART_WIFIMANAGER_H_ */

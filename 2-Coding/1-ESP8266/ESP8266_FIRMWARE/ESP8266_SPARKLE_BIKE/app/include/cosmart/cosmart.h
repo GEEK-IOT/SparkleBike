@@ -11,8 +11,8 @@
 #include "c_types.h"
 
 #define COSMART_VERSION        "v1.00["__DATE__"]"
-#define SSID_PREFIX            "CoSmart"
-#define SSID_FORMAT            "CoSmart%02x%02x%02x%02x%02x%02x"
+#define SSID_PREFIX            "▶CoSmart_"
+#define SSID_FORMAT            "▶CoSmart_%02X%02X%02X%02X%02X%02X"
 #define COSMART_INDENTIFY      "cosmart"
 #define AP_CHANNEL             5
 #define AP_MAX_CONNECTION_SIZE 4

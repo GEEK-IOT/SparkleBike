@@ -6,6 +6,8 @@ import android.content.Context;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.cobox.cosmart.devicebridge.Config;
@@ -22,6 +24,7 @@ import java.util.List;
 public class ESP8266Scaner implements WifiStateBroadcastReceiver.OnNetworkStateChangedListener, WifiStateBroadcastReceiver.OnWifiRSSIChangedListener, WifiStateBroadcastReceiver.OnWifiScanedCompletedListener, WifiStateBroadcastReceiver.OnWifiStateChangedListener {
 
     private static final String TAG = "ESP8266Scaner";
+    private static final int    CONTINUE_SCAN_DELAY = 3000;
 
     private Context                    mContext                    = null;
     private WifiManager                mWiFiManager                = null;
@@ -29,6 +32,8 @@ public class ESP8266Scaner implements WifiStateBroadcastReceiver.OnNetworkStateC
     private boolean                    mIsContinueScan             = false;
     private OnDeviceScanListener       mOnDeviceScanListener       = null;
     private List<Device>               mDeviceList                 = null;
+    private Handler                    mHandler                    = new Handler(Looper.getMainLooper());
+    private Runnable                   mDelayScanRunnable          = null;
 
     public ESP8266Scaner(Context context) {
         mContext                    = context;
@@ -41,6 +46,12 @@ public class ESP8266Scaner implements WifiStateBroadcastReceiver.OnNetworkStateC
 
     private void initializeComponments() {
         mWifiStateBroadcastReceiver.register(mContext);
+        mDelayScanRunnable = new Runnable() {
+            @Override
+            public void run() {
+                scan();
+            }
+        };
     }
 
     private void initializeListeners() {
@@ -62,10 +73,12 @@ public class ESP8266Scaner implements WifiStateBroadcastReceiver.OnNetworkStateC
 
     public void cancel() {
         mIsContinueScan = false;
+        mHandler.removeCallbacks(mDelayScanRunnable);
     }
 
     public void release() {
         mWifiStateBroadcastReceiver.unregister(mContext);
+        mHandler.removeCallbacks(mDelayScanRunnable);
     }
 
     @Override
@@ -85,8 +98,11 @@ public class ESP8266Scaner implements WifiStateBroadcastReceiver.OnNetworkStateC
         Iterator<ScanResult> scanResultItr = mWiFiManager.getScanResults().iterator();
         while (scanResultItr.hasNext()) {
             ScanResult result = scanResultItr.next();
+            String     ssid   = result.SSID;
             Log.i(TAG, String.format("[onWifiScanedCompleted] #%d SSID: %s, BSSID: %s", i++, result.SSID, result.BSSID));
-           // if (result.SSID.startsWith(Config.COSMART_DEVICE_SSID_PREFIX)) {
+            if (ssid.startsWith(Config.COSMART_DEVICE_SSID_PREFIX)
+                    && ssid.length() > (Config.COSMART_DEVICE_SSID_PREFIX.length() + 12 + 1)
+                    && ssid.charAt(ssid.length() - 13) == Config.COSMART_DEVICE_SSID_SPLITER) {
                 synchronized (mDeviceList) {
                     boolean hasUpdatedResult = false;
                     for (Device device : mDeviceList) {
@@ -101,16 +117,15 @@ public class ESP8266Scaner implements WifiStateBroadcastReceiver.OnNetworkStateC
                         mDeviceList.add(device);
                     }
                 }
-           // }
+            }
         }
         fireScaningEvent();
 
         // Rescan
         if (mIsContinueScan) {
-            mWiFiManager.startScan();
-        } else {
-            fireScanEndEvent();
+            mHandler.postDelayed(mDelayScanRunnable, CONTINUE_SCAN_DELAY);
         }
+        fireScanEndEvent();
     }
 
     @Override

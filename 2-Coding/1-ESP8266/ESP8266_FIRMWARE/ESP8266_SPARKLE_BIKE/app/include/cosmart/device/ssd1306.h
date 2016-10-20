@@ -76,7 +76,10 @@
 #define DEVICE_WRITE_RETRY_COUNT            3    // 写入IIC从机设备重试次数
 #define SLAVE_DEVICE_COUNT                  2    // 额定设备挂在数量
 
-extern uint8 ASCII[][7];
+extern uint8 ASCII       [][7];
+extern uint8 ICON_WIFI   [];
+extern uint8 ICON_BATTERY[];
+extern uint8 ICON_NO_WIFI[];
 
 typedef struct {
 	uint8  address;
@@ -94,7 +97,9 @@ bool SSD1306_bindDevice(int index);
 void SSD1306_drawPixels(uint16 x, uint16 y, uint16 width, uint16 height, const uint8* pixels);
 void SSD1306_drawBuffer(uint16 startColumn, uint16 endColumn, uint16 startPage, uint16 endPage, const uint8* buffer);
 void SSD1306_drawText(char* text, uint16 x, uint16 y);
+void SSD1306_erase(uint16 x, uint16 y, uint16 width, uint16 height);
 void SSD1306_cleanScreen();
+void SSD1306_flush();
 void SSD1306_reset();
 
 #endif /* APP_INCLUDE_COSMART_DEVICE_SSD1306_H_ */

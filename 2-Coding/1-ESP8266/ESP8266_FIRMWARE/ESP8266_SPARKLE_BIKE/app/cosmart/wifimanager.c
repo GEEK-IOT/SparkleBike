@@ -87,6 +87,16 @@ void ICACHE_FLASH_ATTR WiFi_setupProtocolBridge() {
 	CMDServer_startCommandServer();
 }
 
+sint8 ICACHE_FLASH_ATTR WiFi_getSTARssi() {
+	sint8 rssi = wifi_station_get_rssi();
+	if (rssi < 10) {
+		return rssi - 10;
+	} else {
+		// Error code
+		return rssi;
+	}
+}
+
 void ICACHE_FLASH_ATTR WiFi_connectAP(const char* ssid, const char* password) {
 	Log_printf(LOG_WIFI_CONNECT_TO_AP, ssid);
 	struct station_config staConfig = {0};

@@ -44,6 +44,7 @@ public abstract class DialogWindow extends ColorActivity {
     private View          mContentView           = null;
     private ViewGroup     mSceneRoot             = null;
     private Toolbar       mToolbar               = null;
+    private boolean       mIsFinishingActivity   = false;
     public  int           mPauseBackgroundColor  = 0x00000000;
     public  int           mResumeBackgroundColor = 0x00000000;
     public  int           mPauseStatusBarColor   = 0x00000000;
@@ -66,8 +67,8 @@ public abstract class DialogWindow extends ColorActivity {
         findViews();
     }
 
-    private void initializeIntent() {
-        Intent intent         = getIntent();
+    protected void initializeIntent() {
+        Intent  intent         = getIntent();
         boolean needLaunchAnim = false;
         if (intent != null) {
             needLaunchAnim         = intent.getBooleanExtra(KEY_NEED_LAUNCH_ANIM, false);
@@ -90,6 +91,13 @@ public abstract class DialogWindow extends ColorActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        mIsFinishingActivity = false;
+        invalidateOptionsMenu();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         initializeIntent();
@@ -104,6 +112,9 @@ public abstract class DialogWindow extends ColorActivity {
             Animatable icon = (Animatable) closeItem.getIcon();
             if (icon.isRunning()) {
                 icon.stop();
+            }
+            if (mIsFinishingActivity) {
+                icon.start();
             }
         }
         return true;
@@ -133,6 +144,13 @@ public abstract class DialogWindow extends ColorActivity {
                 finishAfterTransition();
             }
         }, 250);
+    }
+
+    @Override
+    public void onBackPressed() {
+        mIsFinishingActivity = true;
+        invalidateOptionsMenu();
+        finishSettingWindowDelay();
     }
 
     private void setupActionBar() {
@@ -254,8 +272,12 @@ public abstract class DialogWindow extends ColorActivity {
 
     private void findViews() {
         mToolbar     = (Toolbar) findViewById(R.id.ToolBar);
-        mContentView = findViewById(R.id.Layout_SettingPage);
+        mContentView = findViewById(R.id.Layout_DialogWindow);
         mSceneRoot   = (ViewGroup) findViewById(R.id.Layout_ContentContainer);
+    }
+
+    protected View getContentView() {
+        return mContentView;
     }
 
     @Override

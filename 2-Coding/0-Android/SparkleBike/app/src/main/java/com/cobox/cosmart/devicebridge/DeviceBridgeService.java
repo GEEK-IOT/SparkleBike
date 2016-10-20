@@ -8,6 +8,7 @@ import android.os.IBinder;
 import com.cobox.cosmart.devicebridge.devicelayer.ESP8266Scaner;
 import com.cobox.cosmart.devicebridge.listeners.OnDeviceConnectionListener;
 import com.cobox.cosmart.devicebridge.listeners.OnDeviceScanListener;
+import com.cobox.cosmart.devicebridge.listeners.OnGuideDeviceListener;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -44,22 +45,28 @@ public class DeviceBridgeService extends Service {
 
             @Override
             public void onScanStart() {
-                for (OnDeviceScanListener listener : mOnDeviceScanListeners) {
-                    listener.onScanStart();
+                synchronized (mOnDeviceScanListeners) {
+                    for (OnDeviceScanListener listener : mOnDeviceScanListeners) {
+                        listener.onScanStart();
+                    }
                 }
             }
 
             @Override
             public void onDeviceScaned(List<Device> deviceList) {
-                for (OnDeviceScanListener listener : mOnDeviceScanListeners) {
-                    listener.onDeviceScaned(deviceList);
+                synchronized (mOnDeviceScanListeners) {
+                    for (OnDeviceScanListener listener : mOnDeviceScanListeners) {
+                        listener.onDeviceScaned(deviceList);
+                    }
                 }
             }
 
             @Override
             public void onScanCompleted() {
-                for (OnDeviceScanListener listener : mOnDeviceScanListeners) {
-                    listener.onScanCompleted();
+                synchronized (mOnDeviceScanListeners) {
+                    for (OnDeviceScanListener listener : mOnDeviceScanListeners) {
+                        listener.onScanCompleted();
+                    }
                 }
             }
 
@@ -128,6 +135,10 @@ public class DeviceBridgeService extends Service {
     }
 
     public void disconnectDevice(Device device) {
+        // TODO
+    }
+
+    public void guideDeviceToAP(Device device, String apSSID, String apPassword, OnGuideDeviceListener listener) {
         // TODO
     }
 }

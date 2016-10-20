@@ -6,7 +6,6 @@ import android.graphics.ColorFilter;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Layout;
@@ -14,11 +13,13 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.cobox.cosmart.devicebridge.Config;
 import com.cobox.cosmart.devicebridge.Device;
 import com.cobox.utils.Differ;
 
@@ -36,13 +37,18 @@ import cn.geekiot.sparklebike.R;
  */
 public class DeviceRecyclerViewHelper {
 
-    private RecyclerView        mRecyclerView     = null;
-    private List<Device>        mDeviceList       = null;
-    private DeviceListDiffer    mDeviceListDiffer = null;
-    private DeviceAdapter       mAdapter          = null;
-    private LinearLayoutManager mLayoutManager    = null;
-    private DeviceComparator    mDeviceComparator = null;
-    private TextDrawable        mEmptyBackground  = null;
+    private RecyclerView        mRecyclerView        = null;
+    private List<Device>        mDeviceList          = null;
+    private DeviceListDiffer    mDeviceListDiffer    = null;
+    private DeviceAdapter       mAdapter             = null;
+    private LinearLayoutManager mLayoutManager       = null;
+    private DeviceComparator    mDeviceComparator    = null;
+    private TextDrawable        mEmptyBackground     = null;
+    private OnItemClickListener mOnItemClickListener = null;
+
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position, Device device);
+    }
 
     public DeviceRecyclerViewHelper(RecyclerView recyclerView) {
         mRecyclerView     = recyclerView;
@@ -54,6 +60,20 @@ public class DeviceRecyclerViewHelper {
         mLayoutManager.setAutoMeasureEnabled(true);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setItemAnimator(new DeviceRecyclerViewItemAnimator());
+        mAdapter.setOnClickedListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                DeviceViewHolder holder   = (DeviceViewHolder) mRecyclerView.getChildViewHolder(view);
+                int              position = holder.getAdapterPosition();
+                Device           device   = mAdapter.getItemDevice(position);
+                if (mOnItemClickListener != null) {
+                    mOnItemClickListener.onItemClick(view, position, device);
+                }
+            }
+
+        });
     }
 
     public void setEmptyTextParameters(int textResid, int textSizeResid, int textColorResid) {
@@ -90,6 +110,10 @@ public class DeviceRecyclerViewHelper {
                 mAdapter.notifyItemInserted(add);
             }
         }
+    }
+
+    public void setOnItemClickedListener(OnItemClickListener listener) {
+        mOnItemClickListener = listener;
     }
 
     /**
@@ -146,12 +170,13 @@ public class DeviceRecyclerViewHelper {
      */
     private class DeviceAdapter extends RecyclerView.Adapter {
 
-        private Context      mContext          = null;
-        private List<Device> mDataSet          = null;
-        private Drawable     mDblDefaultDevice = null;
-        private Drawable     mDblStateInfo     = null;
-        private Drawable     mDblStateQuestion = null;
-        private Drawable     mDblStateExchange = null;
+        private Context         mContext           = null;
+        private List<Device>    mDataSet           = null;
+        private Drawable        mDblDefaultDevice  = null;
+        private Drawable        mDblStateInfo      = null;
+        private Drawable        mDblStateQuestion  = null;
+        private Drawable        mDblStateExchange  = null;
+        private OnClickListener mOnClickedListener = null;
 
         public DeviceAdapter(Context context) {
             mContext          = context;
@@ -161,6 +186,10 @@ public class DeviceRecyclerViewHelper {
             mDblStateExchange = context.getDrawable(R.drawable.ic_device_exchange);
         }
 
+        public void setOnClickedListener(OnClickListener listener) {
+            mOnClickedListener = listener;
+        }
+
         public void setDataSet(List<Device> dataSet) {
             mDataSet = new ArrayList<>(dataSet);
         }
@@ -168,6 +197,7 @@ public class DeviceRecyclerViewHelper {
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(mContext).inflate(R.layout.layout_scanning_device_item, null);
+            itemView.setOnClickListener(mOnClickedListener);
             DeviceViewHolder holder = new DeviceViewHolder(itemView);
             return holder;
         }
@@ -183,8 +213,10 @@ public class DeviceRecyclerViewHelper {
             }
 
             DeviceViewHolder viewHolder = (DeviceViewHolder) holder;
-            if (title.length() > 12) {
-                viewHolder.setTitle(title.substring(0, title.length() - 12));
+            if (title.startsWith(Config.COSMART_DEVICE_SSID_PREFIX)
+                    && title.length() > (Config.COSMART_DEVICE_SSID_PREFIX.length() + 12 + 1)
+                    && title.charAt(title.length() - 13) == Config.COSMART_DEVICE_SSID_SPLITER) {
+                viewHolder.setTitle(title.substring(1, title.length() - 13));
             } else {
                 viewHolder.setTitle(title);
             }
@@ -198,6 +230,16 @@ public class DeviceRecyclerViewHelper {
             return mDataSet == null ? 0 : mDataSet.size();
         }
 
+        public Device getItemDevice(int position) {
+            synchronized (mDataSet) {
+                int size = mDataSet.size();
+                if (position < 0 || position >= size) {
+                    return null;
+                } else {
+                    return mDataSet.get(position);
+                }
+            }
+        }
     }
 
     /**
@@ -331,4 +373,5 @@ public class DeviceRecyclerViewHelper {
             getPadding(mPadding);
         }
     }
+
 }

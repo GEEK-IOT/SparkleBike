@@ -3,17 +3,26 @@ package cn.geekiot.sparklebike.page;
 import android.Manifest;
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ViewUtils;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewAnimationUtils;
 
 import com.cobox.cosmart.devicebridge.Device;
 import com.cobox.cosmart.devicebridge.DeviceBridge;
 import com.cobox.cosmart.devicebridge.listeners.OnBridgeConnectionListener;
+import com.cobox.cosmart.devicebridge.listeners.OnDeviceConnectionListener;
 import com.cobox.cosmart.devicebridge.listeners.OnDeviceScanListener;
 
 import java.util.ArrayList;
@@ -21,6 +30,7 @@ import java.util.List;
 
 import cn.geekiot.sparklebike.R;
 import cn.geekiot.sparklebike.adapter.DeviceManager;
+import cn.geekiot.sparklebike.ui.APGuideDialog;
 import cn.geekiot.sparklebike.ui.DeviceRecyclerViewHelper;
 import cn.geekiot.sparklebike.ui.DialogWindow;
 import cn.geekiot.sparklebike.ui.WiFiEnableDialog;
@@ -31,11 +41,15 @@ import cn.geekiot.sparklebike.ui.WiFiEnableDialog;
  * @Date 2016-10-03 15:56:08
  * Copyright (c) 2016 Cocoonshu
  */
-public class ScanningWindow extends DialogWindow implements OnBridgeConnectionListener, OnDeviceScanListener {
+public class ScanningWindow extends DialogWindow implements OnBridgeConnectionListener,
+                                                            OnDeviceScanListener,
+                                                            DeviceRecyclerViewHelper.OnItemClickListener {
 
     public static final String TAG = "ScanningWindow";
 
-    private static final int KEY_PERMISSIONS_REQUEST_FOR_WIFI_SCAN = 0x0001;
+    private static final int    KEY_PERMISSIONS_REQUEST_FOR_WIFI_SCAN = 0x0001;
+    private static final String KEY_HOTPOT_X                          = "hotpotX";
+    private static final String KEY_HOTPOT_Y                          = "hotpotY";
 
     private static final String[] PERMISSIONS = new String[] {
             Manifest.permission.ACCESS_WIFI_STATE,
@@ -44,6 +58,8 @@ public class ScanningWindow extends DialogWindow implements OnBridgeConnectionLi
             Manifest.permission.ACCESS_COARSE_LOCATION
     };
 
+    private Point                    mHotpot               = new Point();
+    private Handler                  mHandler              = new Handler(Looper.getMainLooper());
     private DeviceRecyclerViewHelper mDeviceListViewHelper = null;
     private RecyclerView             mDeviceList           = null;
     private DeviceBridge             mBridge               = DeviceManager.getDeviceBridge();
@@ -93,9 +109,23 @@ public class ScanningWindow extends DialogWindow implements OnBridgeConnectionLi
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
+    protected void initializeIntent() {
+        super.initializeIntent();
+        Intent intent = getIntent();
+        if (intent != null) {
+            mHotpot.x = intent.getIntExtra(KEY_HOTPOT_X, -1);
+            mHotpot.y = intent.getIntExtra(KEY_HOTPOT_Y, -1);
+        }
+        if (mHotpot.x == -1 && mHotpot.y == -1) {
+            getWindow().getWindowManager().getDefaultDisplay().getSize(mHotpot);
+        }
+    }
+
+    @Override
     protected void onContentViewInflated() {
         mDeviceList = (RecyclerView) findViewById(R.id.RecyclerView_DeviceList);
         mDeviceListViewHelper = new DeviceRecyclerViewHelper(mDeviceList);
+        mDeviceListViewHelper.setOnItemClickedListener(this);
         mDeviceListViewHelper.setEmptyTextParameters(
                 R.string.ScanningWindow_NoDeviceFound,
                 R.dimen.ScanningWindow_EmptyText_TextSize,
@@ -103,15 +133,45 @@ public class ScanningWindow extends DialogWindow implements OnBridgeConnectionLi
     }
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         connectDeviceBridgeService();
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                ViewAnimationUtils.createCircularReveal(
+                        getContentView(),
+                        1020, 1860,
+                        0, (int)Math.sqrt(1020 * 1020 + 1860 * 1860)).setDuration(400).start();
+            }
+        });
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         disconnectDeviceBridgeService();
+    }
+
+    @Override
+    public void finishAfterTransition() {
+        super.finishAfterTransition();
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                ViewAnimationUtils.createCircularReveal(
+                        getContentView(),
+                        mHotpot.x, mHotpot.y,
+                        (int)Math.sqrt(Math.pow(mHotpot.x, 2) + Math.pow(mHotpot.y, 2)), 0)
+                        .setDuration(250)
+                        .start();
+            }
+        });
     }
 
     @Override
@@ -225,6 +285,18 @@ public class ScanningWindow extends DialogWindow implements OnBridgeConnectionLi
 
     private void disconnectDeviceBridgeService() {
         mBridge.disconnectService(ScanningWindow.this);
+    }
+
+    @Override
+    public void onItemClick(View view, int position, Device device) {
+        APGuideDialog.createDialog(ScanningWindow.this, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (which == DialogInterface.BUTTON_POSITIVE) {
+                    // mBridge.guideDeviceToAP(device);
+                }
+            }
+        }).show();
     }
 
 }

@@ -81,6 +81,8 @@
     <style name="AppTheme.DialogWindow">
         <item name="android:windowContentTransitions">true</item>
         <item name="android:statusBarColor">@color/DialogWindowActivity_Background</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--<item name="android:windowIsTranslucent">true</item>-->
     </style>
 
 </resources>
