@@ -14,7 +14,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.ViewUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -22,7 +21,6 @@ import android.view.ViewAnimationUtils;
 import com.cobox.cosmart.devicebridge.Device;
 import com.cobox.cosmart.devicebridge.DeviceBridge;
 import com.cobox.cosmart.devicebridge.listeners.OnBridgeConnectionListener;
-import com.cobox.cosmart.devicebridge.listeners.OnDeviceConnectionListener;
 import com.cobox.cosmart.devicebridge.listeners.OnDeviceScanListener;
 
 import java.util.ArrayList;

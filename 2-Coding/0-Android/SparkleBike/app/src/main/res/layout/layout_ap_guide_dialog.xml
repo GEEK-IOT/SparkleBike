@@ -4,11 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingTop="10dp"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
+    android:paddingLeft="30dp"
+    android:paddingRight="30dp"
     android:orientation="vertical">
 
+    <requestFocus/>
+
     <android.support.design.widget.TextInputLayout
+        android:id="@+id/TextInputLayout_SSID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/APGuideDialog_SSID_Hint"
@@ -18,12 +21,14 @@
         app:counterMaxLength="32">
 
         <android.support.design.widget.TextInputEditText
+            android:id="@+id/EditText_SSID"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
+        android:id="@+id/TextInputLayout_Password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/APGuideDialog_Password_Hint"
@@ -33,13 +38,14 @@
         app:counterMaxLength="64">
 
         <android.support.design.widget.TextInputEditText
+            android:id="@+id/EditText_Password"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
+            android:layout_height="wrap_content" />
 
     </android.support.design.widget.TextInputLayout>
 
     <CheckBox
+        android:id="@+id/CheckBox_RememberAP"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/APGuideDialog_Rememeber_AP"/>
