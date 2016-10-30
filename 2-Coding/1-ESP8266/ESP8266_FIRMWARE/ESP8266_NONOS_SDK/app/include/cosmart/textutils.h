@@ -47,6 +47,10 @@ const char* Text_physicalMode2STR(enum phy_mode physicalMode);
 
 const char* Text_toConnectReasonString(int connectReason);
 
+char* Text_asciiToUtf8(const char* ascii);
+
+uint16 Text_utf8Length(const char* utf8);
+
 int Text_indexOfOrder(const char* strSource, const char mod, bool forward, int order);
 
 #endif /* APP_INCLUDE_COSMART_TEXTUTILS_H_ */

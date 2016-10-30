@@ -217,3 +217,52 @@ int ICACHE_FLASH_ATTR Text_indexOfOrder(const char* src, const char mod, bool fo
 	}
 	return -1;
 }
+
+char* ICACHE_FLASH_ATTR Text_asciiToUtf8(const char* ascii) {
+	if (ascii == NULL)
+		return NULL;
+
+	uint16  size    = os_strlen(ascii);
+	uint16* utf8    = NULL;
+	uint8*  unicode = NULL;
+
+	utf8 = (uint16* )os_malloc(sizeof(uint16) * 2 * size - 1);
+	utf8[0] = 2 * size - 1;
+
+	size = 0;
+	while (ascii[size] != '\0') {
+		unsigned char character = ascii[size];
+		unsigned char unicode[2];
+		if ((character < 192) && (character != 168) && (character != 184) ) {
+			unicode[0] = 0;
+			unicode[1] = character;
+		} else if (character == 168) {
+			unicode[0] = 208;
+			unicode[1] = 129;
+		} else if (character == 184) {
+			unicode[0] = 209;
+			unicode[1] = 145;
+		} else if (character < 240) {
+			unicode[0] = 208;
+			unicode[1] = character - 48;
+		} else if (character) {
+			unicode[0] = 209;
+			unicode[1] = character - 112;
+		}
+
+		utf8[2 * size + 1] = unicode[0];
+		utf8[2 * size + 2] = unicode[1];
+		size++;
+	}
+
+	return utf8;
+}
+
+uint16 ICACHE_FLASH_ATTR Text_utf8Length(const char* utf8) {
+	if (utf8 == NULL) {
+		return 0;
+	} else {
+		uint16* pointer = (uint16* )utf8;
+		return *pointer;
+	}
+}
