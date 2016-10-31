@@ -10,6 +10,9 @@
 
 #include "c_types.h"
 
+#define MQTT_STREAM_INVALID    0 // ignore
+#define MQTT_PROTOCOL_ILLEGAL -1 // should disconnect
+
 typedef struct {
 	uint8  protocolLevel;
 	uint16 keepAlive;
@@ -55,23 +58,23 @@ typedef struct {
 
 #pragma pack ()
 
-uint8 MQTTProcotol_MakeFixedHeader(ProtocolStream* stream, uint8 packetType, uint8 dup, uint8 QoS, uint8 retain, uint32 remainLength);
-uint8 MQTTProcotol_GeneratePacketIndenitifier();
+uint8 MQTTProcotol_makeFixedHeader(ProtocolStream* stream, uint8 packetType, uint8 dup, uint8 QoS, uint8 retain, uint32 remainLength);
+uint8 MQTTProcotol_generatePacketIndenitifier();
 uint8 MQTTProcotol_packEncoededStream(ProtocolStream* stream);
 
-uint8 MQTTProcotol_EncodeConnectPacket(ProtocolStream* stream, const char* clientIndentifier, bool cleanSession, const char* userName, const char* password, const char* willTopic, const char* willMessage, uint16 keepAliveTimeout);
-uint8 MQTTProcotol_DecodeConnectAckPacket(ProtocolStream* stream, MQTTSession* session);
-uint8 MQTTProcotol_CreatePublishPacket(ProtocolStream* stream);
-uint8 MQTTProcotol_CreatePublishAclPacket(ProtocolStream* stream);
-uint8 MQTTProcotol_CreatePublishReceivedPacket(ProtocolStream* stream);
-uint8 MQTTProcotol_CreatePublishReleasePacket(ProtocolStream* stream);
-uint8 MQTTProcotol_CreatePublishCompleletedPacket(ProtocolStream* stream);
-uint8 MQTTProcotol_CreateSubscribePacket(ProtocolStream* stream);
-uint8 MQTTProcotol_CreateSubscribeAckPacket(ProtocolStream* stream);
-uint8 MQTTProcotol_CreateUnsubscribePacket(ProtocolStream* stream);
-uint8 MQTTProcotol_CreateUnsubscribeAckPacket(ProtocolStream* stream);
-uint8 MQTTProcotol_EncodePingPacket(ProtocolStream* stream);
-uint8 MQTTProcotol_DecodePingAckPacket(ProtocolStream* stream);
-uint8 MQTTProcotol_EncodeDisconnectPacket(ProtocolStream* stream);
+int   MQTTProcotol_encodeConnectPacket(ProtocolStream* stream, const char* clientIndentifier, bool cleanSession, const char* userName, const char* password, const char* willTopic, const char* willMessage, uint16 keepAliveTimeout);
+int   MQTTProcotol_decodeConnectAckPacket(ProtocolStream* stream, MQTTSession* session);
+int   MQTTProcotol_createPublishPacket(ProtocolStream* stream);
+int   MQTTProcotol_createPublishAclPacket(ProtocolStream* stream);
+int   MQTTProcotol_createPublishReceivedPacket(ProtocolStream* stream);
+int   MQTTProcotol_createPublishReleasePacket(ProtocolStream* stream);
+int   MQTTProcotol_createPublishCompleletedPacket(ProtocolStream* stream);
+int   MQTTProcotol_createSubscribePacket(ProtocolStream* stream);
+int   MQTTProcotol_createSubscribeAckPacket(ProtocolStream* stream);
+int   MQTTProcotol_createUnsubscribePacket(ProtocolStream* stream);
+int   MQTTProcotol_createUnsubscribeAckPacket(ProtocolStream* stream);
+int   MQTTProcotol_encodePingPacket(ProtocolStream* stream);
+int   MQTTProcotol_decodePingAckPacket(ProtocolStream* stream);
+int   MQTTProcotol_encodeDisconnectPacket(ProtocolStream* stream);
 
 #endif /* APP_INCLUDE_COSMART_MQTT_MQTT_PROTOCOL_H_ */

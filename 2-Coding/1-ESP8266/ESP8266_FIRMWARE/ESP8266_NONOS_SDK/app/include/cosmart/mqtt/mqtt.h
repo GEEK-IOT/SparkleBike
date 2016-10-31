@@ -9,10 +9,16 @@
 #define APP_INCLUDE_COSMART_MQTT_MQTT_H_
 
 #include "c_types.h"
+#include "espconn.h"
 
 #define PROTOCOL_LEVEL_3_1_1 0x04
 #define MAX_REMAIN_LENGTH    268435455
 #define MQTT_NAME            "MQTT"
+#define MQTT_SERVER          "45.55.5.8"
+#define MQTT_PORT            8461
+#define MQTT_KEEP_ALIVE      120
+#define MQTT_QoS             MQTT_QoS_AT_LEAST_ONCE
+#define MQTT_RETAIN_MESSAGE  true
 
 enum QoS {
 	MQTT_QoS_AT_MOST_ONCE  = 0x00,
@@ -47,9 +53,34 @@ enum PacketType {
 };
 
 typedef struct {
-	uint8 protocolLevel;
+	const char* clientId;
+	const char* username;
+	const char* password;
+	const char* server;
+	uint32      port;
+	uint8       protocolLevel;
+	uint16      keepAlive;
+	uint8       QoS;
+	bool        isRetain;
+	bool        enabledSSL;
+
+	struct espconn* connection;
+	ip_addr_t       hostIP;
 } MQTTClient;
 
-const char* MQTT_GetClientIndentifier();
+typedef void OnMessageReceived(const char* topic, const char* message);
+
+void        MQTT_initialize();
+void        MQTT_setService(const char* server, uint32 port);
+void        MQTT_setConnectParameters(uint8 protocolLevel, uint16 keepAlive, uint8 QoS, bool isRetain, bool isSSL);
+void        MQTT_setAuthentication(const char* clientID, const char* username, const char* password);
+void        MQTT_connect();
+void        MQTT_disconnect();
+void        MQTT_subscribe();
+void        MQTT_unsubscribe();
+void        MQTT_publish(const char* topic, const char* message);
+void        MQTT_setOnReceivedCallback(OnMessageReceived* listener);
+const char* MQTT_getClientIndentifier();
+
 
 #endif /* APP_INCLUDE_COSMART_MQTT_MQTT_H_ */

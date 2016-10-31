@@ -30,3 +30,67 @@
 */
 
 #include "cosmart/mqtt/mqtt.h"
+#include "cosmart/config.h"
+#include "user_interface.h"
+
+typedef struct espconn Connnection;
+
+LOCAL void onDNSResponding(const char* name, ip_addr_t* ip, void* args);
+
+LOCAL MQTTClient* mClient = NULL;
+
+void ICACHE_FLASH_ATTR MQTT_initialize() {
+	Log_printfln("");
+	Log_printfln("[MQTT] MQTT initialized");
+
+	mClient = (MQTTClient*) os_malloc(sizeof(MQTTClient));
+	os_memset(mClient, NULL, sizeof(MQTTClient));
+
+	MQTT_setService(MQTT_SERVER, MQTT_PORT);
+	MQTT_setConnectParameters(MQTT_KEEP_ALIVE, MQTT_QoS, MQTT_RETAIN_MESSAGE);
+	MQTT_setAuthentication(MQTT_getClientIndentifier(), MQTT_USER, MQTT_PASSWORD);
+}
+
+void ICACHE_FLASH_ATTR MQTT_setService(const char* server, uint32 port) {
+	mClient->server = server;
+	mClient->port   = port;
+
+	if (mClient->connection == NULL) {
+		mClient->connection          = (Connnection* )os_malloc(sizeof(Connnection));
+		mClient->connection->type    = ESPCONN_TCP;
+		mClient->connection->state   = ESPCONN_NONE;
+		mClient->connection->reverse = mClient;
+	}
+	if (mClient->connection->proto.tcp == NULL) {
+		mClient->connection->proto.tcp = (esp_tcp *)os_malloc(sizeof(esp_tcp));
+	}
+	mClient->connection->proto.tcp->local_port  = espconn_port();
+	mClient->connection->proto.tcp->remote_port = mClient->port;
+
+	espconn_gethostbyname(&mClient->connection, mClient->server, &mClient->hostIP, onDNSResponding);
+}
+
+void ICACHE_FLASH_ATTR MQTT_setConnectParameters(uint8 protocolLevel, uint16 keepAlive, uint8 QoS, bool isRetain, bool isSSL) {
+	mClient->protocolLevel = PROTOCOL_LEVEL_3_1_1;
+	mClient->keepAlive     = keepAlive;
+	mClient->QoS           = QoS;
+	mClient->isRetain      = isRetain;
+	mClient->enabledSSL    = isSSL;
+}
+
+void ICACHE_FLASH_ATTR MQTT_setAuthentication(const char* clientId, const char* username, const char* password) {
+	mClient->clientId = clientId;
+	mClient->username = username;
+	mClient->password = password;
+}
+
+LOCAL ICACHE_FLASH_ATTR void onDNSResponding(const char* name, ip_addr_t* ip, void* args) {
+	Log_printfln("[MQTT] mapped %s to %03d.%03d.%03d.%03d",
+			name, *((uint8*)ip->addr), *((uint8*)ip->addr + 1), *((uint8*)ip->addr + 2), *((uint8*)ip->addr + 3));
+
+	struct espconn *connection = (struct espconn *)args;
+	MQTTClient* client = (MQTTClient *)connection->reverse;
+}
+
+void ICACHE_FLASH_ATTR MQTT_connect() {}
+void ICACHE_FLASH_ATTR MQTT_disconnect() {}

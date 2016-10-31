@@ -9,13 +9,13 @@
 #include "cosmart/textutils.h"
 #include "mem.h"
 
-#define DELETE_POINTER(ptr) if (ptr != NULL) {os_free(ptr); ptr == NULL;}
+#define DELETE_POINTER(ptr) if (ptr != NULL) {os_free(ptr); ptr = NULL;}
 
 LOCAL uint16 sPacketIndentifier = 0;
 
 LOCAL uint8  makeFixedHeaderRemainLengthStream(uint32 length, uint8** stream);
 
-uint8 ICACHE_FLASH_ATTR MQTTProcotol_MakeFixedHeader(ProtocolStream* stream, uint8 packetType, uint8 dup, uint8 QoS, uint8 retain, uint32 remainLength) {
+uint8 ICACHE_FLASH_ATTR MQTTProcotol_makeFixedHeader(ProtocolStream* stream, uint8 packetType, uint8 dup, uint8 QoS, uint8 retain, uint32 remainLength) {
 	if (stream == NULL) {
 		return 0;
 	}
@@ -97,11 +97,36 @@ LOCAL uint8 ICACHE_FLASH_ATTR makeFixedHeaderRemainLengthStream(uint32 length, u
 	return lengthStreamSize;
 }
 
-uint8 ICACHE_FLASH_ATTR MQTTProcotol_GeneratePacketIndenitifier() {
+uint8 ICACHE_FLASH_ATTR MQTTProcotol_generatePacketIndenitifier() {
 	return sPacketIndentifier++;
 }
 
-uint8 ICACHE_FLASH_ATTR MQTTProcotol_EncodeConnectPacket(
+uint8 ICACHE_FLASH_ATTR MQTTProcotol_packEncoededStream(ProtocolStream* stream) {
+	if (stream == NULL) {
+		return 0;
+	}
+
+	uint8* pointer   = NULL;
+	uint16 totalSize = (stream->fixedHeader != NULL    ? stream->fixedHeaderLength : 0)
+			         + (stream->variableHeader != NULL ? stream->variableHeaderLength : 0)
+					 + (stream->payload != NULL        ? stream->payloadLength : 0);
+
+	DELETE_POINTER(stream->encodedStream);
+	stream->encodedStream = (uint8 *) os_malloc(totalSize);
+	pointer = stream->encodedStream;
+
+	os_memcpy(pointer, stream->fixedHeader,    stream->fixedHeaderLength);    pointer += stream->fixedHeaderLength;
+	os_memcpy(pointer, stream->variableHeader, stream->variableHeaderLength); pointer += stream->variableHeaderLength;
+	os_memcpy(pointer, stream->payload,        stream->payloadLength);        pointer += stream->payloadLength;
+
+	DELETE_POINTER(stream->fixedHeader);    stream->fixedHeaderLength    = 0;
+	DELETE_POINTER(stream->variableHeader); stream->variableHeaderLength = 0;
+	DELETE_POINTER(stream->payload);        stream->payloadLength        = 0;
+
+	return totalSize;
+}
+
+uint8 ICACHE_FLASH_ATTR MQTTProcotol_encodeConnectPacket(
 		ProtocolStream* stream,
 		bool            cleanSession,
         const char*     clientIndentifier,
@@ -143,43 +168,87 @@ uint8 ICACHE_FLASH_ATTR MQTTProcotol_EncodeConnectPacket(
 	 *  byte[24]  = password length LSB
 	 *  byte[25:] = password UTF-8 strings
 	 */
+	if (stream == NULL) {
+		return 0;
+	}
 
-	uint8* utf8_mqtt             = Text_asciiToUtf8(MQTT_NAME);
-	uint8* utf8_clientIdentifier = Text_asciiToUtf8(clientIndentifier);
-	uint8* utf8_willTopic        = Text_asciiToUtf8(willTopic);
-	uint8* utf8_willMessage      = Text_asciiToUtf8(willMessage);
-	uint8* utf8_userName         = Text_asciiToUtf8(userName);
-	uint8* utf8_password         = Text_asciiToUtf8(password);
-	uint16 remainSize            = 0;
-	uint16 variableHeaderSize    = 0;
-	uint16 payloadSize           = 0;
-	uint8  connectFlags          = 0;
+	uint8* utf8_mqtt                 = Text_asciiToUtf8(MQTT_NAME);
+	uint8* utf8_clientIdentifier     = Text_asciiToUtf8(clientIndentifier);
+	uint8* utf8_willTopic            = Text_asciiToUtf8(willTopic);
+	uint8* utf8_willMessage          = Text_asciiToUtf8(willMessage);
+	uint8* utf8_userName             = Text_asciiToUtf8(userName);
+	uint8* utf8_password             = Text_asciiToUtf8(password);
+	uint8  utf8_mqttSize             = Text_utf8Length(utf8_mqtt);
+	uint8  utf8_clientIdentifierSize = Text_utf8Length(utf8_clientIdentifier);
+	uint8  utf8_willTopicSize        = Text_utf8Length(utf8_willTopic);
+	uint8  utf8_willMessageSize      = Text_utf8Length(utf8_willMessage);
+	uint8  utf8_userNameSize         = Text_utf8Length(utf8_userName);
+	uint8  utf8_passwordSize         = Text_utf8Length(utf8_password);
+	uint8  connectFlags              = 0;
+	uint16 remainSize                = 0;
+	uint16 variableHeaderSize        = 0;
+	uint16 payloadSize               = 0;
+	uint16 totalSize                 = 0;
 
 	remainSize += Text_utf8Length(utf8_mqtt);
 	remainSize += 4; // protocol level(1) + connect flags(1) + keep alive(2)
 	variableHeaderSize = remainSize;
 
-	remainSize += Text_utf8Length(utf8_clientIdentifier);
-	remainSize += Text_utf8Length(utf8_willTopic);
-	remainSize += Text_utf8Length(utf8_willMessage);
-	remainSize += Text_utf8Length(utf8_userName);
-	remainSize += Text_utf8Length(utf8_password);
+	remainSize += utf8_clientIdentifierSize;
+	remainSize += utf8_willTopicSize;
+	remainSize += utf8_willMessageSize;
+	remainSize += utf8_userNameSize;
+	remainSize += utf8_passwordSize;
 	payloadSize = remainSize - variableHeaderSize;
 
-	stream->variableHeaderLength = variableHeaderSize;
-	DELETE_POINTER(stream->variableHeader);
-	stream->variableHeader = (uint8*) os_malloc(stream->variableHeaderLength);
-	os_memset(stream->variableHeader, NULL, stream->variableHeaderLength);
-	os_memcpy(stream->variableHeader, utf8_clientIdentifier, Text_utf8Length(utf8_mqtt));
-	uint8* pointer = stream->variableHeader + Text_utf8Length(utf8_mqtt);
-	*(pointer + 0) = PROTOCOL_LEVEL_3_1_1;
-	*(pointer + 1) = PROTOCOL_LEVEL_3_1_1; // user name flag[7] + password flag[6] + will retain[5] + will QoS[4:3] + will flag[2] + clean session[1] + reserved[0]
-	os_memcpy(pointer + 2, &keepAliveTimeout, 2);
+	/**
+	 * user name flag[7] + password flag[6] + will retain[5] + will QoS[4:3] + will flag[2] + clean session[1] + reserved[0]
+	 */
+	connectFlags = (userName != NULL ? 1 << 7 : 0)
+			     | (password != NULL ? 1 << 6 : 0)
+				 | (willTopic != NULL ? 1 << 5 : 0)
+				 | (willTopic != NULL ? MQTT_QoS_AT_LEAST_ONCE << 3 : 0);
 
-	MQTTProcotol_MakeFixedHeader(stream, MQTT_CONNECT, true, MQTT_QoS_AT_MOST_ONCE, cleanSession, remainSize);
+	{// Variable header
+		stream->variableHeaderLength = variableHeaderSize;
+		DELETE_POINTER(stream->variableHeader);
+		stream->variableHeader = (uint8*) os_malloc(stream->variableHeaderLength);
+		os_memset(stream->variableHeader, NULL, stream->variableHeaderLength);
+		os_memcpy(stream->variableHeader, utf8_clientIdentifier, utf8_mqttSize);
+		uint8* pointer = stream->variableHeader + Text_utf8Length(utf8_mqtt);
+		*(pointer + 0) = PROTOCOL_LEVEL_3_1_1;
+		*(pointer + 1) = connectFlags;
+		os_memcpy(pointer + 2, &keepAliveTimeout, 2);
+	}
+
+	{// Pay load
+		stream->payloadLength = payloadSize;
+		DELETE_POINTER(stream->payload);
+		stream->payload = (uint8*) os_malloc(stream->payloadLength);
+		os_memset(stream->payload, NULL, stream->payloadLength);
+		uint8* pointer = stream->payload;
+		os_memcpy(pointer, utf8_clientIdentifier, utf8_clientIdentifierSize); pointer += utf8_clientIdentifierSize;
+		os_memcpy(pointer, utf8_willTopic,        utf8_willTopicSize);        pointer += utf8_willTopicSize;
+		os_memcpy(pointer, utf8_willMessage,      utf8_willMessageSize);      pointer += utf8_willMessageSize;
+		os_memcpy(pointer, utf8_userName,         utf8_userNameSize);         pointer += utf8_userNameSize;
+		os_memcpy(pointer, utf8_password,         utf8_passwordSize);         pointer += utf8_passwordSize;
+	}
+
+	{// Fress resources
+		DELETE_POINTER(utf8_mqtt);
+		DELETE_POINTER(utf8_clientIdentifier);
+		DELETE_POINTER(utf8_willTopic);
+		DELETE_POINTER(utf8_willMessage);
+		DELETE_POINTER(utf8_userName);
+		DELETE_POINTER(utf8_password);
+	}
+
+	MQTTProcotol_makeFixedHeader(stream, MQTT_CONNECT, true, MQTT_QoS_AT_MOST_ONCE, cleanSession, remainSize);
+	totalSize = MQTTProcotol_packEncoededStream(stream);
+	return totalSize;
 }
 
-uint8 ICACHE_FLASH_ATTR MQTTProcotol_DecodeConnectAckPacket(ProtocolStream* stream, MQTTSession* session) {
+int ICACHE_FLASH_ATTR MQTTProcotol_decodeConnectAckPacket(ProtocolStream* stream, MQTTSession* session) {
 	/**
 	 * Fixed header
 	 *  byte[1]   = packetType[7:4] + dup[3] + QoS[2:1] + retain[0]
@@ -191,9 +260,39 @@ uint8 ICACHE_FLASH_ATTR MQTTProcotol_DecodeConnectAckPacket(ProtocolStream* stre
 	 *  return @sessionPresent is the current session state in server
 	 *         @connectReturnCode is connection acknowledge code
 	 */
+	if (stream == NULL) {
+		return MQTT_STREAM_INVALID;
+	}
+	if (stream->encodedStream == NULL) {
+		return MQTT_STREAM_INVALID;
+	}
+	if (stream->encodedStreamLength != 4) {
+		return MQTT_PROTOCOL_ILLEGAL;
+	}
+
+	DELETE_POINTER(stream->fixedHeader);    stream->fixedHeaderLength    = 0;
+	DELETE_POINTER(stream->variableHeader); stream->variableHeaderLength = 0;
+	DELETE_POINTER(stream->payload);        stream->payloadLength        = 0;
+
+	uint8 flags      = 0;
+	uint8 returnCode = 0;
+	stream->fixedHeaderLength = sizeof(FixHeader);
+	stream->fixedHeader = (FixHeader*) os_malloc(stream->fixedHeaderLength);
+	os_memcpy(stream->fixedHeader, stream->encodedStream, stream->fixedHeaderLength);
+	flags      = *(stream->encodedStream + stream->fixedHeaderLength);
+	returnCode = *(stream->encodedStream + stream->fixedHeaderLength + 1);
+
+	DELETE_POINTER(stream->encodedStream); stream->encodedStreamLength = 0;
+
+	if ((flags & 0b11111110) == 0) {
+		session->sessionPresent = flags & 0b00000001;
+		session->connectAck     = returnCode;
+	} else {
+		return MQTT_PROTOCOL_ILLEGAL;
+	}
 }
 
-uint8 ICACHE_FLASH_ATTR MQTTProcotol_EncodeDisconnectPacket(ProtocolStream* stream) {
+uint8 ICACHE_FLASH_ATTR MQTTProcotol_encodeDisconnectPacket(ProtocolStream* stream) {
 	/**
 	 * Fixed header
 	 *  byte[1]   = packetType[7:4] + dup[3] + QoS[2:1] + retain[0]
@@ -207,7 +306,7 @@ uint8 ICACHE_FLASH_ATTR MQTTProcotol_EncodeDisconnectPacket(ProtocolStream* stre
 	 */
 }
 
-uint8 ICACHE_FLASH_ATTR MQTTProcotol_EncodePingPacket(ProtocolStream* stream) {
+uint8 ICACHE_FLASH_ATTR MQTTProcotol_encodePingPacket(ProtocolStream* stream) {
 	/**
 	 * Fixed header
 	 *  byte[1]   = packetType[7:4] + dup[3] + QoS[2:1] + retain[0]
@@ -221,7 +320,7 @@ uint8 ICACHE_FLASH_ATTR MQTTProcotol_EncodePingPacket(ProtocolStream* stream) {
 	 */
 }
 
-uint8 ICACHE_FLASH_ATTR MQTTProcotol_DecodePingAckPacket(ProtocolStream* stream) {
+uint8 ICACHE_FLASH_ATTR MQTTProcotol_decodePingAckPacket(ProtocolStream* stream) {
 	/**
 	 * Fixed header
 	 *  byte[1]   = packetType[7:4] + dup[3] + QoS[2:1] + retain[0]
