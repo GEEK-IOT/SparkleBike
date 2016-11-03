@@ -55,8 +55,23 @@ void ICACHE_FLASH_ATTR CMDServer_initialize() {
 	mCommandMulticastGroupIP   = ipaddr_addr(STATION_CMD_MULTICAST_GROUP_IP);
 	mCommandMulticastGroupPort = STATION_CMD_MULTICAST_GROUP_PORT;
 	os_memset(mUDPMessageQueue, NULL, sizeof(UDPMessage*) * UDP_MESSAGE_QUEUE_SIZE);
+	initializeMQTT();
+}
 
-	MQTT_initialize();
+LOCAL ICACHE_FLASH_ATTR void initializeMQTT() {
+//	char* deviceID       = WiFi_generateSTAIdentify();
+//	BOOL  isCleanSession = TRUE;
+//
+//	MQTT_InitConnection(&mMQTTClient, MQTT_HOST, MQTT_PORT, MQTT_SECURITY);
+//	MQTT_InitClient(&mMQTTClient, deviceID, MQTT_USER, MQTT_PASSWORD, MQTT_KEEPALIVE, isCleanSession);
+//	MQTT_InitLWT(&mMQTTClient, "/lwt", "offline", 0, 0);
+//
+//	MQTT_OnConnected(&mMQTTClient,    onMQTTConnected);
+//	MQTT_OnDisconnected(&mMQTTClient, onMQTTDisconnected);
+//	MQTT_OnPublished(&mMQTTClient,    onMQTTPublished);
+//	MQTT_OnData(&mMQTTClient,         onMQTTReceived);
+//
+//	WiFi_freeSTAIdentify(&deviceID);
 }
 
 void ICACHE_FLASH_ATTR CMDServer_startCommandServer() {
@@ -77,13 +92,11 @@ void ICACHE_FLASH_ATTR CMDServer_stopLANCommandGroup() {
 
 void ICACHE_FLASH_ATTR CMDServer_startMQTT() {
 	Log_printfln("[CMD] Start MQTT client");
-	MQTT_connect();
 //	MQTT_Connect(&mMQTTClient);
 }
 
 void ICACHE_FLASH_ATTR CMDServer_stopMQTT() {
 	Log_printfln("[CMD] Stop MQTT client");
-	MQTT_disconnect();
 //	MQTT_Disconnect(&mMQTTClient);
 }
 

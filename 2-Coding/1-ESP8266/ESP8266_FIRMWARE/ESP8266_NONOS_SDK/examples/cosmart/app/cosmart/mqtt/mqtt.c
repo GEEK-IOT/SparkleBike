@@ -30,10 +30,8 @@
 */
 
 #include "cosmart/mqtt/mqtt.h"
-#include "cosmart/wifimanager.h"
 #include "cosmart/config.h"
 #include "user_interface.h"
-#include "osapi.h"
 #include "mem.h"
 
 #ifndef DELETE_POINTER
@@ -67,10 +65,6 @@ void ICACHE_FLASH_ATTR MQTT_initialize() {
 	MQTT_setWill(MQTT_WILL_TOPIC, MQTT_WILL_MESSAGE);
 
 	system_os_task(MQTT_Task, MQTT_TASK_PRIORITY, mTaskQueue, MQTT_TASK_QUEUE_SIZE);
-}
-
-const char* ICACHE_FLASH_ATTR MQTT_getClientIndentifier() {
-	return WiFi_generateSTAIdentify();
 }
 
 void ICACHE_FLASH_ATTR MQTT_setService(const char* server, uint32 port) {
@@ -195,11 +189,11 @@ LOCAL ICACHE_FLASH_ATTR void onTCPReceived(void *args, char *data, unsigned shor
 //	client->protocolStream = (ProtocolStream*) os_malloc(sizeof(ProtocolStream));
 //	client->protocolStream->fixedHeader = (FixHeader*) os_malloc(sizeof(FixHeader));
 //	client->protocolStream->fixedHeaderLength = sizeof(FixHeader);
-//	os_memset(client->protocolStream->fixedHeader, NULL, client->protocolStream->fixedHeaderLength);
+//	os_memet(client->protocolStream->fixedHeader, NULL, client->protocolStream->fixedHeaderLength);
 //	os_memcpy(client->protocolStream->fixedHeader, data, client->protocolStream->fixedHeaderLength);
 
 	FixHeader* header = (FixHeader*) os_malloc(sizeof(FixHeader));
-	os_memset(header, 0, sizeof(FixHeader));
+	os_memet(header, 0, sizeof(FixHeader));
 	os_memcpy(header, data, sizeof(FixHeader));
 
 	switch (header->packetType) {
@@ -228,14 +222,14 @@ void ICACHE_FLASH_ATTR MQTT_connect() {
 	}
 
 	if (mClient->connection == NULL) {
-		mClient->connection = (Connnection* )os_zalloc(sizeof(Connnection));
+		mClient->connection = (Connnection* )os_malloc(sizeof(Connnection));
 	}
 	mClient->connection->type    = ESPCONN_TCP;
 	mClient->connection->state   = ESPCONN_NONE;
 	mClient->connection->reverse = mClient;
 
 	if (mClient->connection->proto.tcp == NULL) {
-		mClient->connection->proto.tcp = (esp_tcp *)os_zalloc(sizeof(esp_tcp));
+		mClient->connection->proto.tcp = (esp_tcp *)os_malloc(sizeof(esp_tcp));
 	}
 	mClient->connection->proto.tcp->local_port  = espconn_port();
 	mClient->connection->proto.tcp->remote_port = mClient->port;

@@ -94,6 +94,7 @@ typedef struct {
 typedef void OnMessageReceived(const char* topic, const char* message);
 
 void        MQTT_initialize();
+const char* MQTT_getClientIndentifier();
 void        MQTT_setService(const char* server, uint32 port);
 void        MQTT_setConnectParameters(uint8 protocolLevel, uint16 keepAlive, uint8 QoS, bool isCleanSession, bool isSSL);
 void        MQTT_setAuthentication(const char* clientID, const char* username, const char* password);
@@ -104,7 +105,6 @@ void        MQTT_subscribe();
 void        MQTT_unsubscribe();
 void        MQTT_publish(const char* topic, const char* message);
 void        MQTT_setOnReceivedCallback(OnMessageReceived* listener);
-const char* MQTT_getClientIndentifier();
 
 
 #endif /* APP_INCLUDE_COSMART_MQTT_MQTT_H_ */

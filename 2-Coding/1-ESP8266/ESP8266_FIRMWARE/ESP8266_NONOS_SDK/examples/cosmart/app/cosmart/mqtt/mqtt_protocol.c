@@ -7,7 +7,6 @@
 #include "cosmart/mqtt/mqtt_protocol.h"
 #include "cosmart/mqtt/mqtt.h"
 #include "cosmart/textutils.h"
-#include "osapi.h"
 #include "mem.h"
 
 #ifndef DELETE_POINTER

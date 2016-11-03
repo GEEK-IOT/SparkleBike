@@ -4,8 +4,8 @@ MEMORY
 {
   dport0_0_seg :                        org = 0x3FF00000, len = 0x10
   dram0_0_seg :                         org = 0x3FFE8000, len = 0x14000
-  iram1_0_seg :                         org = 0x40100000, len = 0x8000
-  irom0_0_seg :                         org = 0x40210000, len = 0x5C000
+iram1_0_seg :                       	org = 0x40100000, len = 0x9000 /* 0x8000 = 32768, 0x10000 = 65536 */
+  irom0_0_seg :                       	org = 0x40240000, len = 0xC0000 /* 0x32000 = 200 * 1024, 0xC0000 = 768 * 1024 */
 }
 
 PHDRS
