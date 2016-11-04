@@ -211,6 +211,7 @@ int ICACHE_FLASH_ATTR MQTTProcotol_encodeConnectPacket(
 				 | (willTopic != NULL ? 1 << 5 : 0)
 				 | (willTopic != NULL ? MQTT_QoS_AT_LEAST_ONCE << 3 : 0);
 
+	Log_printfln("[MQTTProcotol_encodeConnectPacket] #1");
 	{// Variable header
 		stream->variableHeaderLength = variableHeaderSize;
 		DELETE_POINTER(stream->variableHeader);
@@ -223,6 +224,7 @@ int ICACHE_FLASH_ATTR MQTTProcotol_encodeConnectPacket(
 		os_memcpy(pointer + 2, &keepAliveTimeout, 2);
 	}
 
+	Log_printfln("[MQTTProcotol_encodeConnectPacket] #2");
 	{// Pay load
 		stream->payloadLength = payloadSize;
 		DELETE_POINTER(stream->payload);
@@ -236,6 +238,7 @@ int ICACHE_FLASH_ATTR MQTTProcotol_encodeConnectPacket(
 		os_memcpy(pointer, utf8_password,         utf8_passwordSize);         pointer += utf8_passwordSize;
 	}
 
+	Log_printfln("[MQTTProcotol_encodeConnectPacket] #3");
 	{// Fress resources
 		DELETE_POINTER(utf8_mqtt);
 		DELETE_POINTER(utf8_clientIdentifier);
@@ -245,8 +248,11 @@ int ICACHE_FLASH_ATTR MQTTProcotol_encodeConnectPacket(
 		DELETE_POINTER(utf8_password);
 	}
 
+	Log_printfln("[MQTTProcotol_encodeConnectPacket] #4");
 	MQTTProcotol_makeFixedHeader(stream, MQTT_CONNECT, true, MQTT_QoS_AT_MOST_ONCE, cleanSession, remainSize);
+	Log_printfln("[MQTTProcotol_encodeConnectPacket] #5");
 	totalSize = MQTTProcotol_packEncoededStream(stream);
+	Log_printfln("[MQTTProcotol_encodeConnectPacket] #6");
 	return totalSize;
 }
 

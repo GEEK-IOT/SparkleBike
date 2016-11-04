@@ -134,11 +134,12 @@ LOCAL ICACHE_FLASH_ATTR void onDNSResponding(const char* name, ip_addr_t* ip, vo
 		system_os_post(MQTT_TASK_PRIORITY, MQTT_TASK_SIGNAL, (os_param_t)mClient);
 		return;
 	} else {
-		Log_printfln("[MQTT] mapped %s to %03d.%03d.%03d.%03d",
-				name, *((uint8*)ip->addr), *((uint8*)ip->addr + 1), *((uint8*)ip->addr + 2), *((uint8*)ip->addr + 3));
-		Log_printfln("[MQTT] Connecting %03d.%03d.%03d.%03d:%d",
-				*((uint8*)ip->addr), *((uint8*)ip->addr + 1), *((uint8*)ip->addr + 2), *((uint8*)ip->addr + 3),
-				mClient->port);
+		uint8 ipAddress[4];
+		os_memcpy(ipAddress, &ip->addr, 4);
+		Log_printfln("[MQTT] mapped %s to %d.%d.%d.%d",
+				name, ipAddress[0], ipAddress[1], ipAddress[2], ipAddress[3]);
+		Log_printfln("[MQTT] Connecting %d.%d.%d.%d",
+				ipAddress[0], ipAddress[1], ipAddress[2], ipAddress[3], mClient->port);
 
 		// Connect TCP server
 		os_memcpy(client->connection->proto.tcp->remote_ip, &ip->addr, 4);
@@ -148,15 +149,19 @@ LOCAL ICACHE_FLASH_ATTR void onDNSResponding(const char* name, ip_addr_t* ip, vo
 }
 
 LOCAL ICACHE_FLASH_ATTR void onTCPConnected(void* args) {
+	Log_printfln("[MQTT][onTCPConnected]");
 	struct espconn* connection = (struct espconn *)args;
 	MQTTClient*     client     = (MQTTClient *)connection->reverse;
 
-	DELETE_POINTER(client->protocolStream->fixedHeader);
-	DELETE_POINTER(client->protocolStream->variableHeader);
-	DELETE_POINTER(client->protocolStream->payload);
+	if (client->protocolStream != NULL) {
+		DELETE_POINTER(client->protocolStream->fixedHeader);
+		DELETE_POINTER(client->protocolStream->variableHeader);
+		DELETE_POINTER(client->protocolStream->payload);
+	}
 	DELETE_POINTER(client->protocolStream);
-	client->protocolStream = (ProtocolStream*) os_malloc(sizeof(ProtocolStream));
+	client->protocolStream = (ProtocolStream*) os_zalloc(sizeof(ProtocolStream));
 	os_memset(client->protocolStream, NULL, sizeof(ProtocolStream));
+	Log_printfln("[MQTT][onTCPConnected] #1");
 	MQTTProcotol_encodeConnectPacket(
 			client->protocolStream,
 			client->clientId,
@@ -166,6 +171,7 @@ LOCAL ICACHE_FLASH_ATTR void onTCPConnected(void* args) {
 			client->willMessage,
 			client->isCleanSession,
 			client->keepAlive);
+	Log_printfln("[MQTT][onTCPConnected] #2");
 
 	espconn_send(client->connection,
 			client->protocolStream->encodedStream, client->protocolStream->encodedStreamLength);
@@ -185,6 +191,7 @@ LOCAL ICACHE_FLASH_ATTR void onTCPDisconnected(void* args) {
 }
 
 LOCAL ICACHE_FLASH_ATTR void onTCPReceived(void *args, char *data, unsigned short length) {
+	Log_printfln("[MQTT][onTCPReceived] data = %s", data);
 	struct espconn* connection = (struct espconn *)args;
 	MQTTClient*     client     = (MQTTClient *)connection->reverse;
 
@@ -246,6 +253,7 @@ void ICACHE_FLASH_ATTR MQTT_connect() {
 	espconn_regist_disconcb(mClient->connection, onTCPDisconnected);
 
 	Log_printfln("[MQTT] Connect to %s:%d", mClient->server, mClient->port);
+	mClient->currentTask = MQTT_TASK_DNS;
     system_os_post(MQTT_TASK_PRIORITY, MQTT_TASK_SIGNAL, (os_param_t)mClient);
 }
 void ICACHE_FLASH_ATTR MQTT_disconnect() {}
