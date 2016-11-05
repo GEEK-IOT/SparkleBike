@@ -116,6 +116,7 @@ uint8 ICACHE_FLASH_ATTR MQTTProcotol_packEncoededStream(ProtocolStream* stream) 
 
 	DELETE_POINTER(stream->encodedStream);
 	stream->encodedStream = (uint8 *) os_malloc(totalSize);
+	stream->encodedStreamLength = totalSize;
 	pointer = stream->encodedStream;
 
 	os_memcpy(pointer, stream->fixedHeader,    stream->fixedHeaderLength);    pointer += stream->fixedHeaderLength;
@@ -217,11 +218,12 @@ int ICACHE_FLASH_ATTR MQTTProcotol_encodeConnectPacket(
 		DELETE_POINTER(stream->variableHeader);
 		stream->variableHeader = (uint8*) os_malloc(stream->variableHeaderLength);
 		os_memset(stream->variableHeader, NULL, stream->variableHeaderLength);
-		os_memcpy(stream->variableHeader, utf8_clientIdentifier, utf8_mqttSize);
-		uint8* pointer = stream->variableHeader + Text_utf8Length(utf8_mqtt);
+		os_memcpy(stream->variableHeader, utf8_mqtt, utf8_mqttSize);
+		uint8* pointer = stream->variableHeader + utf8_mqttSize;
 		*(pointer + 0) = MQTT_PROTOCOL_LEVEL_3_1_1;
 		*(pointer + 1) = connectFlags;
-		os_memcpy(pointer + 2, &keepAliveTimeout, 2);
+		*(pointer + 2) = keepAliveTimeout >> 8;
+		*(pointer + 2) = keepAliveTimeout & 0xFF;
 	}
 
 	{// Pay load

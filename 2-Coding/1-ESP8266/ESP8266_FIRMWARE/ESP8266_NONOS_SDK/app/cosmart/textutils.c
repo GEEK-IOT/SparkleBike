@@ -222,39 +222,13 @@ char* ICACHE_FLASH_ATTR Text_asciiToUtf8(const char* ascii) {
 	if (ascii == NULL)
 		return NULL;
 
-	uint16  size    = os_strlen(ascii);
-	uint16* utf8    = NULL;
-	uint8*  unicode = NULL;
+	uint16 size    = os_strlen(ascii);
+	uint8* utf8    = (uint8*) os_malloc(size + 2);
+	uint8* pointer = utf8;
 
-	utf8 = (uint16* )os_malloc(sizeof(uint16) * 2 * size - 1);
-	utf8[0] = 2 * size - 1;
-
-	size = 0;
-	while (ascii[size] != '\0') {
-		unsigned char character = ascii[size];
-		unsigned char unicode[2];
-		if ((character < 192) && (character != 168) && (character != 184) ) {
-			unicode[0] = 0;
-			unicode[1] = character;
-		} else if (character == 168) {
-			unicode[0] = 208;
-			unicode[1] = 129;
-		} else if (character == 184) {
-			unicode[0] = 209;
-			unicode[1] = 145;
-		} else if (character < 240) {
-			unicode[0] = 208;
-			unicode[1] = character - 48;
-		} else if (character) {
-			unicode[0] = 209;
-			unicode[1] = character - 112;
-		}
-
-		utf8[2 * size + 1] = unicode[0];
-		utf8[2 * size + 2] = unicode[1];
-		size++;
-	}
-
+	*(pointer + 0) = size >> 8;
+	*(pointer + 1) = size & 0xFF;
+	os_memcpy(pointer + 2, ascii, size);
 	return (char*)utf8;
 }
 
@@ -262,7 +236,8 @@ uint16 ICACHE_FLASH_ATTR Text_utf8Length(const char* utf8) {
 	if (utf8 == NULL) {
 		return 0;
 	} else {
-		uint16* pointer = (uint16* )utf8;
-		return *pointer;
+		uint16 size = (((*(utf8 + 0)) << 8) & 0xFF00)
+				    | (((*(utf8 + 1)) << 0) & 0x00FF);
+		return size + 2;
 	}
 }

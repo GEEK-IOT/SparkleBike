@@ -262,7 +262,7 @@ ifeq ($(app), 0)
 	@echo "No boot needed."
 	@echo "Generate eagle.flash.bin and eagle.irom0text.bin successully in folder bin."
 	@echo "eagle.flash.bin-------->0x00000"
-	@echo "eagle.irom0text.bin---->0x10000"
+	@echo "eagle.irom0text.bin---->0x40000"
 else
     ifneq ($(boot), new)
 		@python2.7 ../tools/gen_appbin.py $< 1 $(mode) $(freqdiv) $(size_map) $(app)
