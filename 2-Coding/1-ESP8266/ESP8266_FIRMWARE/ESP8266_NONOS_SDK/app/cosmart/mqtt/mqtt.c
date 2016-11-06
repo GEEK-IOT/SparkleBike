@@ -108,14 +108,19 @@ LOCAL ICACHE_FLASH_ATTR void onSystemTask(os_event_t *event) {
 		case MQTT_TASK_NONE:
 			break;
 		case MQTT_TASK_DNS: {
-			espconn_gethostbyname(client->connection, client->server, &client->hostIP, onDNSResponding);
+			Log_printfln("[MQTT] Query host name %s", client->server);
+			if (espconn_gethostbyname(client->connection, client->server, &client->hostIP, onDNSResponding) == ESPCONN_OK) {
+				onDNSResponding(client->server, &client->hostIP, (void*) client->connection);
+			}
 			client->currentTask = MQTT_TASK_DNSING;
 		} break;
 		case MQTT_TASK_CONNECT: {
 			client->currentTask = MQTT_TASK_CONNECTING;
 			if (client->enabledSSL) {
+				Log_printfln("[MQTT] Sent SSL connect to %s", client->server);
 				espconn_secure_connect(client->connection);
 			} else {
+				Log_printfln("[MQTT] Sent TCP connect to %s", client->server);
 				espconn_connect(client->connection);
 			}
 		} break;
@@ -137,7 +142,7 @@ LOCAL ICACHE_FLASH_ATTR void onDNSResponding(const char* name, ip_addr_t* ip, vo
 	} else {
 		uint8 ipAddress[4];
 		os_memcpy(ipAddress, &ip->addr, 4);
-		Log_printfln("[MQTT] mapped %s to %d.%d.%d.%d",
+		Log_printfln("[MQTT] Mapped %s to %d.%d.%d.%d",
 				name, ipAddress[0], ipAddress[1], ipAddress[2], ipAddress[3]);
 		Log_printfln("[MQTT] Connecting %d.%d.%d.%d",
 				ipAddress[0], ipAddress[1], ipAddress[2], ipAddress[3], mClient->port);

@@ -16,7 +16,7 @@
 
 #define MQTT_TASK_SIGNAL          0x10
 #define MQTT_TASK_PRIORITY        2
-#define MQTT_TASK_QUEUE_SIZE      1
+#define MQTT_TASK_QUEUE_SIZE      2
 #define MQTT_TASK_NONE            0x00
 #define MQTT_TASK_DNS             0x01
 #define MQTT_TASK_DNSING          0x02
@@ -37,8 +37,8 @@
 #define MQTT_KEEP_SESSOIN         true
 #define MQTT_WILL_TOPIC           "topic/dev/offline"
 #define MQTT_WILL_MESSAGE         "000000"
-#define MQTT_USERNAME             "admin" // "ctytmovg"
-#define MQTT_PASSWORD             "admin" // "FI4fkpUG97nx"
+#define MQTT_USERNAME             "Cocoonshu" // "ctytmovg"
+#define MQTT_PASSWORD             "89mik7" // "FI4fkpUG97nx"
 
 enum QoS {
 	MQTT_QoS_AT_MOST_ONCE  = 0x00,
