@@ -1,8 +1,8 @@
 /*
  * uimanager.c
  *
- *  Created on: 2016年10月17日
- *      Author: oppo
+ *  Created on: 2016/10/17
+ *      Author: Cocoonshu
  */
 
 #include "cosmart/uimanager.h"

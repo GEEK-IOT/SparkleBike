@@ -1,8 +1,9 @@
 /*
  * mqtt.h
  *
- *  Created on: 2016年10月28日
- *      Author: oppo
+ *  Created on: 2016/10/28
+ *      Author: Cocoonshu
+ *
  */
 
 #ifndef APP_INCLUDE_COSMART_MQTT_MQTT_H_
@@ -24,20 +25,20 @@
 #define MQTT_TASK_DISCONNECT      0x05
 #define MQTT_TASK_DISCONNECTING   0x06
 
-
 #define MQTT_PROTOCOL_LEVEL_3_1_1 0x04
 #define MAX_REMAIN_LENGTH         268435455
 #define MQTT_NAME                 "MQTT"
-#define MQTT_SERVER               "m13.cloudmqtt.com" // "45.55.5.8"
-#define MQTT_PORT                 10419
+#define MQTT_SERVER               "45.55.5.8" // "m13.cloudmqtt.com"
+#define MQTT_PORT                 1883 // 10419
+#define MQTT_SSL_PORT             20419
 #define MQTT_KEEP_ALIVE           120
 #define MQTT_QoS                  MQTT_QoS_AT_LEAST_ONCE
 #define MQTT_ENABLE_SSL           false
 #define MQTT_KEEP_SESSOIN         true
 #define MQTT_WILL_TOPIC           "topic/dev/offline"
 #define MQTT_WILL_MESSAGE         "000000"
-#define MQTT_USERNAME             "ctytmovg"
-#define MQTT_PASSWORD             "FI4fkpUG97nx"
+#define MQTT_USERNAME             "admin" // "ctytmovg"
+#define MQTT_PASSWORD             "admin" // "FI4fkpUG97nx"
 
 enum QoS {
 	MQTT_QoS_AT_MOST_ONCE  = 0x00,

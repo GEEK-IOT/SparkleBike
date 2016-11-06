@@ -1,8 +1,28 @@
 /*
  * mqtt_protocol.h
  *
- *  Created on: 2016年10月28日
- *      Author: oppo
+ *  Created on: 2016/10/28
+ *      Author: Cocoonshu
+ *
+ *  The flags in Fixed header
+ *  ===============================================
+ *  type              Bit3 Bit2 Bit1 Bit0     Combo
+ *  -----------------------------------------------
+ *  CONNECT           0    0    0    0        0x10
+ *  CONNACK           0    0    0    0        0x20
+ *  PUBLISH           DUP  QoS  QoS  Retain > 0x30
+ *  PUBACK            0    0    0    0        0x40
+ *  PUBREC            0    0    0    0        0x50
+ *  PUBREL            0    0    0    0        0x60
+ *  PUBCOMP           0    0    0    0        0x70
+ *  SUBSCRIBE         0    0    0    0        0x80
+ *  SUBACK            0    0    0    0        0x90
+ *  UNSUBSCRIBE       0    0    0    0        0xA0
+ *  UNSUBACK          0    0    0    0        0xB0
+ *  PINGREQ           0    0    0    0        0xC0
+ *  PINGRESP          0    0    0    0        0xD0
+ *  DISCONNECT        0    0    0    0        0xE0
+ *  ===============================================
  */
 
 #ifndef APP_INCLUDE_COSMART_MQTT_MQTT_PROTOCOL_H_
@@ -24,24 +44,6 @@ typedef struct {
 	bool   sessionPresent;
 } MQTTSession;
 
-#pragma pack (1)
-
-/**
- * FixedHeader {
- *   uint8 packetType   : 4;
- *   uint8 dup          : 1;
- *   uint8 QoS          : 2;
- *   uint8 retain       : 1;
- *   uint8 remainLength : 8 ~ 32;
- * }
- */
-typedef struct {
-	uint8 packetType : 4;
-	uint8 dup        : 1;
-	uint8 QoS        : 2;
-	uint8 retain     : 1;
-} FixHeader;
-
 typedef struct {
 	uint8*  fixedHeader;
 	uint8   fixedHeaderLength;
@@ -55,8 +57,6 @@ typedef struct {
 	uint8*  encodedStream;
 	uint32  encodedStreamLength;
 } ProtocolStream;
-
-#pragma pack ()
 
 uint8 MQTTProcotol_makeFixedHeader(ProtocolStream* stream, uint8 packetType, uint8 dup, uint8 QoS, uint8 retain, uint32 remainLength);
 uint8 MQTTProcotol_generatePacketIndenitifier();

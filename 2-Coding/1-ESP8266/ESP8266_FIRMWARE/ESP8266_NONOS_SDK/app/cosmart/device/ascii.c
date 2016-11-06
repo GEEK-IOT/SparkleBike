@@ -1,8 +1,8 @@
 /*
  * ascii.c
  *
- *  Created on: 2016年10月18日
- *      Author: oppo
+ *  Created on: 2016/10/18
+ *      Author: Cocoonshu
  */
 
 #include "cosmart/device/ssd1306.h"

@@ -1,8 +1,8 @@
 /*
  * mqtt_protocol.c
  *
- *  Created on: 2016年10月28日
- *      Author: oppo
+ *  Created on: 2016/10/28
+ *      Author: Cocoonshu
  */
 #include "cosmart/mqtt/mqtt_protocol.h"
 #include "cosmart/mqtt/mqtt.h"
@@ -28,19 +28,17 @@ uint8 ICACHE_FLASH_ATTR MQTTProcotol_makeFixedHeader(ProtocolStream* stream, uin
 	uint8  remainLengthStreamSize = makeFixedHeaderRemainLengthStream(remainLength, &remainLengthStream);
 
 	// make fixed header stream
-	int        headerSize = sizeof(FixHeader);
-	FixHeader* header     = (FixHeader *) os_malloc(headerSize);
-	os_memset(header, NULL, headerSize);
-	header->packetType = packetType;
-	header->dup        = dup;
-	header->QoS        = QoS;
-	header->retain     = retain;
+	uint8 headerSize = 1;
+	uint8 header     = ((packetType << 4) & 0xF0)
+				     | ((dup << 3) & 0x08)
+				     | ((QoS << 1) & 0x06)
+				     | (retain & 0x01);
 
 	// make protocol stream
 	int fixedHeaderTotalSize = headerSize + remainLengthStreamSize;
 	stream->fixedHeader       = (uint8*) os_malloc(fixedHeaderTotalSize);
 	stream->fixedHeaderLength = fixedHeaderTotalSize;
-	os_memcpy(stream->fixedHeader, header, headerSize);
+	*stream->fixedHeader      = header;
 	do {
 		int streamOffset       = fixedHeaderTotalSize - remainLengthStreamSize;
 		int remainStreamOffset = remainLengthStreamSize - remainLengthStreamSize;
@@ -51,9 +49,6 @@ uint8 ICACHE_FLASH_ATTR MQTTProcotol_makeFixedHeader(ProtocolStream* stream, uin
 	// free resource
 	if (remainLengthStream != NULL) {
 		os_free(remainLengthStream);
-	}
-	if (header != NULL) {
-		os_free(header);
 	}
 
 	return fixedHeaderTotalSize;
@@ -223,7 +218,7 @@ int ICACHE_FLASH_ATTR MQTTProcotol_encodeConnectPacket(
 		*(pointer + 0) = MQTT_PROTOCOL_LEVEL_3_1_1;
 		*(pointer + 1) = connectFlags;
 		*(pointer + 2) = keepAliveTimeout >> 8;
-		*(pointer + 2) = keepAliveTimeout & 0xFF;
+		*(pointer + 3) = keepAliveTimeout & 0xFF;
 	}
 
 	{// Pay load
@@ -248,7 +243,7 @@ int ICACHE_FLASH_ATTR MQTTProcotol_encodeConnectPacket(
 		DELETE_POINTER(utf8_password);
 	}
 
-	MQTTProcotol_makeFixedHeader(stream, MQTT_CONNECT, true, MQTT_QoS_AT_MOST_ONCE, cleanSession, remainSize);
+	MQTTProcotol_makeFixedHeader(stream, MQTT_CONNECT, false, MQTT_QoS_AT_MOST_ONCE, false, remainSize);
 	totalSize = MQTTProcotol_packEncoededStream(stream);
 	return totalSize;
 }
@@ -281,7 +276,7 @@ int ICACHE_FLASH_ATTR MQTTProcotol_decodeConnectAckPacket(ProtocolStream* stream
 
 	uint8 flags      = 0;
 	uint8 returnCode = 0;
-	stream->fixedHeaderLength = sizeof(FixHeader);
+	stream->fixedHeaderLength = 1;
 //	stream->fixedHeader = (FixHeader*) os_malloc(stream->fixedHeaderLength);
 //	os_memcpy(stream->fixedHeader, stream->encodedStream, stream->fixedHeaderLength);
 	flags      = *(stream->encodedStream + stream->fixedHeaderLength);

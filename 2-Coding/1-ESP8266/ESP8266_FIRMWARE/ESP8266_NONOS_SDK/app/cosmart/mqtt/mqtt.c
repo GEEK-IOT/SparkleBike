@@ -62,7 +62,7 @@ void ICACHE_FLASH_ATTR MQTT_initialize() {
 
 	mClient = (MQTTClient*) os_malloc(sizeof(MQTTClient));
 	os_memset(mClient, NULL, sizeof(MQTTClient));
-	MQTT_setService(MQTT_SERVER, MQTT_PORT);
+	MQTT_setService(MQTT_SERVER, MQTT_ENABLE_SSL ? MQTT_SSL_PORT : MQTT_PORT);
 	MQTT_setConnectParameters(MQTT_PROTOCOL_LEVEL_3_1_1, MQTT_KEEP_ALIVE, MQTT_QoS, MQTT_KEEP_SESSOIN, MQTT_ENABLE_SSL);
 	MQTT_setAuthentication(MQTT_getClientIndentifier(), MQTT_USERNAME, MQTT_PASSWORD);
 	MQTT_setWill(MQTT_WILL_TOPIC, MQTT_WILL_MESSAGE);
@@ -222,11 +222,10 @@ LOCAL ICACHE_FLASH_ATTR void onTCPReceived(void *args, char *data, unsigned shor
 //	os_memset(client->protocolStream->fixedHeader, NULL, client->protocolStream->fixedHeaderLength);
 //	os_memcpy(client->protocolStream->fixedHeader, data, client->protocolStream->fixedHeaderLength);
 
-	FixHeader* header = (FixHeader*) os_malloc(sizeof(FixHeader));
-	os_memset(header, 0, sizeof(FixHeader));
-	os_memcpy(header, data, sizeof(FixHeader));
+	uint8 packetType = *(data + 0);
+	packetType = (packetType >> 4) & 0x0F;
 
-	switch (header->packetType) {
+	switch (packetType) {
 		case MQTT_CONNECT_ACK: {
 			Log_printfln("[MQTT] Received [CONNECT_ACK] from %d.%d.%d.%d:%d",
 					connection->proto.tcp->remote_ip[0],
@@ -237,7 +236,6 @@ LOCAL ICACHE_FLASH_ATTR void onTCPReceived(void *args, char *data, unsigned shor
 		} break;
 	}
 
-	DELETE_POINTER(header);
 }
 
 void ICACHE_FLASH_ATTR MQTT_connect() {
