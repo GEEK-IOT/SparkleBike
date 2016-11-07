@@ -206,7 +206,8 @@ int ICACHE_FLASH_ATTR MQTTProcotol_encodeConnectPacket(
 	connectFlags = (userName != NULL ? 1 << 7 : 0)
 			     | (password != NULL ? 1 << 6 : 0)
 				 | (willTopic != NULL ? 1 << 5 : 0)
-				 | (willTopic != NULL ? MQTT_QoS_AT_LEAST_ONCE << 3 : 0);
+				 | (willTopic != NULL ? MQTT_QoS_AT_LEAST_ONCE << 3 : 0)
+				 | (willTopic != NULL ? 1 << 2 : 0);
 
 	{// Variable header
 		stream->variableHeaderLength = variableHeaderSize;

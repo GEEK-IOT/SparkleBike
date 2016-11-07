@@ -111,8 +111,9 @@ LOCAL ICACHE_FLASH_ATTR void onSystemTask(os_event_t *event) {
 			Log_printfln("[MQTT] Query host name %s", client->server);
 			if (espconn_gethostbyname(client->connection, client->server, &client->hostIP, onDNSResponding) == ESPCONN_OK) {
 				onDNSResponding(client->server, &client->hostIP, (void*) client->connection);
+			} else {
+				client->currentTask = MQTT_TASK_DNSING;
 			}
-			client->currentTask = MQTT_TASK_DNSING;
 		} break;
 		case MQTT_TASK_CONNECT: {
 			client->currentTask = MQTT_TASK_CONNECTING;
@@ -217,10 +218,14 @@ LOCAL ICACHE_FLASH_ATTR void onTCPReceived(void *args, char *data, unsigned shor
 	struct espconn* connection = (struct espconn *)args;
 	MQTTClient*     client     = (MQTTClient *)connection->reverse;
 
-	DELETE_POINTER(client->protocolStream->fixedHeader);
-	DELETE_POINTER(client->protocolStream->variableHeader);
-	DELETE_POINTER(client->protocolStream->payload);
-	DELETE_POINTER(client->protocolStream);
+	if (client != NULL) {
+		if (client->protocolStream != NULL) {
+			DELETE_POINTER(client->protocolStream->fixedHeader);
+			DELETE_POINTER(client->protocolStream->variableHeader);
+			DELETE_POINTER(client->protocolStream->payload);
+		}
+		DELETE_POINTER(client->protocolStream);
+	}
 //	client->protocolStream = (ProtocolStream*) os_malloc(sizeof(ProtocolStream));
 //	client->protocolStream->fixedHeader = (FixHeader*) os_malloc(sizeof(FixHeader));
 //	client->protocolStream->fixedHeaderLength = sizeof(FixHeader);
@@ -275,6 +280,6 @@ void ICACHE_FLASH_ATTR MQTT_connect() {
 
 	Log_printfln("[MQTT] Connect to %s:%d", mClient->server, mClient->port);
 	mClient->currentTask = MQTT_TASK_DNS;
-    system_os_post(MQTT_TASK_PRIORITY, MQTT_TASK_SIGNAL, (os_param_t)mClient);
+	system_os_post(MQTT_TASK_PRIORITY, MQTT_TASK_SIGNAL, (os_param_t)mClient);
 }
 void ICACHE_FLASH_ATTR MQTT_disconnect() {}
