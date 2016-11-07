@@ -37,8 +37,8 @@
 #define MQTT_KEEP_SESSOIN         true
 #define MQTT_WILL_TOPIC           "topic/dev/offline"
 #define MQTT_WILL_MESSAGE         "000000"
-#define MQTT_USERNAME             "Cocoonshu" // "ctytmovg"
-#define MQTT_PASSWORD             "89mik7" // "FI4fkpUG97nx"
+#define MQTT_USERNAME             "admin" // "ctytmovg"
+#define MQTT_PASSWORD             "admin" // "FI4fkpUG97nx"
 
 enum QoS {
 	MQTT_QoS_AT_MOST_ONCE  = 0x00,

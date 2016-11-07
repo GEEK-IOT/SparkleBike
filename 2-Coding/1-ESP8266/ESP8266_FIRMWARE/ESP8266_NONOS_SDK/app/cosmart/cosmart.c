@@ -67,8 +67,9 @@ LOCAL void ICACHE_FLASH_ATTR onSystemInitialized() {
 	WiFi_initialize();
 	WiFi_setupAPAndSTA();
 	WiFi_setupAPRecevier();
-	WiFi_connectAP("OS_Media", "media@oppo.com");
+//	WiFi_connectAP("OS_Media", "media@oppo.com");
 //	WiFi_connectAP("Cocoonshu_MW316R", "j989mik7!");
+	WiFi_connectAP("Here601", "13701778635");
 
 	// 启动Timer管理器
 	Timer_initialize();
