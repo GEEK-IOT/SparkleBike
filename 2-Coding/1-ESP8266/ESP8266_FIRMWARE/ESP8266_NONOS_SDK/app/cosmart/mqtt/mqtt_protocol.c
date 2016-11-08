@@ -291,6 +291,7 @@ int ICACHE_FLASH_ATTR MQTTProcotol_decodeConnectAckPacket(ProtocolStream* stream
 	} else {
 		return MQTT_PROTOCOL_ILLEGAL;
 	}
+	return MQTT_PROTOCOL_OK;
 }
 
 int ICACHE_FLASH_ATTR MQTTProcotol_encodeDisconnectPacket(ProtocolStream* stream) {
@@ -319,6 +320,9 @@ int ICACHE_FLASH_ATTR MQTTProcotol_encodePingPacket(ProtocolStream* stream) {
 	 *               }
 	 *  byte[2]   = remainLength (0 for Disconnect)
 	 */
+	MQTTProcotol_makeFixedHeader(stream, MQTT_PING, false, MQTT_QoS_AT_MOST_ONCE, false, 0);
+	int totalSize = MQTTProcotol_packEncoededStream(stream);
+	return totalSize;
 }
 
 int ICACHE_FLASH_ATTR MQTTProcotol_decodePingAckPacket(ProtocolStream* stream) {
@@ -333,4 +337,5 @@ int ICACHE_FLASH_ATTR MQTTProcotol_decodePingAckPacket(ProtocolStream* stream) {
 	 *               }
 	 *  byte[2]   = remainLength (0 for Disconnect)
 	 */
+	return MQTT_PROTOCOL_OK;
 }

@@ -14,31 +14,33 @@
 #include "espconn.h"
 #include "cosmart/mqtt/mqtt_protocol.h"
 
-#define MQTT_TASK_SIGNAL          0x10
-#define MQTT_TASK_PRIORITY        2
-#define MQTT_TASK_QUEUE_SIZE      2
-#define MQTT_TASK_NONE            0x00
-#define MQTT_TASK_DNS             0x01
-#define MQTT_TASK_DNSING          0x02
-#define MQTT_TASK_CONNECT         0x03
-#define MQTT_TASK_CONNECTING      0x04
-#define MQTT_TASK_DISCONNECT      0x05
-#define MQTT_TASK_DISCONNECTING   0x06
+#define MQTT_TASK_SIGNAL           0x10
+#define MQTT_TASK_PRIORITY         2
+#define MQTT_TASK_QUEUE_SIZE       2
+#define MQTT_TASK_NONE             0x00
+#define MQTT_TASK_DNS              0x01
+#define MQTT_TASK_DNSING           0x02
+#define MQTT_TASK_CONNECT          0x03
+#define MQTT_TASK_CONNECTING       0x04
+#define MQTT_TASK_DISCONNECT       0x05
+#define MQTT_TASK_DISCONNECTING    0x06
+#define MQTT_TASK_ABORT_CONNECTION 0x07
 
-#define MQTT_PROTOCOL_LEVEL_3_1_1 0x04
-#define MAX_REMAIN_LENGTH         268435455
-#define MQTT_NAME                 "MQTT"
-#define MQTT_SERVER               "45.55.5.8" // "m13.cloudmqtt.com"
-#define MQTT_PORT                 1883 // 10419
-#define MQTT_SSL_PORT             20419
-#define MQTT_KEEP_ALIVE           120
-#define MQTT_QoS                  MQTT_QoS_AT_LEAST_ONCE
-#define MQTT_ENABLE_SSL           false
-#define MQTT_KEEP_SESSOIN         true
-#define MQTT_WILL_TOPIC           "topic/dev/offline"
-#define MQTT_WILL_MESSAGE         "000000"
-#define MQTT_USERNAME             "Cocoonshu" // "ctytmovg"
-#define MQTT_PASSWORD             "89mik7" // "FI4fkpUG97nx"
+#define MQTT_PROTOCOL_LEVEL_3_1_1  0x04
+#define MAX_REMAIN_LENGTH          268435455
+#define MQTT_NAME                  "MQTT"
+#define MQTT_SERVER                "45.55.5.8" // "m13.cloudmqtt.com"
+#define MQTT_PORT                  1883 // 10419
+#define MQTT_SSL_PORT              20419
+#define MQTT_KEEP_ALIVE            120
+#define MQTT_QoS                   MQTT_QoS_AT_LEAST_ONCE
+#define MQTT_ENABLE_SSL            false
+#define MQTT_KEEP_SESSOIN          true
+#define MQTT_WILL_TOPIC            "dev/offline"
+#define MQTT_WILL_MESSAGE          "000000"
+#define MQTT_USERNAME              "Cocoonshu" // "ctytmovg"
+#define MQTT_PASSWORD              "89mik7" // "FI4fkpUG97nx"
+#define MQTT_PING_INTERVAL         (MQTT_KEEP_ALIVE * 1000 / 2)
 
 enum QoS {
 	MQTT_QoS_AT_MOST_ONCE  = 0x00,

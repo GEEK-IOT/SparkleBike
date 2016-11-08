@@ -30,6 +30,7 @@
 
 #include "c_types.h"
 
+#define MQTT_PROTOCOL_OK       1
 #define MQTT_STREAM_INVALID    0 // ignore
 #define MQTT_PROTOCOL_ILLEGAL -1 // should disconnect
 

@@ -31,10 +31,15 @@
 
 #include "cosmart/mqtt/mqtt.h"
 #include "cosmart/wifimanager.h"
+#include "cosmart/timer.h"
 #include "cosmart/config.h"
 #include "user_interface.h"
 #include "osapi.h"
 #include "mem.h"
+
+const char* MQTT_SUBSCRIBE_LIST[] = {
+		"dev/oled12864/display"
+};
 
 #ifndef DELETE_POINTER
 #define DELETE_POINTER(ptr) if (ptr != NULL) {os_free(ptr); ptr = NULL;}
@@ -45,6 +50,7 @@
 
 typedef struct espconn Connnection;
 
+LOCAL void ping();
 LOCAL void onSystemTask(os_event_t *event);
 LOCAL void onDNSResponding(const char* name, ip_addr_t* ip, void* args);
 LOCAL void onTCPConnected(void* args);
@@ -52,9 +58,11 @@ LOCAL void onTCPReconnected(void* args, sint8 error);
 LOCAL void onTCPDisconnected(void* args);
 LOCAL void onTCPSent(void* args);
 LOCAL void onTCPReceived(void *args, char *data, unsigned short length);
+LOCAL void onPingTimeout(void *arg);
 
 LOCAL os_event_t  mTaskQueue[MQTT_TASK_QUEUE_SIZE];
-LOCAL MQTTClient* mClient = NULL;
+LOCAL MQTTClient* mClient    = NULL;
+LOCAL Timer*      mPingTimer = NULL;
 
 void ICACHE_FLASH_ATTR MQTT_initialize() {
 	Log_printfln("");
@@ -115,6 +123,7 @@ LOCAL ICACHE_FLASH_ATTR void onSystemTask(os_event_t *event) {
 				client->currentTask = MQTT_TASK_DNSING;
 			}
 		} break;
+
 		case MQTT_TASK_CONNECT: {
 			client->currentTask = MQTT_TASK_CONNECTING;
 			if (client->enabledSSL) {
@@ -124,6 +133,13 @@ LOCAL ICACHE_FLASH_ATTR void onSystemTask(os_event_t *event) {
 				Log_printfln("[MQTT] Sent TCP connect to %s", client->server);
 				espconn_connect(client->connection);
 			}
+		} break;
+
+		case MQTT_TASK_ABORT_CONNECTION: {
+			espconn_disconnect(mClient->connection);
+			DELETE_POINTER(mClient->connection->proto.tcp);
+			DELETE_POINTER(mClient->connection);
+			mClient->currentTask = MQTT_TASK_NONE;
 		} break;
 	}
 }
@@ -190,17 +206,20 @@ LOCAL ICACHE_FLASH_ATTR void onTCPConnected(void* args) {
 	Log_printfln("[Total: %d]", client->protocolStream->encodedStreamLength);
 
 	DELETE_POINTER(client->protocolStream->fixedHeader);
-		DELETE_POINTER(client->protocolStream->variableHeader);
-		DELETE_POINTER(client->protocolStream->payload);
-		DELETE_POINTER(client->protocolStream);
+	DELETE_POINTER(client->protocolStream->variableHeader);
+	DELETE_POINTER(client->protocolStream->payload);
+	DELETE_POINTER(client->protocolStream);
 }
 
 LOCAL ICACHE_FLASH_ATTR void onTCPReconnected(void* args, sint8 error) {
 	Log_printfln("[MQTT][onTCPReconnected]");
+	MQTT_connect();
 }
 
 LOCAL ICACHE_FLASH_ATTR void onTCPDisconnected(void* args) {
 	Log_printfln("[MQTT][onTCPDisconnected]");
+	mClient->currentTask = MQTT_TASK_ABORT_CONNECTION;
+	system_os_post(MQTT_TASK_PRIORITY, MQTT_TASK_SIGNAL, (os_param_t)mClient);
 }
 
 LOCAL ICACHE_FLASH_ATTR void onTCPSent(void* args) {
@@ -226,11 +245,6 @@ LOCAL ICACHE_FLASH_ATTR void onTCPReceived(void *args, char *data, unsigned shor
 		}
 		DELETE_POINTER(client->protocolStream);
 	}
-//	client->protocolStream = (ProtocolStream*) os_malloc(sizeof(ProtocolStream));
-//	client->protocolStream->fixedHeader = (FixHeader*) os_malloc(sizeof(FixHeader));
-//	client->protocolStream->fixedHeaderLength = sizeof(FixHeader);
-//	os_memset(client->protocolStream->fixedHeader, NULL, client->protocolStream->fixedHeaderLength);
-//	os_memcpy(client->protocolStream->fixedHeader, data, client->protocolStream->fixedHeaderLength);
 
 	uint8 packetType = *(data + 0);
 	packetType = (packetType >> 4) & 0x0F;
@@ -243,9 +257,81 @@ LOCAL ICACHE_FLASH_ATTR void onTCPReceived(void *args, char *data, unsigned shor
 					connection->proto.tcp->remote_ip[2],
 					connection->proto.tcp->remote_ip[3],
 					connection->proto.tcp->remote_port);
+			client->currentTask = MQTT_TASK_NONE;
+			ping();
+		} break;
+
+		case MQTT_PING_ACK: {
+			Log_printfln("[MQTT] Received [PING_ACK] from %d.%d.%d.%d:%d",
+					connection->proto.tcp->remote_ip[0],
+					connection->proto.tcp->remote_ip[1],
+					connection->proto.tcp->remote_ip[2],
+					connection->proto.tcp->remote_ip[3],
+					connection->proto.tcp->remote_port);
+			client->currentTask = MQTT_TASK_NONE;
 		} break;
 	}
 
+}
+
+LOCAL ICACHE_FLASH_ATTR void onPingTimeout(void *arg) {
+	Log_printfln("[MQTT][ping] #1");
+	if (mClient->currentTask == MQTT_TASK_NONE) {
+		// Send PING to MQTT
+		Log_printfln("[MQTT][ping] #3 state = %d", mClient->connection->state);
+		if (mClient->connection->state == ESPCONN_CONNECT) {
+			// Send PING
+			if (mClient->protocolStream != NULL) {
+				DELETE_POINTER(mClient->protocolStream->fixedHeader);
+				DELETE_POINTER(mClient->protocolStream->variableHeader);
+				DELETE_POINTER(mClient->protocolStream->payload);
+			}
+			DELETE_POINTER(mClient->protocolStream);
+			mClient->protocolStream = (ProtocolStream*) os_malloc(sizeof(ProtocolStream));
+			os_memset(mClient->protocolStream, NULL, sizeof(ProtocolStream));
+			MQTTProcotol_encodePingPacket(mClient->protocolStream);
+
+			espconn_send(mClient->connection,
+					mClient->protocolStream->encodedStream, mClient->protocolStream->encodedStreamLength);
+			Log_printfln("[MQTT] Sent [PING] to %s:%d", mClient->server, mClient->port);
+
+			int i;
+			Log_printf("       - ");
+			for (i = 0; i < mClient->protocolStream->encodedStreamLength; i++) {
+				Log_printf("%x ", *(mClient->protocolStream->encodedStream + i));
+			}
+			Log_printfln("[Total: %d]", mClient->protocolStream->encodedStreamLength);
+
+			DELETE_POINTER(mClient->protocolStream->fixedHeader);
+			DELETE_POINTER(mClient->protocolStream->variableHeader);
+			DELETE_POINTER(mClient->protocolStream->payload);
+			DELETE_POINTER(mClient->protocolStream);
+		} else if (mClient->connection->state == ESPCONN_READ || mClient->connection->state == ESPCONN_WRITE) {
+			Log_printfln("[MQTT] Socket is busy, cancel ping this time");
+		}
+	} else {
+		Log_printfln("[MQTT] Task is busy, cancel ping this time");
+	}
+}
+
+LOCAL ICACHE_FLASH_ATTR void ping() {
+	if (mPingTimer == NULL) {
+		mPingTimer = (Timer*) os_malloc(sizeof(Timer));
+		os_memset(mPingTimer, NULL, sizeof(Timer));
+		Timer_setCallback(mPingTimer, onPingTimeout);
+		Timer_setInterval(mPingTimer, MQTT_PING_INTERVAL);
+		Timer_setLoopable(mPingTimer, true);
+		Timer_setTimerUnit(mPingTimer, MSTimer);
+		Timer_start(mPingTimer);
+	}
+}
+
+LOCAL ICACHE_FLASH_ATTR void unping() {
+	if (mPingTimer != NULL) {
+		Timer_stop(mPingTimer);
+		os_free(mPingTimer);
+		mPingTimer = NULL;
+	}
 }
 
 void ICACHE_FLASH_ATTR MQTT_connect() {
@@ -282,4 +368,7 @@ void ICACHE_FLASH_ATTR MQTT_connect() {
 	mClient->currentTask = MQTT_TASK_DNS;
 	system_os_post(MQTT_TASK_PRIORITY, MQTT_TASK_SIGNAL, (os_param_t)mClient);
 }
-void ICACHE_FLASH_ATTR MQTT_disconnect() {}
+
+void ICACHE_FLASH_ATTR MQTT_disconnect() {
+	// TODO Should send DISCONNECT first
+}
