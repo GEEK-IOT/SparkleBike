@@ -51,6 +51,8 @@ const char* MQTT_SUBSCRIBE_LIST[] = {
 typedef struct espconn Connnection;
 
 LOCAL void ping();
+LOCAL void unping();
+LOCAL void sendStream(MQTTClient* client);
 LOCAL void onSystemTask(os_event_t *event);
 LOCAL void onDNSResponding(const char* name, ip_addr_t* ip, void* args);
 LOCAL void onTCPConnected(void* args);
@@ -116,16 +118,22 @@ LOCAL ICACHE_FLASH_ATTR void onSystemTask(os_event_t *event) {
 		case MQTT_TASK_NONE:
 			break;
 		case MQTT_TASK_DNS: {
-			Log_printfln("[MQTT] Query host name %s", client->server);
-			if (espconn_gethostbyname(client->connection, client->server, &client->hostIP, onDNSResponding) == ESPCONN_OK) {
+			Log_printf("[MQTT] Query host name %s", client->server);
+			sint8 result = espconn_gethostbyname(client->connection, client->server, &client->hostIP, onDNSResponding);
+			if (result == ESPCONN_OK) {
+				Log_printfln(" - OK");
 				onDNSResponding(client->server, &client->hostIP, (void*) client->connection);
-			} else {
+			} else if (result == ESPCONN_INPROGRESS){
 				client->currentTask = MQTT_TASK_DNSING;
+				Log_printfln(" - doing");
+			} else {
+				Log_printfln(" - failed, result = %d", result);
 			}
 		} break;
 
 		case MQTT_TASK_CONNECT: {
 			client->currentTask = MQTT_TASK_CONNECTING;
+			client->status = STATUS_CONNECTING;
 			if (client->enabledSSL) {
 				Log_printfln("[MQTT] Sent SSL connect to %s", client->server);
 				espconn_secure_connect(client->connection);
@@ -139,7 +147,20 @@ LOCAL ICACHE_FLASH_ATTR void onSystemTask(os_event_t *event) {
 			espconn_disconnect(mClient->connection);
 			DELETE_POINTER(mClient->connection->proto.tcp);
 			DELETE_POINTER(mClient->connection);
+			if (mClient->protocolStream != NULL) {
+				DELETE_POINTER(mClient->protocolStream->fixedHeader);
+				DELETE_POINTER(mClient->protocolStream->variableHeader);
+				DELETE_POINTER(mClient->protocolStream->payload);
+			}
 			mClient->currentTask = MQTT_TASK_NONE;
+		} break;
+
+		case MQTT_TASK_RECONNECT: {
+			espconn_disconnect(mClient->connection);
+			DELETE_POINTER(mClient->connection->proto.tcp);
+			DELETE_POINTER(mClient->connection);
+			mClient->currentTask = MQTT_TASK_NONE;
+			MQTT_connect();
 		} break;
 	}
 }
@@ -176,6 +197,8 @@ LOCAL ICACHE_FLASH_ATTR void onTCPConnected(void* args) {
 	struct espconn* connection = (struct espconn *)args;
 	MQTTClient*     client     = (MQTTClient *)connection->reverse;
 
+	client->status = STATUS_IDLE;
+
 	if (client->protocolStream != NULL) {
 		DELETE_POINTER(client->protocolStream->fixedHeader);
 		DELETE_POINTER(client->protocolStream->variableHeader);
@@ -194,16 +217,7 @@ LOCAL ICACHE_FLASH_ATTR void onTCPConnected(void* args) {
 			client->isCleanSession,
 			client->keepAlive);
 
-	espconn_send(client->connection,
-			client->protocolStream->encodedStream, client->protocolStream->encodedStreamLength);
-	Log_printfln("[MQTT] Sent [CONNECT] to %s:%d", mClient->server, mClient->port);
-
-	int i;
-	Log_printf("       - ");
-	for (i = 0; i < client->protocolStream->encodedStreamLength; i++) {
-		Log_printf("%x ", *(client->protocolStream->encodedStream + i));
-	}
-	Log_printfln("[Total: %d]", client->protocolStream->encodedStreamLength);
+	sendStream(client);
 
 	DELETE_POINTER(client->protocolStream->fixedHeader);
 	DELETE_POINTER(client->protocolStream->variableHeader);
@@ -212,18 +226,88 @@ LOCAL ICACHE_FLASH_ATTR void onTCPConnected(void* args) {
 }
 
 LOCAL ICACHE_FLASH_ATTR void onTCPReconnected(void* args, sint8 error) {
-	Log_printfln("[MQTT][onTCPReconnected]");
+	Log_printf("[MQTT][onTCPReconnected] Error: ");
+	switch (error) {
+	case ESPCONN_TIMEOUT: {
+		Log_printfln("timeout");
+		// Timeout
+	} break;
+	case ESPCONN_ABRT: {
+		Log_printfln("connection aborted");
+		// Connection aborted
+	} break;
+	case ESPCONN_RST: {
+		Log_printfln("connection reset");
+		// Connection reset
+	} break;
+	case ESPCONN_CLSD: {
+		Log_printfln("connection closed");
+		// Connection closed
+	} break;
+	case ESPCONN_CONN: {
+		Log_printfln("not connected yet");
+		// Not connected
+	} break;
+	case ESPCONN_HANDSHAKE: {
+		Log_printfln("SSL handshake failed");
+		// SSL handshake failed
+	} break;
+	case ESPCONN_SSL_INVALID_DATA: {
+		Log_printfln("SSL application invalid");
+		// SSL application invalid
+	} break;
+	default: {
+		Log_printfln("%d", error);
+	} break;
+	}
+
 	MQTT_connect();
 }
 
 LOCAL ICACHE_FLASH_ATTR void onTCPDisconnected(void* args) {
 	Log_printfln("[MQTT][onTCPDisconnected]");
-	mClient->currentTask = MQTT_TASK_ABORT_CONNECTION;
-	system_os_post(MQTT_TASK_PRIORITY, MQTT_TASK_SIGNAL, (os_param_t)mClient);
+	espconn_disconnect(mClient->connection);
+	DELETE_POINTER(mClient->connection->proto.tcp);
+	DELETE_POINTER(mClient->connection);
+
+	if (mClient->status != STATUS_DISCONNECTING) {
+		MQTT_connect();
+	} else {
+		mClient->status != STATUS_IDLE;
+	}
+}
+
+LOCAL ICACHE_FLASH_ATTR void sendStream(MQTTClient* client) {
+	Log_printfln("[sendStream] status = %d", client->status);
+	if (client->status == STATUS_CONNECTING || client->status == STATUS_DISCONNECTING) {
+		return;
+	}
+
+	mClient->status = STATUS_SENDING;
+	uint8 buffer[client->protocolStream->encodedStreamLength];
+	os_memcpy(buffer, client->protocolStream->encodedStream, client->protocolStream->encodedStreamLength);
+	sint8 result = espconn_send(client->connection, buffer, client->protocolStream->encodedStreamLength);
+	if (result == ESPCONN_MAXNUM) {
+		Log_printfln(" - Failed, buffer is full");
+	} else {
+		Log_printfln(" - OK");
+		int i;
+		Log_printf("       - ");
+		for (i = 0; i < mClient->protocolStream->encodedStreamLength; i++) {
+			Log_printf("%x ", *(mClient->protocolStream->encodedStream + i));
+		}
+		Log_printfln("[Total: %d]", mClient->protocolStream->encodedStreamLength);
+	}
 }
 
 LOCAL ICACHE_FLASH_ATTR void onTCPSent(void* args) {
 	Log_printfln("[MQTT][onTCPSent]");
+	struct espconn* connection = (struct espconn *)args;
+	MQTTClient*     client     = (MQTTClient *)connection->reverse;
+	if (client->status == STATUS_SENDING) {
+		client->status = STATUS_IDLE;
+		client->keepAliveTimeCount = MQTT_PING_TIMEOUT;
+	}
 }
 
 LOCAL ICACHE_FLASH_ATTR void onTCPReceived(void *args, char *data, unsigned short length) {
@@ -275,40 +359,37 @@ LOCAL ICACHE_FLASH_ATTR void onTCPReceived(void *args, char *data, unsigned shor
 }
 
 LOCAL ICACHE_FLASH_ATTR void onPingTimeout(void *arg) {
+	mClient->keepAliveTimeCount--;
+	Log_printfln("[MQTT][ping] #0 time = %d s", mClient->keepAliveTimeCount);
+	if (mClient->keepAliveTimeCount > 0) {
+		return;
+	} else if (mClient->keepAliveTimeCount < 0) {
+		mClient->keepAliveTimeCount = -1;
+	}
+
 	Log_printfln("[MQTT][ping] #1");
-	if (mClient->currentTask == MQTT_TASK_NONE) {
+	if (mClient->currentTask == MQTT_TASK_NONE && mClient->status == STATUS_IDLE) {
 		// Send PING to MQTT
-		Log_printfln("[MQTT][ping] #3 state = %d", mClient->connection->state);
-		if (mClient->connection->state == ESPCONN_CONNECT) {
-			// Send PING
-			if (mClient->protocolStream != NULL) {
-				DELETE_POINTER(mClient->protocolStream->fixedHeader);
-				DELETE_POINTER(mClient->protocolStream->variableHeader);
-				DELETE_POINTER(mClient->protocolStream->payload);
-			}
-			DELETE_POINTER(mClient->protocolStream);
-			mClient->protocolStream = (ProtocolStream*) os_malloc(sizeof(ProtocolStream));
-			os_memset(mClient->protocolStream, NULL, sizeof(ProtocolStream));
-			MQTTProcotol_encodePingPacket(mClient->protocolStream);
+		Log_printfln("[MQTT][ping] #2");
 
-			espconn_send(mClient->connection,
-					mClient->protocolStream->encodedStream, mClient->protocolStream->encodedStreamLength);
-			Log_printfln("[MQTT] Sent [PING] to %s:%d", mClient->server, mClient->port);
-
-			int i;
-			Log_printf("       - ");
-			for (i = 0; i < mClient->protocolStream->encodedStreamLength; i++) {
-				Log_printf("%x ", *(mClient->protocolStream->encodedStream + i));
-			}
-			Log_printfln("[Total: %d]", mClient->protocolStream->encodedStreamLength);
-
+		// Send PING
+		if (mClient->protocolStream != NULL) {
 			DELETE_POINTER(mClient->protocolStream->fixedHeader);
 			DELETE_POINTER(mClient->protocolStream->variableHeader);
 			DELETE_POINTER(mClient->protocolStream->payload);
-			DELETE_POINTER(mClient->protocolStream);
-		} else if (mClient->connection->state == ESPCONN_READ || mClient->connection->state == ESPCONN_WRITE) {
-			Log_printfln("[MQTT] Socket is busy, cancel ping this time");
 		}
+		DELETE_POINTER(mClient->protocolStream);
+		mClient->protocolStream = (ProtocolStream*) os_malloc(sizeof(ProtocolStream));
+		os_memset(mClient->protocolStream, NULL, sizeof(ProtocolStream));
+		MQTTProcotol_encodePingPacket(mClient->protocolStream);
+
+		Log_printf("[MQTT] Sent [PING] to %s:%d", mClient->server, mClient->port);
+		sendStream(mClient);
+
+		DELETE_POINTER(mClient->protocolStream->fixedHeader);
+		DELETE_POINTER(mClient->protocolStream->variableHeader);
+		DELETE_POINTER(mClient->protocolStream->payload);
+		DELETE_POINTER(mClient->protocolStream);
 	} else {
 		Log_printfln("[MQTT] Task is busy, cancel ping this time");
 	}
@@ -348,15 +429,15 @@ void ICACHE_FLASH_ATTR MQTT_connect() {
 	if (mClient->connection == NULL) {
 		mClient->connection = (Connnection* )os_zalloc(sizeof(Connnection));
 	}
-	mClient->connection->type    = ESPCONN_TCP;
-	mClient->connection->state   = ESPCONN_NONE;
-	mClient->connection->reverse = mClient;
+	mClient->connection->type  = ESPCONN_TCP;
+	mClient->connection->state = ESPCONN_NONE;
 
 	if (mClient->connection->proto.tcp == NULL) {
 		mClient->connection->proto.tcp = (esp_tcp *)os_zalloc(sizeof(esp_tcp));
 	}
 	mClient->connection->proto.tcp->local_port  = espconn_port();
 	mClient->connection->proto.tcp->remote_port = mClient->port;
+	mClient->connection->reverse = mClient;
 
 	espconn_regist_connectcb(mClient->connection, onTCPConnected);
 	espconn_regist_reconcb(mClient->connection, onTCPReconnected);
@@ -370,5 +451,15 @@ void ICACHE_FLASH_ATTR MQTT_connect() {
 }
 
 void ICACHE_FLASH_ATTR MQTT_disconnect() {
-	// TODO Should send DISCONNECT first
+	Log_printfln("[MQTT] Disconnect from %s:%d", mClient->server, mClient->port);
+
+	unping();
+	if (false/* WiFi down || TCP down */) {
+		mClient->currentTask = MQTT_TASK_ABORT_CONNECTION;
+		system_os_post(MQTT_TASK_PRIORITY, MQTT_TASK_SIGNAL, (os_param_t)mClient);
+	} else {
+		mClient->status = STATUS_DISCONNECTING;
+		mClient->currentTask = MQTT_TASK_DISCONNECT;
+		system_os_post(MQTT_TASK_PRIORITY, MQTT_TASK_SIGNAL, (os_param_t)mClient);
+	}
 }

@@ -14,6 +14,11 @@
 #include "espconn.h"
 #include "cosmart/mqtt/mqtt_protocol.h"
 
+#define STATUS_IDLE          0
+#define STATUS_SENDING       1
+#define STATUS_CONNECTING    2
+#define STATUS_DISCONNECTING 3
+
 #define MQTT_TASK_SIGNAL           0x10
 #define MQTT_TASK_PRIORITY         2
 #define MQTT_TASK_QUEUE_SIZE       2
@@ -25,6 +30,7 @@
 #define MQTT_TASK_DISCONNECT       0x05
 #define MQTT_TASK_DISCONNECTING    0x06
 #define MQTT_TASK_ABORT_CONNECTION 0x07
+#define MQTT_TASK_RECONNECT        0x08
 
 #define MQTT_PROTOCOL_LEVEL_3_1_1  0x04
 #define MAX_REMAIN_LENGTH          268435455
@@ -40,7 +46,8 @@
 #define MQTT_WILL_MESSAGE          "000000"
 #define MQTT_USERNAME              "Cocoonshu" // "ctytmovg"
 #define MQTT_PASSWORD              "89mik7" // "FI4fkpUG97nx"
-#define MQTT_PING_INTERVAL         (MQTT_KEEP_ALIVE * 1000 / 2)
+#define MQTT_PING_INTERVAL         1000
+#define MQTT_PING_TIMEOUT          (MQTT_KEEP_ALIVE / 2)
 
 enum QoS {
 	MQTT_QoS_AT_MOST_ONCE  = 0x00,
@@ -92,6 +99,8 @@ typedef struct {
 	ip_addr_t       hostIP;
 	uint8           currentTask;
 	ProtocolStream* protocolStream;
+	sint8           status;
+	int             keepAliveTimeCount;
 } MQTTClient;
 
 typedef void OnMessageReceived(const char* topic, const char* message);
