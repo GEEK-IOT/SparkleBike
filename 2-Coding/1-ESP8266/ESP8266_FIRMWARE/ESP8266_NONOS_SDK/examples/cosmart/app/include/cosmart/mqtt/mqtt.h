@@ -48,7 +48,6 @@
 #define MQTT_PASSWORD              "89mik7" // "FI4fkpUG97nx"
 #define MQTT_PING_INTERVAL         1000
 #define MQTT_PING_TIMEOUT          (MQTT_KEEP_ALIVE / 2)
-#define MQTT_SENT_TIMEOUT          15
 
 enum QoS {
 	MQTT_QoS_AT_MOST_ONCE  = 0x00,
@@ -102,7 +101,6 @@ typedef struct {
 	ProtocolStream* protocolStream;
 	sint8           status;
 	int             keepAliveTimeCount;
-	int             sendTimeCount;
 } MQTTClient;
 
 typedef void OnMessageReceived(const char* topic, const char* message);
@@ -114,7 +112,6 @@ void        MQTT_setAuthentication(const char* clientID, const char* username, c
 void        MQTT_setWill(const char* willTopic, const char* willMessage);
 void        MQTT_connect();
 void        MQTT_disconnect();
-void        MQTT_reconnect();
 void        MQTT_subscribe();
 void        MQTT_unsubscribe();
 void        MQTT_publish(const char* topic, const char* message);

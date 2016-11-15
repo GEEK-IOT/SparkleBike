@@ -145,7 +145,6 @@ LOCAL ICACHE_FLASH_ATTR void onSystemTask(os_event_t *event) {
 
 		case MQTT_TASK_ABORT_CONNECTION: {
 			espconn_disconnect(mClient->connection);
-			espconn_delete(mClient->connection);
 			DELETE_POINTER(mClient->connection->proto.tcp);
 			DELETE_POINTER(mClient->connection);
 			if (mClient->protocolStream != NULL) {
@@ -158,12 +157,10 @@ LOCAL ICACHE_FLASH_ATTR void onSystemTask(os_event_t *event) {
 
 		case MQTT_TASK_RECONNECT: {
 			espconn_disconnect(mClient->connection);
-			espconn_delete(mClient->connection);
 			DELETE_POINTER(mClient->connection->proto.tcp);
 			DELETE_POINTER(mClient->connection);
 			mClient->currentTask = MQTT_TASK_NONE;
-			mClient->status = STATUS_IDLE;
-			MQTT_reconnect();
+			MQTT_connect();
 		} break;
 	}
 }
@@ -231,56 +228,50 @@ LOCAL ICACHE_FLASH_ATTR void onTCPConnected(void* args) {
 LOCAL ICACHE_FLASH_ATTR void onTCPReconnected(void* args, sint8 error) {
 	Log_printf("[MQTT][onTCPReconnected] Error: ");
 	switch (error) {
-		case ESPCONN_TIMEOUT: {
-			Log_printfln("timeout");
-			MQTT_reconnect();
-		} break;
-
-		case ESPCONN_ABRT: {
-			Log_printfln("connection aborted");
-			MQTT_reconnect();
-		} break;
-
-		case ESPCONN_RST: {
-			Log_printfln("connection reset");
-			MQTT_reconnect();
-		} break;
-
-		case ESPCONN_CLSD: {
-			Log_printfln("connection closed");
-			MQTT_reconnect();
-		} break;
-
-		case ESPCONN_CONN: {
-			Log_printfln("not connected yet");
-			// Not connected
-		} break;
-
-		case ESPCONN_HANDSHAKE: {
-			Log_printfln("SSL handshake failed");
-			MQTT_reconnect();
-		} break;
-
-		case ESPCONN_SSL_INVALID_DATA: {
-			Log_printfln("SSL application invalid");
-			MQTT_reconnect();
-		} break;
-
-		default: {
-			Log_printfln("%d", error);
-		} break;
+	case ESPCONN_TIMEOUT: {
+		Log_printfln("timeout");
+		// Timeout
+	} break;
+	case ESPCONN_ABRT: {
+		Log_printfln("connection aborted");
+		// Connection aborted
+	} break;
+	case ESPCONN_RST: {
+		Log_printfln("connection reset");
+		// Connection reset
+	} break;
+	case ESPCONN_CLSD: {
+		Log_printfln("connection closed");
+		// Connection closed
+	} break;
+	case ESPCONN_CONN: {
+		Log_printfln("not connected yet");
+		// Not connected
+	} break;
+	case ESPCONN_HANDSHAKE: {
+		Log_printfln("SSL handshake failed");
+		// SSL handshake failed
+	} break;
+	case ESPCONN_SSL_INVALID_DATA: {
+		Log_printfln("SSL application invalid");
+		// SSL application invalid
+	} break;
+	default: {
+		Log_printfln("%d", error);
+	} break;
 	}
+
+	MQTT_connect();
 }
 
 LOCAL ICACHE_FLASH_ATTR void onTCPDisconnected(void* args) {
 	Log_printfln("[MQTT][onTCPDisconnected]");
 	espconn_disconnect(mClient->connection);
-	espconn_delete(mClient->connection);
 	DELETE_POINTER(mClient->connection->proto.tcp);
 	DELETE_POINTER(mClient->connection);
 
 	if (mClient->status != STATUS_DISCONNECTING) {
-		MQTT_reconnect();
+		MQTT_connect();
 	} else {
 		mClient->status != STATUS_IDLE;
 	}
@@ -296,7 +287,6 @@ LOCAL ICACHE_FLASH_ATTR void sendStream(MQTTClient* client) {
 	uint8 buffer[client->protocolStream->encodedStreamLength];
 	os_memcpy(buffer, client->protocolStream->encodedStream, client->protocolStream->encodedStreamLength);
 	sint8 result = espconn_send(client->connection, buffer, client->protocolStream->encodedStreamLength);
-	client->sendTimeCount = MQTT_SENT_TIMEOUT;
 	if (result == ESPCONN_MAXNUM) {
 		Log_printfln(" - Failed, buffer is full");
 	} else {
@@ -369,28 +359,19 @@ LOCAL ICACHE_FLASH_ATTR void onTCPReceived(void *args, char *data, unsigned shor
 }
 
 LOCAL ICACHE_FLASH_ATTR void onPingTimeout(void *arg) {
-	if (mClient->status == STATUS_SENDING) {
-		mClient->sendTimeCount--;
-		if (mClient->sendTimeCount < 0) {
-			Log_printfln("[MQTT] Sending timeout, reconnect");
-			unping();
-			mClient->currentTask = MQTT_TASK_RECONNECT;
-			system_os_post(MQTT_TASK_PRIORITY, MQTT_TASK_SIGNAL, (os_param_t)mClient);
-			return;
-		}
-	} else {
-		mClient->sendTimeCount = 0;
-	}
 	mClient->keepAliveTimeCount--;
-
+	Log_printfln("[MQTT][ping] #0 time = %d s", mClient->keepAliveTimeCount);
 	if (mClient->keepAliveTimeCount > 0) {
 		return;
 	} else if (mClient->keepAliveTimeCount < 0) {
 		mClient->keepAliveTimeCount = -1;
 	}
 
-	Log_printfln("[MQTT][ping] PingTimer = %d s, SendTimer = %d s", mClient->keepAliveTimeCount, mClient->sendTimeCount);
+	Log_printfln("[MQTT][ping] #1");
 	if (mClient->currentTask == MQTT_TASK_NONE && mClient->status == STATUS_IDLE) {
+		// Send PING to MQTT
+		Log_printfln("[MQTT][ping] #2");
+
 		// Send PING
 		if (mClient->protocolStream != NULL) {
 			DELETE_POINTER(mClient->protocolStream->fixedHeader);
@@ -473,32 +454,12 @@ void ICACHE_FLASH_ATTR MQTT_disconnect() {
 	Log_printfln("[MQTT] Disconnect from %s:%d", mClient->server, mClient->port);
 
 	unping();
-
-	bool isWifiOK = wifi_station_get_connect_status() == STATION_GOT_IP;
-	if (!(isWifiOK)) {
+	if (false/* WiFi down || TCP down */) {
 		mClient->currentTask = MQTT_TASK_ABORT_CONNECTION;
 		system_os_post(MQTT_TASK_PRIORITY, MQTT_TASK_SIGNAL, (os_param_t)mClient);
 	} else {
 		mClient->status = STATUS_DISCONNECTING;
 		mClient->currentTask = MQTT_TASK_DISCONNECT;
 		system_os_post(MQTT_TASK_PRIORITY, MQTT_TASK_SIGNAL, (os_param_t)mClient);
-	}
-}
-
-void ICACHE_FLASH_ATTR MQTT_reconnect() {
-	unping();
-
-	bool isWifiOK = wifi_station_get_connect_status() == STATION_GOT_IP;
-	if (isWifiOK) {
-		if (mClient->connection != NULL) {
-			espconn_disconnect(mClient->connection);
-			espconn_delete(mClient->connection);
-			if (mClient->connection != NULL) {
-				DELETE_POINTER(mClient->connection->proto.tcp);
-			}
-			DELETE_POINTER(mClient->connection);
-		}
-
-		MQTT_connect();
 	}
 }
