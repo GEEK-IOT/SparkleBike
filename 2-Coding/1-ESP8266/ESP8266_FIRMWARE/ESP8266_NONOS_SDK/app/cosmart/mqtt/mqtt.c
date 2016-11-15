@@ -287,7 +287,6 @@ LOCAL ICACHE_FLASH_ATTR void onTCPDisconnected(void* args) {
 }
 
 LOCAL ICACHE_FLASH_ATTR void sendStream(MQTTClient* client) {
-	Log_printfln("[sendStream] status = %d", client->status);
 	if (client->status == STATUS_CONNECTING || client->status == STATUS_DISCONNECTING) {
 		return;
 	}
